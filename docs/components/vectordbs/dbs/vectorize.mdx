@@ -2,12 +2,16 @@
 title: "Cloudflare Vectorize"
 description: "Use Cloudflare Vectorize as a vector database in Mem0 for building AI-powered applications at the edge."
 ---
-[Cloudflare Vectorize](https://developers.cloudflare.com/vectorize/) is a vector database offering from Cloudflare, allowing you to build AI-powered applications with vector embeddings.
 
-### Usage
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<CodeGroup>
-```typescript TypeScript
+
+
+[Cloudflare Vectorize](https://developers.cloudflare.com/vectorize/) 是 Cloudflare 提供的矢量数据库产品，允许您使用矢量嵌入构建人工智能驱动的应用程序。
+
+### 用法
+
+<代码组>```typescript TypeScript
 import { Memory } from 'mem0ai/oss';
 
 const config = {
@@ -31,19 +35,19 @@ const messages = [
 ]
 await memory.add(messages, { userId: "bob", metadata: { interest: "books" } });
 ```
-</CodeGroup>
+</代码组>
 
-### Config
+### 配置
 
-Here are the parameters available for configuring Vectorize:
+以下是可用于配置 Vectorize 的参数：
 
-<Tabs>
-<Tab title="TypeScript">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `indexName` | The name of the Vectorize index | `None` (Required) |
-| `accountId` | Your Cloudflare account ID | `None` (Required) |
-| `apiKey` | Your Cloudflare API token | `None` (Required) |
-| `dimension` | Dimensions of the embedding model | `1536` |
-</Tab>
-</Tabs>
+<标签>
+<选项卡标题=“TypeScript”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `索引名称` | Vectorize 索引的名称 | “无”（必填）|
+| `账户ID` |您的 Cloudflare 帐户 ID | “无”（必填）|
+| `apiKey` |您的 Cloudflare API 令牌 | “无”（必填）|
+| `尺寸` |嵌入模型的尺寸| `1536` |
+</标签>
+</标签>

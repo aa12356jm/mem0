@@ -4,35 +4,35 @@ description: "Guide to contributing code to Mem0, covering the fork and clone wo
 icon: "code"
 ---
 
-# Development Contributions
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-We strive to make contributions **easy, collaborative, and enjoyable**. Follow the steps below to ensure a smooth contribution process.
 
-## Submitting Your Contribution through PR
 
-To contribute, follow these steps:
+# 开发贡献
 
-1. **Fork & Clone** the repository: [Mem0 on GitHub](https://github.com/mem0ai/mem0)
-2. **Create a Feature Branch**: Use a dedicated branch for your changes, e.g., `feature/my-new-feature`
-3. **Implement Changes**: If adding a feature or fixing a bug, ensure to:
-   - Write necessary **tests**
-   - Add **documentation, docstrings, and runnable examples**
-4. **Code Quality Checks**:
-   - Run **linting** to catch style issues
-   - Ensure **all tests pass**
-5. **Submit a Pull Request**
+我们努力做出贡献**轻松、协作且愉快**。请按照以下步骤操作，以确保贡献过程顺利进行。
 
-For detailed guidance on pull requests, refer to [GitHub's documentation](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
+## 通过 PR 提交您的贡献
+
+要做出贡献，请按照以下步骤操作：
+
+1. **分叉并克隆**存储库：[GitHub 上的 Mem0](https://github.com/mem0ai/mem0)
+2. **创建功能分支**：使用专用分支进行更改，例如“feature/my-new-feature”
+3. **实施更改**：如果添加功能或修复错误，请确保：
+   - 编写必要的**测试**
+   - 添加**文档、文档字符串和可运行示例**
+4. **代码质量检查**：
+   - 运行 **linting** 来捕获样式问题
+   - 确保**所有测试通过**
+5. **提交拉取请求**
+
+有关拉取请求的详细指南，请参阅 [GitHub 的文档](https://docs.github.com)。com/en/pull-requests/collaborating-with-pull-requests/propose-changes-to-your-work-with-pull-requests/creating-a-pull-request)。
 
 ---
 
-## Dependency Management
+## 依赖管理
 
-We use `hatch` as our package manager. Install it by following the [official instructions](https://hatch.pypa.io/latest/install/).
-
-**Do NOT use `pip` or `conda` for dependency management.** Instead, follow these steps in order:
-
-```bash
+我们使用“hatch”作为包管理器。按照[官方说明](https://hatch.py​​pa.io/latest/install/)安装它。**不要使用 `pip` 或 `conda` 进行依赖管理。** 相反，请按顺序执行以下步骤：```bash
 # 1. Install base dependencies
 make install
 
@@ -43,51 +43,38 @@ hatch -e dev_py_3_11 shell  # For dev_py_3_11 (differences are mentioned in pypr
 # 3. Install all optional dependencies
 make install_all
 ```
-
 ---
 
-## Development Standards
+## 开发标准
 
-### Pre-commit Hooks
+### 预提交挂钩
 
-Ensure `pre-commit` is installed before contributing:
-
-```bash
+确保在贡献之前安装了“pre-commit”：```bash
 pre-commit install
 ```
+### 使用 `ruff` 进行 Linting
 
-### Linting with `ruff`
-
-Run the linter and fix any reported issues before submitting your PR:
-
-```bash
+在提交 PR 之前运行 linter 并修复任何报告的问题：```bash
 make lint
 ```
+### 代码格式化
 
-### Code Formatting
-
-To maintain a consistent code style, format your code:
-
-```bash
+要保持一致的代码风格，请格式化您的代码：```bash
 make format
 ```
+### 使用 `pytest` 进行测试
 
-### Testing with `pytest`
-
-Run tests to verify functionality before submitting your PR:
-
-```bash
+在提交 PR 之前运行测试以验证功能：```bash
 make test
 ```
-
-**Note:** Some dependencies have been removed from the main dependencies to reduce package size. Run `make install_all` to install necessary dependencies before running tests.
-
----
-
-## Release Process
-
-Currently, releases are handled manually. We aim for frequent releases, typically when new features or bug fixes are introduced.
+**注意：** 一些依赖项已从主要依赖项中删除，以减少包大小。在运行测试之前运行“make install_all”来安装必要的依赖项。
 
 ---
 
-Thank you for contributing to Mem0!
+## 发布流程
+
+目前，发布是手动处理的。我们的目标是频繁发布，通常是在引入新功能或错误修复时。
+
+---
+
+感谢您对 Mem0 的贡献！

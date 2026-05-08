@@ -3,22 +3,20 @@ title: Bedrock with Persistent Memory
 description: "Pair Mem0 with AWS Bedrock and OpenSearch for a managed stack."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-This example demonstrates how to configure and use the `mem0ai` SDK with **AWS Bedrock** and **OpenSearch Service (AOSS)** for persistent memory capabilities in Python.
 
-## Installation
 
-Install the required dependencies to include the Amazon data stack, including **boto3**, **opensearch-py**, and **langchain-aws**:
+此示例演示如何在 Python 中配置和使用“mem0ai”开发工具包与 **AWS Bedrock** 和 **OpenSearch Service (AOSS)** 来实现持久内存功能。
 
-```bash
+## 安装
+
+安装所需的依赖项以包含 Amazon 数据堆栈，包括 **boto3**、**opensearch-py** 和 **langchain-aws**：```bash
 pip install "mem0ai[extras]"
 ```
+## 环境设置
 
-## Environment Setup
-
-Set your AWS environment variables:
-
-```python
+设置您的 AWS 环境变量：```python
 import os
 
 # Set these in your environment or notebook
@@ -31,15 +29,12 @@ print(os.environ['AWS_REGION'])
 print(os.environ['AWS_ACCESS_KEY_ID'])
 print(os.environ['AWS_SECRET_ACCESS_KEY'])
 ```
+## 配置与使用
 
-## Configuration and Usage
-
-This sets up Mem0 with:
-- [AWS Bedrock for LLM](https://docs.mem0.ai/components/llms/models/aws_bedrock)
-- [AWS Bedrock for embeddings](https://docs.mem0.ai/components/embedders/models/aws_bedrock#aws-bedrock)
-- [OpenSearch as the vector store](https://docs.mem0.ai/components/vectordbs/dbs/opensearch)
-
-```python
+这将 Mem0 设置为：
+- [LLM 的 AWS Bedrock](https://docs.mem0.ai/components/llms/models/aws_bedrock)
+- [用于嵌入的 AWS Bedrock](https://docs.mem0.ai/components/embedders/models/aws_bedrock#aws-bedrock)
+- [OpenSearch 作为矢量存储](https://docs.mem0.ai/components/vectordbs/dbs/opensearch)```python
 import boto3
 from opensearchpy import RequestsHttpConnection, AWSV4SignerAuth
 from mem0 import Memory
@@ -83,12 +78,9 @@ config = {
 # Initialize the memory system
 m = Memory.from_config(config)
 ```
+## 用法
 
-## Usage
-
-### Add a memory
-
-```python
+### 添加内存```python
 messages = [
     {"role": "user", "content": "I'm planning to watch a movie tonight. Any recommendations?"},
     {"role": "assistant", "content": "How about thriller movies? They can be quite engaging."},
@@ -99,33 +91,23 @@ messages = [
 # Store inferred memories (default behavior)
 result = m.add(messages, user_id="alice", metadata={"category": "movie_recommendations"})
 ```
-
-### Search a memory
-
-```python
+### 搜索记忆```python
 relevant_memories = m.search(query, filters={"user_id": "alice"})
 ```
-
-### Get all memories
-
-```python
+### 获取所有记忆```python
 all_memories = m.get_all(filters={"user_id": "alice"})
 ```
-
-### Get a specific memory
-
-```python
+### 获取特定内存```python
 memory = m.get(memory_id)
 ```
+## 结论
 
-## Conclusion
-
-With Mem0 and AWS services like Bedrock and OpenSearch, you can build intelligent AI companions that remember, adapt, and personalize their responses over time. This makes them ideal for long-term assistants, tutors, or support bots with persistent memory and natural conversation abilities.
+借助 Mem0 和 Bedrock 和 OpenSearch 等 AWS 服务，您可以构建智能 AI 伴侣，随着时间的推移，它们会记住、适应和个性化他们的响应。这使得它们成为长期助理、导师或具有持久记忆和自然对话能力的支持机器人的理想选择。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Memory Evaluation" icon="chart-line" href="/core-concepts/memory-evaluation">
-    Understand how Mem0's memory system is benchmarked and evaluated.
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="记忆评估" icon="chart-line" href="/core-concepts/memory-evaluation">
+    了解 Mem0 的内存系统如何进行基准测试和评估。
+  </卡>
+</卡组>

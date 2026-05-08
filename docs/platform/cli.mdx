@@ -5,51 +5,43 @@ icon: "terminal"
 iconType: "solid"
 ---
 
-The mem0 CLI lets you add, search, list, update, and delete memories directly from the terminal. It works with the Mem0 Platform API and is available as both an npm package and a Python package.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Both implementations provide identical behavior — same commands, same options, same output formats.
 
-<Tip>
-**Built for AI agents.** Pass `--agent` (or `--json`) as a global flag on any command to get structured JSON output optimized for programmatic consumption — sanitized fields, no colors or spinners, and errors as JSON too. Drop it into any agent tool loop with zero extra parsing.
-</Tip>
 
-## Installation
+mem0 CLI 允许您直接从终端添加、搜索、列出、更新和删除内存。它与 Mem0 平台 API 配合使用，并以 npm 包和 Python 包的形式提供。
 
-<CodeGroup>
-```bash npm
+两种实现都提供相同的行为 - 相同的命令、相同的选项、相同的输出格式。
+
+<提示>
+**为 AI 代理构建。** 在任何命令上将 `--agent` （或 `--json`） 作为全局标志传递，以获得针对编程使用而优化的结构化 JSON 输出 — 已清理的字段、无颜色或旋转器以及 JSON 格式的错误。将其放入任何代理工具循环中，并进行零额外解析。
+</提示>
+
+## 安装
+
+<代码组>```bash npm
 npm install -g @mem0/cli
 ```
 
 ```bash pip
 pip install mem0-cli
 ```
-</CodeGroup>
+</代码组>
 
-## Authentication
+## 身份验证
 
-Run the interactive setup wizard to configure your API key:
-
-```bash
+运行交互式设置向导来配置您的 API 密钥：```bash
 mem0 init
 ```
+这会提示您输入 API 密钥和默认用户 ID、验证连接并在本地保存配置。
 
-This prompts for your API key and a default user ID, validates the connection, and saves the configuration locally.
-
-For CI/CD or non-interactive environments, pass both values as flags:
-
-```bash
+对于 CI/CD 或非交互式环境，将两个值作为标志传递：```bash
 mem0 init --api-key m0-xxx --user-id alice
 ```
-
-You can also set your API key via environment variable:
-
-```bash
+您还可以通过环境变量设置 API 密钥：```bash
 export MEM0_API_KEY="m0-xxx"
 ```
-
-## Quick start
-
-```bash
+## 快速开始```bash
 # Add a memory
 mem0 add "I prefer dark mode and use vim keybindings" --user-id alice
 
@@ -68,118 +60,94 @@ mem0 update <memory-id> "I prefer light mode now"
 # Delete a memory
 mem0 delete <memory-id>
 ```
+## 命令
 
-## Commands
+### `mem0 初始化`
 
-### `mem0 init`
-
-Interactive setup wizard. Prompts for your API key and default user ID.
-
-```bash
+交互式设置向导。提示输入 API 密钥和默认用户 ID。```bash
 mem0 init
 mem0 init --api-key m0-xxx --user-id alice
 mem0 init --email alice@company.com
 ```
-
-If an existing configuration is detected, the CLI will ask for confirmation before overwriting. Use `--force` to skip the prompt (useful in CI/CD pipelines).
-
-```bash
+如果检测到现有配置，CLI 将在覆盖之前要求确认。使用 `--force` 跳过提示（在 CI/CD 管道中很有用）。```bash
 mem0 init --api-key m0-xxx --user-id alice --force
 ```
-
-| Flag | Description |
+|旗帜|描述 |
 |------|-------------|
-| `--api-key` | API key (skip prompt) |
-| `-u, --user-id` | Default user ID (skip prompt) |
-| `--email` | Login via email verification code |
-| `--code` | Verification code (use with `--email` for non-interactive login) |
-| `--force` | Overwrite existing config without confirmation |
+| `--api-key` | API 密钥（跳过提示）|
+| `-u, --user-id` |默认用户 ID（跳过提示）|
+| `--电子邮件` |邮箱验证码登录 |
+| `--代码` |验证码（与“--email”一起使用进行非交互式登录）|
+| `--force` |无需确认即可覆盖现有配置 |
 
-### `mem0 add`
+### `mem0 添加`
 
-Add a memory from text, a JSON messages array, a file, or stdin.
-
-```bash
+从文本、JSON 消息数组、文件或标准输入添加内存。```bash
 mem0 add "I prefer dark mode" --user-id alice
 mem0 add --file conversation.json --user-id alice
 echo "Loves hiking on weekends" | mem0 add --user-id alice
 ```
-
-| Flag | Description |
+|旗帜|描述 |
 |------|-------------|
-| `-u, --user-id` | Scope to a user |
-| `--agent-id` | Scope to an agent |
-| `--messages` | Conversation messages as JSON |
-| `-f, --file` | Read messages from a JSON file |
-| `-m, --metadata` | Custom metadata as JSON |
-| `--categories` | Categories (JSON array or comma-separated) |
-| `--graph / --no-graph` | Enable or disable graph memory extraction |
-| `-o, --output` | Output format: `text`, `json`, `quiet` |
+| `-u, --user-id` |范围到用户|
+| `--agent-id` |代理范围 |
+| `--消息` | JSON 格式的对话消息 |
+| `-f, --file` |从 JSON 文件读取消息 |
+| `-m，--元数据` | JSON 格式的自定义元数据 |
+| `--类别` |类别（JSON 数组或逗号分隔）|
+| `--graph / --no-graph` |启用或禁用图形内存提取 |
+| `-o, --output` |输出格式：`text`、`json`、`quiet` |
 
-### `mem0 search`
+### `mem0 搜索`
 
-Search memories using natural language.
-
-```bash
+使用自然语言搜索记忆。```bash
 mem0 search "dietary restrictions" --user-id alice
 mem0 search "preferred tools" --user-id alice --output json --top-k 5
 ```
-
-| Flag | Description |
+|旗帜|描述 |
 |------|-------------|
-| `-u, --user-id` | Filter by user |
-| `-k, --top-k` | Number of results (default: 10) |
-| `--threshold` | Minimum similarity score (default: 0.3) |
-| `--rerank` | Enable reranking |
-| `--keyword` | Use keyword search instead of semantic |
-| `--filter` | Advanced filter expression (JSON) |
-| `--graph / --no-graph` | Enable or disable graph in search |
-| `-o, --output` | Output format: `text`, `json`, `table` |
+| `-u, --user-id` |按用户过滤 |
+| `-k, --top-k` |结果数（默认：10）|
+| `--阈值` |最小相似度分数（默认值：0.3）|
+| `--重新排名` |启用重新排名 |
+| `--关键字` |使用关键字搜索而不是语义 |
+| `--过滤器` |高级过滤表达式（JSON）|
+| `--graph / --no-graph` |在搜索中启用或禁用图表 |
+| `-o, --output` |输出格式：`text`、`json`、`table` |
 
-### `mem0 list`
+### `mem0 列表`
 
-List memories with optional filters and pagination.
-
-```bash
+使用可选的过滤器和分页列出记忆。```bash
 mem0 list --user-id alice
 mem0 list --user-id alice --category preferences --output json
 mem0 list --user-id alice --after 2024-01-01 --page-size 50
 ```
-
-| Flag | Description |
+|旗帜|描述 |
 |------|-------------|
-| `-u, --user-id` | Filter by user |
-| `--page` | Page number (default: 1) |
-| `--page-size` | Results per page (default: 100) |
-| `--category` | Filter by category |
-| `--after` | Created after date (YYYY-MM-DD) |
-| `--before` | Created before date (YYYY-MM-DD) |
-| `-o, --output` | Output format: `text`, `json`, `table` |
+| `-u, --user-id` |按用户过滤 |
+| `--页` |页码（默认：1）|
+| `--页面大小` |每页结果（默认：100）|
+| `--类别` |按类别过滤 |
+| `--之后` |创建于日期 (YYYY-MM-DD) | 之后
+| `--之前` |创建于日期 (YYYY-MM-DD) 之前 |
+| `-o, --output` |输出格式：`text`、`json`、`table` |
 
-### `mem0 get`
+### `mem0 获取`
 
-Retrieve a specific memory by ID.
-
-```bash
+通过ID检索特定内存。```bash
 mem0 get 7b3c1a2e-4d5f-6789-abcd-ef0123456789
 mem0 get 7b3c1a2e-4d5f-6789-abcd-ef0123456789 --output json
 ```
+### `mem0 更新`
 
-### `mem0 update`
-
-Update the text or metadata of an existing memory.
-
-```bash
+更新现有内存的文本或元数据。```bash
 mem0 update <memory-id> "Updated preference text"
 mem0 update <memory-id> --metadata '{"priority": "high"}'
 echo "new text" | mem0 update <memory-id>
 ```
+### `mem0 删除`
 
-### `mem0 delete`
-
-Delete a single memory, all memories for a scope, or an entire entity.
-
-```bash
+删除单个内存、某个范围的所有内存或整个实体。```bash
 # Delete a single memory
 mem0 delete <memory-id>
 
@@ -192,114 +160,88 @@ mem0 delete --all --project --force
 # Preview what would be deleted
 mem0 delete --all --user-id alice --dry-run
 ```
-
-| Flag | Description |
+|旗帜|描述 |
 |------|-------------|
-| `--all` | Delete all memories matching scope filters |
-| `--entity` | Delete the entity and all its memories |
-| `--project` | With `--all`: delete all memories project-wide |
-| `--dry-run` | Preview without deleting |
-| `--force` | Skip confirmation prompt |
+| `--全部` |删除所有与范围过滤器匹配的记忆|
+| `--实体` |删除该实体及其所有记忆|
+| `--项目` |使用 `--all`：删除项目范围内的所有内存 |
+| `--试运行` |预览而不删除 |
+| `--force` |跳过确认提示 |
 
-### `mem0 import`
+### `mem0 导入`
 
-Bulk import memories from a JSON file.
-
-```bash
+从 JSON 文件批量导入内存。```bash
 mem0 import data.json --user-id alice
 ```
+该文件应该是一个 JSON 数组，其中每个项目都有一个“内存”（或“文本”或“内容”）字段和可选的“user_id”、“agent_id”和“元数据”字段。
 
-The file should be a JSON array where each item has a `memory` (or `text` or `content`) field and optional `user_id`, `agent_id`, and `metadata` fields.
+### `mem0 配置`
 
-### `mem0 config`
-
-View or modify the local CLI configuration.
-
-```bash
+查看或修改本地 CLI 配置。```bash
 mem0 config show              # Display current config (secrets redacted)
 mem0 config get api_key       # Get a specific value
 mem0 config set user_id bob   # Set a value
 ```
+### `mem0 实体`
 
-### `mem0 entity`
-
-List or delete entities (users, agents, apps, runs).
-
-```bash
+列出或删除实体（用户、代理、应用程序、运行）。```bash
 mem0 entity list users
 mem0 entity list agents --output json
 mem0 entity delete --user-id alice --force
 ```
+### `mem0 事件`
 
-### `mem0 event`
-
-Inspect background processing events created by async operations (e.g. bulk deletes, large add jobs).
-
-```bash
+检查异步操作创建的后台处理事件（例如批量删除、大型添加作业）。```bash
 # List recent events
 mem0 event list
 
 # Check the status of a specific event
 mem0 event status <event-id>
 ```
-
-| Flag | Description |
+|旗帜|描述 |
 |------|-------------|
-| `-o, --output` | Output format: `text`, `json` |
+| `-o, --output` |输出格式：`text`、`json` |
 
-### `mem0 status`
+### `mem0 状态`
 
-Verify your API connection and display the current project.
-
-```bash
+验证您的 API 连接并显示当前项目。```bash
 mem0 status
 ```
+### `mem0 版本`
 
-### `mem0 version`
-
-Print the CLI version.
-
-```bash
+打印 CLI 版本。```bash
 mem0 version
 ```
+## 输出格式
 
-## Output formats
+所有命令都支持“--output”标志来控制结果的显示方式：
 
-All commands support the `--output` flag to control how results are displayed:
-
-| Format | Description |
+|格式|描述 |
 |--------|-------------|
-| `text` | Human-readable output with colors and formatting (default for most commands) |
-| `json` | Structured JSON, suitable for piping to `jq` or consumption by AI agents |
-| `table` | Tabular format (default for `list`) |
-| `quiet` | Minimal output — just IDs or status codes |
-| `agent` | Structured JSON envelope with sanitized fields — set automatically by `--json`/`--agent` |
+| `文本` |具有颜色和格式的人类可读输出（大多数命令的默认设置）|
+| `json` |结构化 JSON，适合通过管道传输到“jq”或由 AI 代理使用 |
+| `表` |表格格式（默认为“列表”）|
+| `安静` |最小输出 — 仅 ID 或状态代码 |
+| `代理` |带有清理字段的结构化 JSON 信封 — 由 `--json`/`--agent` 自动设置 |
 
-Example with JSON output:
-
-```bash
+JSON 输出示例：```bash
 mem0 search "user preferences" --user-id alice --output json | jq '.data.results[].memory'
 ```
+## 与 AI 代理一起使用
 
-## Use with AI agents
+CLI 专为在 AI 代理工具循环内使用而构建。将 `--agent` 或 `--json` 作为全局标志传递到 **any** 命令以激活代理模式：
 
-The CLI is purpose-built for use inside AI agent tool loops. Pass `--agent` or `--json` as a global flag on **any** command to activate agent mode:
-
-- Every command outputs a consistent JSON envelope: `{"status", "command", "duration_ms", "scope", "count", "data"}`
-- The `data` field contains only the fields that matter — IDs, memory text, scores, categories. Noisy API fields are stripped.
-- All human-readable output is suppressed: no spinners, no colors, no banners.
-- Errors are returned as JSON to stdout with a non-zero exit code, so your agent can catch them the same way as successes.
-
-```bash
+- 每个命令都会输出一致的 JSON 信封：`{"status", "command", "duration_ms", "scope", "count", "data"}`
+- “数据”字段仅包含重要的字段 - ID、内存文本、分数、类别。嘈杂的 API 字段被剥离。
+- 所有人类可读的输出都被抑制：没有旋转器，没有颜色，没有横幅。
+- 错误以 JSON 形式返回到 stdout，并带有非零退出代码，因此您的代理可以像成功一样捕获它们。```bash
 # Drop --agent on any command and get clean, parseable JSON
 mem0 --agent search "response preferences" --user-id user-42
 mem0 --agent add "User prefers concise responses" --user-id user-42
 mem0 --agent list --user-id user-42
 mem0 --agent delete --all --user-id user-42 --force
 ```
-
-<CodeGroup>
-```json Output: mem0 --agent search "dark mode" --user-id alice
+<代码组>```json Output: mem0 --agent search "dark mode" --user-id alice
 {
   "status": "success",
   "command": "search",
@@ -323,53 +265,49 @@ mem0 --agent delete --all --user-id user-42 --force
   ]
 }
 ```
-</CodeGroup>
+</代码组>
 
-Two other agent-friendly features:
+另外两个代理友好的功能：
 
-- **`--output json`** returns structured data without sanitization — useful when you want the full raw API response
-- **`mem0 help --json`** returns the complete command tree as JSON, so agents can self-discover available commands and options
+- **`--output json`** 返回未经清理的结构化数据 - 当您需要完整的原始 API 响应时非常有用
+- **`mem0 help --json`** 以 JSON 形式返回完整的命令树，以便代理可以自行发现可用的命令和选项
 
-For non-interactive environments (CI, agent runtimes), set credentials via `mem0 init --api-key m0-xxx --user-id alice --force` or the `MEM0_API_KEY` environment variable.
+对于非交互式环境（CI、代理运行时），通过“mem0 init --api-key m0-xxx --user-id alice --force”或“MEM0_API_KEY”环境变量设置凭据。## 环境变量
 
-## Environment variables
-
-| Variable | Description |
+|变量|描述 |
 |----------|-------------|
-| `MEM0_API_KEY` | API key (overrides config file) |
-| `MEM0_BASE_URL` | API base URL |
-| `MEM0_USER_ID` | Default user ID |
-| `MEM0_AGENT_ID` | Default agent ID |
-| `MEM0_APP_ID` | Default app ID |
-| `MEM0_RUN_ID` | Default run ID |
-| `MEM0_ENABLE_GRAPH` | Enable graph memory (`true` / `false`) |
+| `MEM0_API_KEY` | API 密钥（覆盖配置文件）|
+| `MEM0_BASE_URL` | API 基本 URL |
+| `MEM0_USER_ID` |默认用户 ID |
+| `MEM0_AGENT_ID` |默认代理 ID |
+| `MEM0_APP_ID` |默认应用程序 ID |
+| `MEM0_RUN_ID` |默认运行 ID |
+| `MEM0_ENABLE_GRAPH` |启用图形内存（“true”/“false”）|
 
-Environment variables take precedence over values in the config file, which take precedence over defaults.
+环境变量优先于配置文件中的值，配置文件中的值又优先于默认值。
 
-## Global flags
+## 全局标志
 
-These flags are available on all commands:
-
-| Flag | Description |
+这些标志可用于所有命令：|旗帜|描述 |
 |------|-------------|
-| `--json` | Enable agent mode: structured JSON envelope output, no colors or spinners |
-| `--agent` | Alias for `--json` |
-| `--api-key` | Override the configured API key for this request |
-| `--base-url` | Override the configured API base URL for this request |
-| `-o, --output` | Set the output format |
+| `--json` |启用代理模式：结构化 JSON 信封输出，无颜色或微调器 |
+| `--代理` | `--json` 的别名 |
+| `--api-key` |覆盖此请求配置的 API 密钥 |
+| `--base-url` |覆盖此请求配置的 API 基本 URL |
+| `-o, --output` |设置输出格式|
 
-## What's next
+## 接下来是什么
 
-<CardGroup cols={3}>
+<卡组列={3}>
 <Card title="Quickstart" icon="bolt" href="/platform/quickstart">
-Store your first memory in under five minutes using the SDK or CLI
-</Card>
+使用 SDK 或 CLI 在五分钟内存储您的第一个记忆
+</卡>
 
-<Card title="Memory Operations" icon="database" href="/core-concepts/memory-operations/add">
-Learn about add, search, update, and delete operations in depth
-</Card>
+<Card title="内存操作" icon="database" href="/core-concepts/memory-operations/add">
+深入了解添加、搜索、更新和删除操作
+</卡>
 
-<Card title="API Reference" icon="code" href="/api-reference/memory/add-memories">
-See the complete REST API documentation
-</Card>
-</CardGroup>
+<Card title="API 参考" icon="code" href="/api-reference/memory/add-memories">
+请参阅完整的 REST API 文档
+</卡>
+</卡组>

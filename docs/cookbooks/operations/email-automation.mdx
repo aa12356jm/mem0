@@ -3,61 +3,55 @@ title: Automated Email Intelligence
 description: "Capture, categorize, and recall inbox threads using persistent memories."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-This guide demonstrates how to build an intelligent email processing system using Mem0's memory capabilities. You'll learn how to store, categorize, retrieve, and analyze emails to create a smart email management solution.
 
-## Overview
 
-Email overload is a common challenge for many professionals. By leveraging Mem0's memory capabilities, you can build an intelligent system that:
+本指南演示了如何使用 Mem0 的内存功能构建智能电子邮件处理系统。您将学习如何存储、分类、检索和分析电子邮件以创建智能电子邮件管理解决方案。
 
-- Stores emails as searchable memories
-- Categorizes emails automatically
-- Retrieves relevant past conversations
-- Prioritizes messages based on importance
-- Generates summaries and action items
+## 概述
 
-## Setup
+电子邮件过载是许多专业人士面临的共同挑战。通过利用 Mem0 的内存功能，您可以构建一个智能系统：
 
-<Tabs>
-  <Tab title="Platform">
-Before you begin, ensure you have the required dependencies installed:
+- 将电子邮件存储为可搜索的记忆
+- 自动对电子邮件进行分类
+- 检索相关的过去对话
+- 根据重要性对消息进行优先级排序
+- 生成摘要和行动项目
 
-```bash
+## 设置
+
+<标签>
+  <选项卡标题=“平台”>
+在开始之前，请确保已安装所需的依赖项：```bash
 pip install mem0ai openai
 ```
-  </Tab>
-  <Tab title="Open Source">
-Here we use **Mem0 open source** (`Memory`): all local, no API keys needed for memory. Vectors in **Qdrant**, LLM and embeddings via **Ollama**.
+</标签>
+  <选项卡标题=“开源”>
+这里我们使用**Mem0开源**（`Memory`）：全部本地，内存不需要API密钥。 **Qdrant**、LLM 中的向量和通过 **Ollama** 嵌入。
 
-### Installation
+### 安装
 
-Install the required dependencies:
-
-```bash
+安装所需的依赖项：```bash
 pip install mem0ai qdrant-client openai ollama
 ```
-
-Then start Qdrant and pull the Ollama models:
-
-```bash
+然后启动 Qdrant 并拉取 Ollama 模型：```bash
 docker run -d -p 6333:6333 qdrant/qdrant
 ollama pull llama3.1:latest
 ollama pull nomic-embed-text:latest
 ```
+<注意>您可以将 `nomic-embed-text` 替换为任何 Ollama 支持的嵌入模型（例如，`snowflake-arctic-embed`、`mxbai-embed-large`）。只需更新“embedder”配置中的“model”，并在 Qdrant 配置中设置“embedding_model_dims”以匹配模型的输出尺寸（“nomic-embed-text”为 768）。</Note>
+  </标签>
+</标签>
 
-<Note>You can swap `nomic-embed-text` for any Ollama-supported embedding model (e.g., `snowflake-arctic-embed`, `mxbai-embed-large`). Just update the `model` in the `embedder` config and set `embedding_model_dims` in the Qdrant config to match the model's output dimensions (768 for `nomic-embed-text`).</Note>
-  </Tab>
-</Tabs>
+## 实施
 
-## Implementation
+### 基本电子邮件存储系统
 
-### Basic Email Memory System
+以下示例展示了如何使用 Mem0 创建基本的电子邮件处理系统：
 
-The following example shows how to create a basic email processing system with Mem0:
-
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 import os
 from mem0 import MemoryClient
 from email.parser import Parser
@@ -209,9 +203,8 @@ processor.process_email(sample_email, user_id)
 meeting_emails = processor.search_emails("meeting schedule", user_id)
 print(f"Found {len(meeting_emails['results'])} relevant emails")
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 from mem0 import Memory
 from email.parser import Parser
 
@@ -384,54 +377,49 @@ processor.process_email(sample_email, user_id)
 meeting_emails = processor.search_emails("meeting schedule", user_id)
 print(f"Found {len(meeting_emails['results'])} relevant emails")
 ```
+<注意>
+**类别与元数据：** 平台版本使用由 Mem0 AI 分配的 `categories=["email"]`。在开源中，类别被建模为“元数据”字段（例如“memory_category”），您可以在每个“add”调用中设置这些字段，并在搜索期间进行过滤。
+</注>
+  </标签>
+</标签>
 
-<Note>
-**Categories vs Metadata:** The Platform version uses `categories=["email"]` which are AI-assigned by Mem0. In open source, categories are modeled as `metadata` fields (e.g., `memory_category`) that you set on each `add` call and filter on during search.
-</Note>
-  </Tab>
-</Tabs>
+### 获取记忆
 
-### Fetching Memories
+您可以使用以下代码在任何时间点获取所有内存：
 
-You can fetch all the memories at any point in time using the following code:
-
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 meeting_emails = processor.search_emails("meeting schedule", user_id)
 for m in meeting_emails['results']:
     print(m['memory'])
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 meeting_emails = processor.search_emails("meeting schedule", user_id)
 for m in meeting_emails["results"]:
     print(m["memory"])
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-## Key Features and Benefits
+## 主要特性和优点
 
-- **Long-term Email Memory**: Store and retrieve email conversations across long periods
-- **Semantic Search**: Find relevant emails even if they don't contain exact keywords
-- **Intelligent Categorization**: Automatically sort emails into meaningful categories
-- **Action Item Extraction**: Identify and track tasks mentioned in emails
-- **Priority Management**: Focus on important emails based on AI-determined priority
-- **Context Awareness**: Maintain thread context for more relevant interactions
+- **长期电子邮件内存**：长期存储和检索电子邮件对话
+- **语义搜索**：查找相关电子邮件，即使它们不包含确切的关键字
+- **智能分类**：自动将电子邮件分类为有意义的类别
+- **行动项目提取**：识别并跟踪电子邮件中提到的任务
+- **优先级管理**：根据人工智能确定的优先级重点关注重要电子邮件
+- **上下文感知**：维护线程上下文以进行更相关的交互
 
-## Conclusion
+## 结论
 
-By combining Mem0's memory capabilities with email processing, you can create intelligent email management systems that help users organize, prioritize, and act on their inbox effectively. The advanced capabilities like automatic categorization, action item extraction, and priority management can significantly reduce the time spent on email management, allowing users to focus on more important tasks.
+通过将 Mem0 的内存功能与电子邮件处理相结合，您可以创建智能电子邮件管理系统，帮助用户有效地组织、确定优先级并对其收件箱采取行动。自动分类、操作项提取和优先级管理等高级功能可以显着减少电子邮件管理所花费的时间，使用户能够专注于更重要的任务。
 
----
-
-<CardGroup cols={2}>
-  <Card title="Tag and Organize Memories" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
-    Categorize email threads by sender, topic, and priority for faster retrieval.
-  </Card>
+---<卡组列={2}>
+  <Card title="标记和组织记忆" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
+    按发件人、主题和优先级对电子邮件线程进行分类，以便更快地检索。
+  </卡>
   <Card title="Support Inbox with Mem0" icon="headset" href="/cookbooks/operations/support-inbox">
-    Build customer support agents that remember context across tickets.
-  </Card>
-</CardGroup>
+    建立能够记住工单上下文的客户支持代理。
+  </卡>
+</卡组>

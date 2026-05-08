@@ -3,13 +3,15 @@ title: xAI
 description: "Configure xAI Grok models as an LLM provider in Mem0 with API key setup and usage examples."
 ---
 
-[xAI](https://x.ai/) is a new AI company founded by Elon Musk that develops large language models, including Grok. Grok is trained on real-time data from X (formerly Twitter) and aims to provide accurate, up-to-date responses with a touch of wit and humor.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-In order to use LLMs from xAI, go to their [platform](https://console.x.ai) and get the API key. Set the API key as `XAI_API_KEY` environment variable to use the model as given below in the example.
 
-## Usage
 
-```python
+[xAI](https://x.ai/) 是埃隆·马斯克创立的一家新的人工智能公司，开发大型语言模型，包括 Grok。 Grok 接受了来自 X（以前称为 Twitter）的实时数据的培训，旨在提供准确、最新且充满智慧和幽默的回复。
+
+为了使用 xAI 的法学硕士，请访问他们的[平台](https://console.x.ai) 并获取 API 密钥。将 API 密钥设置为“XAI_API_KEY”环境变量以使用下面示例中给出的模型。
+
+＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -36,7 +38,6 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+## 配置
 
-## Config
-
-All available parameters for the `xai` config are present in [Master List of All Params in Config](../config).
+`xai` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

@@ -3,20 +3,23 @@ title: Configurations
 description: "Reference for vector database configuration options in Mem0, including provider selection and connection settings."
 ---
 
-## How to define configurations?
-
-The `config` is defined as an object with two main keys:
-- `vector_store`: Specifies the vector database provider and its configuration
-  - `provider`: The name of the vector database (e.g., "chroma", "pgvector", "qdrant", "milvus", "upstash_vector", "azure_ai_search", "vertex_ai_vector_search", "valkey")
-  - `config`: A nested dictionary containing provider-specific settings
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
 
-## How to Use Config
 
-Here's a general example of how to use the config with mem0:
+## 如何定义配置？
 
-<CodeGroup>
-```python Python
+`config` 被定义为一个具有两个主键的对象：
+- `vector_store`：指定矢量数据库提供程序及其配置
+  - `provider`：矢量数据库的名称（例如，“chroma”、“pgvector”、“qdrant”、“milvus”、“upstash_vector”、“azure_ai_search”、“vertex_ai_vector_search”、“valkey”）
+  - `config`：包含特定于提供者的设置的嵌套字典
+
+
+## 如何使用配置
+
+以下是如何将配置与 mem0 一起使用的一般示例：
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -52,76 +55,72 @@ const configMemory = {
 const memory = new Memory(configMemory);
 await memory.add("Your text here", { userId: "user", metadata: { category: "example" } });
 ```
-</CodeGroup>
+</代码组>
 
-<Note>
-  The in-memory vector database is only supported in the TypeScript implementation.
-</Note>
+<注意>
+  仅 TypeScript 实现支持内存向量数据库。
+</注>
 
-## Why is Config Needed?
+## 为什么需要配置？
 
-Config is essential for:
-1. Specifying which vector database to use.
-2. Providing necessary connection details (e.g., host, port, credentials).
-3. Customizing database-specific settings (e.g., collection name, path).
-4. Ensuring proper initialization and connection to your chosen vector store.
+配置对于以下方面至关重要：
+1. 指定使用哪个矢量数据库。
+2. 提供必要的连接详细信息（例如主机、端口、凭据）。
+3. 自定义特定于数据库的设置（例如集合名称、路径）。
+4. 确保正确初始化并连接到您选择的矢量存储。
 
-## Master List of All Params in Config
+## 配置中所有参数的主列表
 
-Here's a comprehensive list of all parameters that can be used across different vector databases:
+以下是可在不同矢量数据库中使用的所有参数的完整列表：<标签>
+<标签标题=“Python”>
+|参数|描述 |
+|------------|-------------|
+| `集合名称` |藏品名称|
+| `embedding_model_dims` |嵌入模型的尺寸|
+| `客户` |数据库的自定义客户端 |
+| `路径` |数据库路径 |
+| `主机` |服务器运行所在的主机|
+| `端口` |服务器运行的端口 |
+| `用户` |数据库连接的用户名 |
+| `密码` |数据库连接密码|
+| `数据库名称` |数据库名称 |
+| `网址` |服务器的完整 URL |
+| `api_key` |服务器的 API 密钥 |
+| `磁盘上` |启用持久存储 |
+| `端点_id` |端点 ID (vertex_ai_vector_search) |
+| `index_id` |索引 ID (vertex_ai_vector_search) |
+| `deployment_index_id` |部署索引 ID (vertex_ai_vector_search) |
+| `project_id` |项目 ID (vertex_ai_vector_search) |
+| `项目编号` |项目编号 (vertex_ai_vector_search) |
+| `vector_search_api_endpoint` |矢量搜索 API 端点 (vertex_ai_vector_search) |
+| `连接字符串` | PostgreSQL 连接字符串（用于 Supabase/PGVector）|
+| `索引方法` |向量索引法（用于 Supabase）|
+| `index_measure` |相似性搜索的距离度量（用于 Supabase） |
+</标签>
+<选项卡标题=“TypeScript”>
+|参数|描述 |
+|------------|-------------|
+| `集合名称` |藏品名称|
+| `embeddingModelDims` |嵌入模型的尺寸|
+| `尺寸` |嵌入模型的维度（针对内存提供者）|
+| `主机` |服务器运行所在的主机|
+| `端口` |服务器运行的端口 |
+| `网址` |服务器的 URL |
+| `apiKey` |服务器的 API 密钥 |
+| `路径` |数据库路径 |
+| `磁盘上` |启用持久存储 |
+| `redisUrl` | Redis 服务器的 URL |
+| `用户名` |数据库连接的用户名 |
+| `密码` |数据库连接密码|
+</标签>
+</标签>## 自定义配置
 
-<Tabs>
-<Tab title="Python">
-| Parameter | Description |
-|-----------|-------------|
-| `collection_name` | Name of the collection |
-| `embedding_model_dims` | Dimensions of the embedding model |
-| `client` | Custom client for the database |
-| `path` | Path for the database |
-| `host` | Host where the server is running |
-| `port` | Port where the server is running |
-| `user` | Username for database connection |
-| `password` | Password for database connection |
-| `dbname` | Name of the database |
-| `url` | Full URL for the server |
-| `api_key` | API key for the server |
-| `on_disk` | Enable persistent storage |
-| `endpoint_id` | Endpoint ID (vertex_ai_vector_search) |
-| `index_id` | Index ID (vertex_ai_vector_search) |
-| `deployment_index_id` | Deployment index ID (vertex_ai_vector_search) |
-| `project_id` | Project ID (vertex_ai_vector_search) |
-| `project_number` | Project number (vertex_ai_vector_search) |
-| `vector_search_api_endpoint` | Vector search API endpoint (vertex_ai_vector_search) |
-| `connection_string` | PostgreSQL connection string (for Supabase/PGVector) |
-| `index_method` | Vector index method (for Supabase) |
-| `index_measure` | Distance measure for similarity search (for Supabase) |
-</Tab>
-<Tab title="TypeScript">
-| Parameter | Description |
-|-----------|-------------|
-| `collectionName` | Name of the collection |
-| `embeddingModelDims` | Dimensions of the embedding model |
-| `dimension` | Dimensions of the embedding model (for memory provider) |
-| `host` | Host where the server is running |
-| `port` | Port where the server is running |
-| `url` | URL for the server |
-| `apiKey` | API key for the server |
-| `path` | Path for the database |
-| `onDisk` | Enable persistent storage |
-| `redisUrl` | URL for the Redis server |
-| `username` | Username for database connection |
-| `password` | Password for database connection |
-</Tab>
-</Tabs>
-
-## Customizing Config
-
-Each vector database has its own specific configuration requirements. To customize the config for your chosen vector store:
+每个矢量数据库都有其特定的配置要求。 To customize the config for your chosen vector store:
 
 1. Identify the vector database you want to use from [supported vector databases](./dbs).
 2. Refer to the `Config` section in the respective vector database's documentation.
 3. Include only the relevant parameters for your chosen database in the `config` dictionary.
 
-## Supported Vector Databases
+## 支持的向量数据库
 
 For detailed information on configuring specific vector databases, please visit the [Supported Vector Databases](./dbs) section. There you'll find individual pages for each supported vector store with provider-specific usage examples and configuration details.

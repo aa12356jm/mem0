@@ -4,61 +4,60 @@ description: "Plug Mem0 cloud memory into Camel's agents with the built‑in Mem
 partnerBadge: "Camel AI"
 ---
 
-# Camel AI integration
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Connect Camel's agent framework to Mem0 so every agent can persist and recall conversation context across sessions with minimal setup.
 
-<Info>
-  **Prerequisites**
-  - Mem0: `MEM0_API_KEY` (or self-hosted endpoint), `pip install mem0ai`
-  - Camel AI: `pip install camel-ai` (requires Python 3.9+)
-  - Optional: OpenAI API key if you run LLM-backed agents
-</Info>
 
-<Note>Camel provides a Python SDK today. A TypeScript path is not available yet.</Note>
+# 骆驼人工智能集成
 
-## Configure credentials
+将 Camel 的代理框架连接到 Mem0，以便每个代理都可以通过最少的设置保留并调用跨会话的对话上下文。
 
-<Tabs>
-  <Tab title="Mem0">
-<Steps>
-<Step title="Export your API key">
-```bash
+<信息>
+  **先决条件**
+  - Mem0：`MEM0_API_KEY`（或自托管端点），`pip install mem0ai`
+  - Camel AI：`pip installcamel-ai`（需要 Python 3.9+）
+  - 可选：如果您运行 LLM 支持的代理，则 OpenAI API 密钥
+</信息>
+
+<注意>Camel 今天提供了 Python SDK。 TypeScript 路径尚不可用。</Note>
+
+## 配置凭据
+
+<标签>
+  <标签标题=“Mem0”>
+<步骤>
+<Step title="导出您的 API 密钥">```bash
 export MEM0_API_KEY="sk-..."
 ```
-</Step>
-<Step title="(Self-host) Point to your Mem0 API">
-```bash
+</步骤>
+<Step title="(自托管)指向您的 Mem0 API">```bash
 export MEM0_BASE_URL="https://your-mem0-domain"
 ```
-</Step>
-</Steps>
-  </Tab>
-  <Tab title="Camel">
-<Steps>
-<Step title="Install Camel with Mem0 dependency">
-```bash
+</步骤>
+</步骤>
+  </标签>
+  <标签标题=“骆驼”>
+<步骤>
+<Step title="安装带有 Mem0 依赖项的 Camel">```bash
 pip install "camel-ai>=0.2.0" mem0ai
 ```
-</Step>
-<Step title="(Optional) Add your model credentials">
-```bash
+</步骤>
+<Step title="(可选)添加您的模型凭据">```bash
 export OPENAI_API_KEY="sk-openai..."
 ```
-</Step>
-</Steps>
-  </Tab>
-</Tabs>
+</步骤>
+</步骤>
+  </标签>
+</标签>
 
-<Tip>
-  Mem0Storage reads `MEM0_API_KEY` automatically. Pass `api_key` explicitly only when you need to override the environment.
-</Tip>
+<提示>
+  Mem0Storage 自动读取“MEM0_API_KEY”。仅当您需要覆盖环境时才显式传递“api_key”。
+</提示>
 
-## Wire Mem0 into a Camel agent
+## 将 Mem0 连接到 Camel 代理
 
-<Steps>
-<Step title="Create a Mem0-backed memory store">
-```python
+<步骤>
+<Step title="创建 Mem0 支持的内存存储">```python
 import os
 from camel.storages import Mem0Storage
 
@@ -69,9 +68,8 @@ mem0_store = Mem0Storage(
     metadata={"source": "camel-demo"},
 )
 ```
-</Step>
-<Step title="Attach it to Camel memory">
-```python
+</步骤>
+<Step title="将其附加到 Camel 内存">```python
 from camel.memories import ChatHistoryMemory, ScoreBasedContextCreator
 from camel.utils import OpenAITokenCounter
 from camel.types import ModelType
@@ -85,9 +83,8 @@ memory = ChatHistoryMemory(
     agent_id="travel_agent",
 )
 ```
-</Step>
-<Step title="Let your agent read and write Mem0">
-```python
+</步骤>
+<Step title="让您的代理读写 Mem0">```python
 from camel.agents import ChatAgent
 from camel.messages import BaseMessage
 
@@ -109,36 +106,34 @@ response = agent.step(
 
 print(response.msgs[0].content)
 ```
-</Step>
-</Steps>
+</步骤>
+</步骤>
 
-<Info icon="check">
-  Run `python camel_mem0_demo.py` (or the snippet above in a REPL). You should see the agent respond and the memory persisted to Mem0. Re-running with a new prompt should include the stored preference.
-</Info>
+<信息图标=“检查”>
+  运行“python camel_mem0_demo.py”（或上面 REPL 中的代码片段）。您应该看到代理响应并且内存保留到 Mem0。使用新提示重新运行应包括存储的首选项。
+</信息>
 
-## Verify the integration
+## 验证集成
 
-- Mem0 dashboard shows new memories under `agent_id=travel_agent` and `user_id=alice`.
-- `mem0_store.load()` returns the records you just wrote.
-- Camel agent replies reference prior user preferences on subsequent runs.
+- Mem0 仪表板显示 `agent_id=travel_agent` 和 `user_id=alice` 下的新记忆。
+- `mem0_store.load()` 返回您刚刚写入的记录。
+- Camel 代理在后续运行中回复参考先前的用户首选项。
 
-## Troubleshooting
+## 故障排除
 
-- **Missing MEM0_API_KEY** — set `export MEM0_API_KEY="sk-..."` or pass `api_key` into `Mem0Storage`.
-- **No memories returned** — ensure `agent_id`/`user_id` in your query match what you used when writing.
-- **Network errors to Mem0** — if self-hosting, set `MEM0_BASE_URL` to your deployment URL.
-
-<CardGroup cols={2}>
-  <Card
-    title="Memory types in Mem0"
-    description="Choose between chat history and semantic search for your Camel agents."
-    icon="sparkles"
-    href="/core-concepts/memory-types"
+- **缺少 MEM0_API_KEY** — 设置 `export MEM0_API_KEY="sk-..."` 或将 `api_key` 传递到 `Mem0Storage` 中。
+- **没有返回记忆** — 确保查询中的 `agent_id`/`user_id` 与您在编写时使用的内容匹配。
+- **Mem0 出现网络错误** — 如果是自托管，请将“MEM0_BASE_URL”设置为您的部署 URL。<卡组列={2}>
+  <卡片
+    title="Mem0 中的内存类型"
+    description="为您的 Camel 代理选择聊天历史记录和语义搜索。"
+    图标=“闪闪发光”
+    href="/核心概念/内存类型"
   />
-  <Card
-    title="Try LangChain next"
-    description="Wire the same Mem0 project into LangChain workflows."
-    icon="rocket"
+  <卡片
+    title="接下来试试浪链"
+    description="将同一个 Mem0 项目连接到 LangChain 工作流程中。"
+    图标=“火箭”
     href="/integrations/langchain"
   />
-</CardGroup>
+</卡组>

@@ -4,25 +4,26 @@ description: "Runbook structure for diagnosing and fixing common issues."
 icon: "life-buoy"
 ---
 
-# Troubleshooting Playbook Template
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Troubleshooting playbooks map symptoms to diagnostics and fixes. Keep them fast to scan, script-friendly, and closed with prevention tips plus next steps.
 
----
 
-## ❌ DO NOT COPY — Guidance & Constraints
-- Frontmatter must include `title`, `description`, `icon`. Lead with one sentence about the system or workflow this playbook covers.
-- Add an `<Info>` block (“Use this when…”) and a quick index table (Symptom, Likely cause, Fix link). Surface critical safety warnings in `<Warning>`.
-- Each symptom section needs: diagnostic command/snippet, `<Info icon="check">` expected output, `<Warning>` for the observed failure, numbered fix steps, and optional `<Tip>` for prevention.
-- If you’re migrating an existing playbook, carry forward the known failure modes and scripts—reformat them into this structure unless the troubleshooting path changed.
-- Group unrelated issues with horizontal rules and provide escalation guidance when self-service stops.
-- Conclude with prevention checklist, related docs, and the standard two-card CTA (concept/reference left, applied workflow right).
+# Playbook 模板故障排除
+
+故障排除手册将症状映射到诊断和修复。让它们能够快速扫描、脚本友好，并通过预防提示和后续步骤进行关闭。
 
 ---
 
-## ✅ COPY THIS — Content Skeleton
+## ❌ 请勿复制 — 指南和限制
+- Frontmatter 必须包含“标题”、“描述”、“图标”。用一句话来开头介绍本剧本所涵盖的系统或工作流程。
+- 添加“<Info>”块（“当……时使用此”）和快速索引表（症状、可能的原因、修复链接）。在“<警告>”中显示严重安全警告。
+- 每个症状部分需要：诊断命令/片段、预期输出“<Info icon="check">”、针对观察到的故障的“<Warning>”、编号的修复步骤以及用于预防的可选“<Tip>”。
+- 如果您要迁移现有的剧本，请继承已知的故障模式和脚本 - 将它们重新格式化为此结构，除非故障排除路径发生变化。- 使用横向规则对不相关的问题进行分组，并在自助服务停止时提供升级指导。
+- 最后提供预防清单、相关文档和标准双卡 CTA（左为概念/参考，右为应用工作流程）。
 
-````mdx
+---
+
+## ✅ 复制此内容 — 内容骨架````mdx
 ---
 title: [Playbook name]
 description: Diagnose and resolve [system/component] issues.
@@ -56,8 +57,7 @@ icon: "stethoscope"
 Run this check:
 
 ```bash
-[diagnostic command]
-```
+[诊断命令]```
 
 <Info icon="check">
   Expected: `[describe success signal]`.
@@ -114,104 +114,99 @@ Run this check:
   />
 </CardGroup>
 ````
-
 ---
 
-## ✅ Publish Checklist
-- [ ] Quick index table includes every symptom covered below.
-- [ ] Each symptom section documents diagnostics, expected vs actual output, and actionable fix steps.
-- [ ] Preventative tips and escalation guidance are present where relevant.
-- [ ] Prevention checklist and related docs point to current resources.
-- [ ] CTA pair links to concept/reference (left) and applied workflow (right).
+## ✅ 发布清单
+- [ ] 快速索引表包括下面涵盖的每个症状。
+- [ ] 每个症状部分都记录了诊断、预期输出与实际输出以及可操作的修复步骤。
+- [ ] 提供相关的预防提示和升级指南。
+- [ ] 预防清单和相关文档指向当前资源。
+- [ ] CTA 对链接到概念/参考（左）和应用的工作流程（右）。
 
-## Browse Other Templates
-
-<CardGroup cols={3}>
-  <Card
-    title="Quickstart"
-    description="Install → Configure → Add → Search → Delete."
-    icon="rocket"
+## 浏览其他模板<卡组列={3}>
+  <卡片
+    标题=“快速入门”
+    描述=“安装→配置→添加→搜索→删除。”
+    图标=“火箭”
     href="/templates/quickstart_template"
   />
-  <Card
-    title="Operation Guide"
-    description="Single task walkthrough with verification checkpoints."
-    icon="circle-check"
+  <卡片
+    title="操作指南"
+    描述 =“带有验证检查点的单个任务演练。”
+    图标=“圆圈检查”
     href="/templates/operation_guide_template"
   />
-  <Card
-    title="Feature Guide"
-    description="Explain when and why to use a capability, not just the API."
-    icon="sparkles"
+  <卡片
+    title="功能指南"
+    description="解释何时以及为何使用某个功能，而不仅仅是 API。"
+    图标=“闪闪发光”
     href="/templates/feature_guide_template"
   />
-  <Card
-    title="Concept Guide"
-    description="Define mental models, key terms, and diagrams."
-    icon="brain"
+  <卡片
+    标题=“概念指南”
+    描述=“定义心智模型、关键术语和图表。”
+    图标=“大脑”
     href="/templates/concept_guide_template"
   />
-  <Card
-    title="Integration Guide"
-    description="Configure Mem0 alongside third-party tools."
-    icon="plug"
+  <卡片
+    title="集成指南"
+    description="与第三方工具一起配置 Mem0。”
+    图标=“插头”
     href="/templates/integration_guide_template"
   />
-  <Card
-    title="Cookbook"
-    description="Narrative, end-to-end walkthroughs."
-    icon="book-open"
+  <卡片
+    标题=“食谱”
+    描述=“叙述性、端到端的演练。”
+    图标=“书本打开”
     href="/templates/cookbook_template"
   />
-  <Card
-    title="API Reference"
-    description="Endpoint specifics with dual-language examples."
-    icon="code"
+  <卡片
+    标题=“API参考”
+    description="带有双语言示例的端点细节。"
+    图标=“代码”
     href="/templates/api_reference_template"
   />
-  <Card
-    title="Parameters Reference"
-    description="Accepted fields, defaults, and misuse fixes."
-    icon="list"
+  <卡片
+    title="参数参考"
+    描述 =“接受的字段、默认值和误用修复。”
+    图标=“列表”
     href="/templates/parameters_reference_template"
   />
-  <Card
-    title="Migration Guide"
-    description="Plan → migrate → validate with rollback."
-    icon="arrow-right"
+  <卡片
+    title="迁移指南"
+    描述=“计划→迁移→通过回滚进行验证。”
+    图标=“右箭头”
     href="/templates/migration_guide_template"
   />
-  <Card
-    title="Release Notes"
-    description="Ship highlights and required CTAs."
-    icon="megaphone"
+  <卡片
+    title="发行说明"
+    描述=“发布亮点和所需的 CTA。”
+    图标=“扩音器”
     href="/templates/release_notes_template"
   />
-  <Card
-    title="Troubleshooting Playbook"
-    description="Symptom → diagnose → fix."
-    icon="life-buoy"
+  <卡片
+    title="故障排除手册"
+    描述=“症状→诊断→修复。”
+    图标=“救生圈”
     href="/templates/troubleshooting_playbook_template"
   />
-  <Card
-    title="Section Overview"
-    description="Landing pages with card grids and CTA pair."
-    icon="grid"
+  <卡片
+    title="本节概述"
+    描述 =“带有卡片网格和 CTA 对的着陆页。”
+    图标=“网格”
     href="/templates/section_overview_template"
   />
-</CardGroup>
-
-<CardGroup cols={2}>
-  <Card
-    title="Contribution Hub"
-    description="Review the authoring workflow and linked templates."
-    icon="clipboard-list"
-    href="/platform/contribute"
+</卡组><卡组列={2}>
+  <卡片
+    title="贡献中心"
+    描述 =“查看创作工作流程和链接的模板。”
+    图标=“剪贴板列表”
+    href="/平台/贡献"
   />
-  <Card
-    title="Docs Home"
-    description="Return to the platform overview once you’re done."
-    icon="compass"
-    href="/platform/overview"
+  <卡片
+    title="文档主页"
+    description="完成后返回平台概述。"
+    图标=“指南针”
+    href="/平台/概述"
   />
-</CardGroup>
+</卡组>

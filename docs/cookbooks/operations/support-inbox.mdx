@@ -3,26 +3,24 @@ title: Memory-Powered Support Agent
 description: "Build a support assistant that keeps past tickets and resolutions at its fingertips."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-You can create a personalized Customer Support AI Agent using Mem0. This guide will walk you through the necessary steps and provide the complete code to get you started.
 
-## Overview
 
-The Customer Support AI Agent leverages Mem0 to retain information across interactions, enabling a personalized and efficient support experience.
+您可以使用 Mem0 创建个性化客户支持 AI 代理。本指南将引导您完成必要的步骤，并提供完整的代码以帮助您入门。
 
-## Setup
+## 概述
 
-Install the necessary packages using pip:
+客户支持 AI 代理利用 Mem0 保留交互过程中的信息，从而实现个性化且高效的支持体验。
 
-```bash
+## 设置
+
+使用 pip 安装必要的包：```bash
 pip install openai mem0ai
 ```
+## 完整代码示例
 
-## Full Code Example
-
-Below is the simplified code to create and interact with a Customer Support AI Agent using Mem0:
-
-```python
+以下是使用 Mem0 创建客户支持 AI 代理并与其交互的简化代码：```python
 import os
 from openai import OpenAI
 from mem0 import Memory
@@ -90,34 +88,29 @@ customer_id = "jane_doe"
 # Handle a customer query
 support_agent.handle_query("I need help with my recent order. It hasn't arrived yet.", user_id=customer_id)
 ```
+### 获取记忆
 
-### Fetching Memories
-
-You can fetch all the memories at any point in time using the following code:
-
-```python
+您可以使用以下代码在任何时间点获取所有内存：```python
 memories = support_agent.get_memories(user_id=customer_id)
 for m in memories['results']:
     print(m['memory'])
 ```
+### 要点
 
-### Key Points
+- **初始化**：CustomerSupportAIAgent 类使用必要的内存配置和 OpenAI 客户端设置进行初始化。
+- **处理查询**：handle_query 方法向 AI 发送查询并将相关信息存储在内存中。
+- **检索记忆**：get_memories 方法获取与客户关联的所有存储的记忆。
 
-- **Initialization**: The CustomerSupportAIAgent class is initialized with the necessary memory configuration and OpenAI client setup.
-- **Handling Queries**: The handle_query method sends a query to the AI and stores the relevant information in memory.
-- **Retrieving Memories**: The get_memories method fetches all stored memories associated with a customer.
+### 结论
 
-### Conclusion
-
-As the conversation progresses, Mem0's memory automatically updates based on the interactions, providing a continuously improving personalized support experience.
+随着对话的进行，Mem0 的内存会根据交互自动更新，从而提供不断改进的个性化支持体验。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Build a Mem0 Companion" icon="users" href="/cookbooks/essentials/building-ai-companion">
-    Master the foundational patterns for building memory-powered assistants.
-  </Card>
-  <Card title="Email Automation with Mem0" icon="envelope" href="/cookbooks/operations/email-automation">
-    Extend support capabilities with intelligent email processing and routing.
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="构建 Mem0 伴侣" icon="users" href="/cookbooks/essentials/building-ai-companion">
+    掌握构建记忆驱动助手的基本模式。</卡>
+  <Card title="使用 Mem0 进行电子邮件自动化" icon="envelope" href="/cookbooks/operations/email-automation">
+    通过智能电子邮件处理和路由扩展支持能力。
+  </卡>
+</卡组>

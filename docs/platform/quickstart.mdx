@@ -5,33 +5,34 @@ icon: "bolt"
 iconType: "solid"
 ---
 
-Get started with Mem0 Platform's hosted API in under 5 minutes. This guide shows you how to authenticate and store your first memory.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Prerequisites
 
-- Mem0 Platform account (<a href="https://app.mem0.ai?utm_source=oss&utm_medium=platform-quickstart" rel="nofollow">Sign up here</a>)
-- API key (<a href="https://app.mem0.ai/dashboard/settings?tab=api-keys&subtab=configuration" rel="nofollow">Get one from dashboard</a>)
-- Python 3.10+, Node.js 14+, or cURL
 
-## Installation
+5 分钟内即可开始使用 Mem0 平台的托管 API。本指南向您展示如何验证和存储您的第一个记忆。
 
-<Steps>
-<Step title="Install SDK">
-<CodeGroup>
-```bash pip
+## 先决条件
+
+- Mem0 平台帐户（<a href="https://app.mem0.ai?utm_source=oss&utm_medium=platform-quickstart" rel="nofollow">在此注册</a>）
+- API 密钥（<a href="https://app.mem0.ai/dashboard/settings?tab=api-keys&subtab=configuration" rel="nofollow">从仪表板获取一个</a>）
+- Python 3.10+、Node.js 14+ 或 cURL
+
+## 安装
+
+<步骤>
+<步骤标题=“安装SDK”>
+<代码组>```bash pip
 pip install mem0ai
 ```
 
 ```bash npm
 npm install mem0ai
 ```
+</代码组>
+</步骤>
 
-</CodeGroup>
-</Step>
-
-<Step title="Set your API key">
-<CodeGroup>
-```python Python
+<Step title="设置您的 API 密钥">
+<代码组>```python Python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your-api-key")
@@ -49,13 +50,11 @@ export MEM0_API_KEY="your-api-key"
 ```bash CLI
 mem0 init --api-key "your-api-key"
 ```
+</代码组>
+</步骤>
 
-</CodeGroup>
-</Step>
-
-<Step title="Add a memory">
-<CodeGroup>
-```python Python
+<Step title="添加内存">
+<代码组>```python Python
 messages = [
     {"role": "user", "content": "I'm a vegetarian and allergic to nuts."},
     {"role": "assistant", "content": "Got it! I'll remember your dietary preferences."}
@@ -87,13 +86,11 @@ curl -X POST https://api.mem0.ai/v3/memories/add/ \
 ```bash CLI
 mem0 add "I'm a vegetarian and allergic to nuts." --user-id user123
 ```
+</代码组>
+</步骤>
 
-</CodeGroup>
-</Step>
-
-<Step title="Search memories">
-<CodeGroup>
-```python Python
+<步骤标题=“搜索记忆”>
+<代码组>```python Python
 results = client.search("What are my dietary restrictions?", filters={"user_id": "user123"})
 print(results)
 ````
@@ -116,12 +113,9 @@ curl -X POST https://api.mem0.ai/v3/memories/search/ \
 ```bash CLI
 mem0 search "What are my dietary restrictions?" --user-id user123
 ```
+</代码组>
 
-</CodeGroup>
-
-**Output:**
-
-```json
+**输出：**```json
 {
   "results": [
     {
@@ -135,32 +129,29 @@ mem0 search "What are my dietary restrictions?" --user-id user123
   ]
 }
 ```
-
-</Step>
-</Steps>
+</步骤>
+</步骤>
 
 <Callout type="tip" icon="plug">
-  **Pro Tip**: Want AI agents to manage their own memory automatically? Use <Link href="/platform/mem0-mcp">Mem0 MCP</Link> to let LLMs decide when to save, search, and update memories.
-</Callout>
+  **专业提示**：希望人工智能代理自动管理自己的内存吗？使用 <Link href="/platform/mem0-mcp">Mem0 MCP</Link> 让 LLM 决定何时保存、搜索和更新内存。
+</标注>
 
-## What's Next?
+## 下一步是什么？<卡组列={3}>
+<Card title="内存操作" icon="database" href="/core-concepts/memory-operations/add">
+了解如何通过完整的 CRUD 操作来搜索、更新和删除内存
+</卡>
 
-<CardGroup cols={3}>
-<Card title="Memory Operations" icon="database" href="/core-concepts/memory-operations/add">
-Learn how to search, update, and delete memories with complete CRUD operations
-</Card>
+<Card title="平台功能" icon="star" href="/platform/features/platform-overview">
+  探索元数据过滤、图形内存和 Webhooks 等高级功能
+</卡>
 
-<Card title="Platform Features" icon="star" href="/platform/features/platform-overview">
-  Explore advanced features like metadata filtering, graph memory, and webhooks
-</Card>
+<Card title="API 参考" icon="code" href="/api-reference/memory/add-memories">
+查看完整的 API 文档和集成示例
+</卡>
+</卡组>
 
-<Card title="API Reference" icon="code" href="/api-reference/memory/add-memories">
-See complete API documentation and integration examples
-</Card>
-</CardGroup>
+## 其他资源
 
-## Additional Resources
-
-- **[Platform vs OSS](/platform/platform-vs-oss)** - Understand the differences between Platform and Open Source
-- **[Troubleshooting](/platform/faqs)** - Common issues and solutions
-- **[Integration Examples](/cookbooks/companions/quickstart-demo)** - See Mem0 in action
+- **[平台与 OSS](/platform/platform-vs-oss)** - 了解平台和开源之间的差异
+- **[疑难解答](/platform/faqs)** - 常见问题和解决方案
+- **[集成示例](/cookbooks/companions/quickstart-demo)** - 查看 Mem0 的实际应用

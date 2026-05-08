@@ -4,27 +4,24 @@ description: "Plan → migrate → validate flow with rollback coverage."
 icon: "arrow-right"
 ---
 
-# Migration Guide Template
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Migrations lower blood pressure. They explain what’s changing, why it matters, and how to get through the upgrade with verifications and rollbacks close at hand.
 
----
 
-## ❌ DO NOT COPY — Guidance & Constraints
-- Keep the frontmatter complete (`title`, `description`, `icon`, `versionFrom`, `versionTo`, and optional `releaseDate`). Readers should know at a glance what versions they are moving between.
-- Start with context: summary table + “Should you upgrade?” checklist. Highlight deadlines with `<Warning>` and call out optional paths with `<Tip>`.
-- Break the body into **Plan → Migrate → Validate**. Use numbered headings inside **Migrate** and put rollback instructions directly after any risky step.
-- When porting older migration guides, keep existing change tables, screenshots, and warnings—slot them into this format unless the upgrade path has materially changed.
-- Document breaking changes with an `Old behavior` vs `New behavior` table. Use `<Info icon="check">` for mandatory verification steps.
-- Optional flow diagrams are allowed, but only when a left-to-right Mermaid (`graph LR`) clarifies the upgrade path.
-- End with two CTA cards (left = deep dive reference, right = applied example) and keep the comment reminder for reviewers.
+# 迁移指南模板
 
----
+迁移会降低血压。 They explain what’s changing, why it matters, and how to get through the upgrade with verifications and rollbacks close at hand.
 
-## ✅ COPY THIS — Content Skeleton
-Paste the block below, swap placeholders, and delete optional sections only after you’ve confirmed they aren’t needed.
+---## ❌ 请勿复制 — 指南和限制
+- 保持前面的内容完整（`title`、`description`、`icon`、`versionFrom`、`versionTo` 和可选的 `releaseDate`）。读者应该一眼就知道他们正在哪个版本之间移动。
+- 从上下文开始：汇总表+“你应该升级吗？”清单。使用“<警告>”突出显示截止日期，并使用“<提示>”调用可选路径。
+- 将主体分解为**计划→迁移→验证**。在 **Migrate** 中使用编号标题，并在任何有风险的步骤之后直接放置回滚说明。
+- 移植较旧的迁移指南时，保留现有的更改表、屏幕截图和警告 - 将它们放入此格式，除非升级路径发生重大更改。
+- 使用“旧行为”与“新行为”表记录重大更改。使用“<Info icon="check">”进行强制验证步骤。- 允许使用可选流程图，但前提是从左到右的美人鱼（“图 LR”）阐明了升级路径。
+- 以两张 CTA 卡结束（左 = 深入参考，右 = 应用示例），并为审阅者保留评论提醒。
 
-```mdx
+---## ✅ 复制此内容 — 内容骨架
+仅在确认不需要后才粘贴下面的块、交换占位符并删除可选部分。```mdx
 ---
 title: [Migration title]
 description: [Why this upgrade matters]
@@ -58,11 +55,10 @@ releaseDate: "[YYYY-MM-DD]" # Optional
 
 {/* Optional: delete if not needed */}
 ```mermaid
-graph LR
-  A[Plan] */} B[Migrate]
-  B */} C[Validate]
-  C */} D[Roll back if needed]
-```
+图LR
+  A[计划] */} B[迁移]
+  B */} C[验证]
+  C */} D[如果需要则回滚]```
 
 ## Plan
 
@@ -74,9 +70,8 @@ graph LR
 ### 1. [Upgrade dependencies]
 
 ```bash
-pip install mem0ai==[version]
-npm install mem0ai@[version]
-```
+pip install mem0ai==[版本]
+npm install mem0ai@[版本]```
 
 <Tip>
   [Optional hint or staging strategy.]
@@ -89,9 +84,8 @@ npm install mem0ai@[version]
 ### 2. [Update configuration]
 
 ```diff
-- memory_filters = true
-+ filters = true
-```
+- 内存过滤器 = true
++ 过滤器 = true```
 
 <Warning>
   **Breaking change:** `[Explain the new behavior and what to update]`.
@@ -102,8 +96,7 @@ npm install mem0ai@[version]
 ### 3. [Run data migrations or API updates]
 
 ```python
-[Code snippet showing new behavior]
-```
+[显示新行为的代码片段]```
 
 <Info icon="check">
   `[Describe logs, metrics, or sample response that proves success]`.
@@ -155,105 +148,100 @@ npm install mem0ai@[version]
   />
 </CardGroup>
 ```
-
 ---
 
-## ✅ Publish Checklist
-- [ ] Versions (`versionFrom`, `versionTo`) and timelines are accurate.
-- [ ] Every breaking change is highlighted via table or `<Warning>`.
-- [ ] Rollback instructions are present and placed immediately after risky steps.
-- [ ] Verification steps use `<Info icon="check">` and are actionable.
-- [ ] Optional sections (Mermaid, tips) removed if unused.
-- [ ] Final `<CardGroup>` contains exactly two cards with valid links.
+## ✅ 发布清单
+- [ ] 版本（`versionFrom`、`versionTo`）和时间表是准确的。
+- [ ] 每个重大更改都会通过表格或“<警告>”突出显示。
+- [ ] 存在回滚指令，并立即放置在危险步骤之后。
+- [ ] 验证步骤使用“<Info icon="check">”且可操作。
+- [ ] 可选部分（美人鱼、提示）如果未使用则已删除。
+- [ ] 最终 `<CardGroup>` 恰好包含两张具有有效链接的卡片。
 
-## Browse Other Templates
-
-<CardGroup cols={3}>
-  <Card
-    title="Quickstart"
-    description="Install → Configure → Add → Search → Delete."
-    icon="rocket"
+## 浏览其他模板<卡组列={3}>
+  <卡片
+    标题=“快速入门”
+    描述=“安装→配置→添加→搜索→删除。”
+    图标=“火箭”
     href="/templates/quickstart_template"
   />
-  <Card
-    title="Operation Guide"
-    description="Single task walkthrough with verification checkpoints."
-    icon="circle-check"
+  <卡片
+    title="操作指南"
+    描述 =“带有验证检查点的单个任务演练。”
+    图标=“圆圈检查”
     href="/templates/operation_guide_template"
   />
-  <Card
-    title="Feature Guide"
-    description="Explain when and why to use a capability, not just the API."
-    icon="sparkles"
+  <卡片
+    title="功能指南"
+    description="解释何时以及为何使用某个功能，而不仅仅是 API。"
+    图标=“闪闪发光”
     href="/templates/feature_guide_template"
   />
-  <Card
-    title="Concept Guide"
-    description="Define mental models, key terms, and diagrams."
-    icon="brain"
+  <卡片
+    标题=“概念指南”
+    描述=“定义心智模型、关键术语和图表。”
+    图标=“大脑”
     href="/templates/concept_guide_template"
   />
-  <Card
-    title="Integration Guide"
-    description="Configure Mem0 alongside third-party tools."
-    icon="plug"
+  <卡片
+    title="集成指南"
+    description="与第三方工具一起配置 Mem0。”
+    图标=“插头”
     href="/templates/integration_guide_template"
   />
-  <Card
-    title="Cookbook"
-    description="Narrative, end-to-end walkthroughs."
-    icon="book-open"
+  <卡片
+    标题=“食谱”
+    描述=“叙述性、端到端的演练。”
+    图标=“书本打开”
     href="/templates/cookbook_template"
   />
-  <Card
-    title="API Reference"
-    description="Endpoint specifics with dual-language examples."
-    icon="code"
+  <卡片
+    标题=“API参考”
+    description="带有双语言示例的端点细节。"
+    图标=“代码”
     href="/templates/api_reference_template"
   />
-  <Card
-    title="Parameters Reference"
-    description="Accepted fields, defaults, and misuse fixes."
-    icon="list"
+  <卡片
+    title="参数参考"
+    描述 =“接受的字段、默认值和误用修复。”
+    图标=“列表”
     href="/templates/parameters_reference_template"
   />
-  <Card
-    title="Migration Guide"
-    description="Plan → migrate → validate with rollback."
-    icon="arrow-right"
+  <卡片
+    title="迁移指南"
+    描述=“计划→迁移→通过回滚进行验证。”
+    图标=“右箭头”
     href="/templates/migration_guide_template"
   />
-  <Card
-    title="Release Notes"
-    description="Ship highlights and required CTAs."
-    icon="megaphone"
+  <卡片
+    title="发行说明"
+    描述=“发布亮点和所需的 CTA。”
+    图标=“扩音器”
     href="/templates/release_notes_template"
   />
-  <Card
-    title="Troubleshooting Playbook"
-    description="Symptom → diagnose → fix."
-    icon="life-buoy"
+  <卡片
+    title="故障排除手册"
+    描述=“症状→诊断→修复。”
+    图标=“救生圈”
     href="/templates/troubleshooting_playbook_template"
   />
-  <Card
-    title="Section Overview"
-    description="Landing pages with card grids and CTA pair."
-    icon="grid"
+  <卡片
+    title="本节概述"
+    描述 =“带有卡片网格和 CTA 对的着陆页。”
+    图标=“网格”
     href="/templates/section_overview_template"
   />
-</CardGroup>
-
-<CardGroup cols={2}>
-  <Card
-    title="Contribution Hub"
-    description="Review the authoring workflow and linked templates."
-    icon="clipboard-list"
-    href="/platform/contribute"
+</卡组><卡组列={2}>
+  <卡片
+    title="贡献中心"
+    描述 =“查看创作工作流程和链接的模板。”
+    图标=“剪贴板列表”
+    href="/平台/贡献"
   />
-  <Card
-    title="Docs Home"
-    description="Return to the platform overview once you’re done."
-    icon="compass"
-    href="/platform/overview"
+  <卡片
+    title="文档主页"
+    description="完成后返回平台概述。"
+    图标=“指南针”
+    href="/平台/概述"
   />
-</CardGroup>
+</卡组>

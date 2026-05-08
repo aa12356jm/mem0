@@ -4,57 +4,53 @@ description: Boost relevance by reordering vector hits with reranking models.
 icon: "ranking-star"
 ---
 
-Reranker-enhanced search adds a second scoring pass after vector retrieval so Mem0 can return the most relevant memories first. Enable it when keyword similarity alone misses nuance or when you need the highest-confidence context for an agent decision.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Info>
-  **You’ll use this when…**
-  - Queries are nuanced and require semantic understanding beyond vector distance.
-  - Large memory collections produce too many near matches to review manually.
-  - You want consistent scoring across providers by delegating ranking to a dedicated model.
-</Info>
 
-<Warning>
-  Reranking raises latency and, for hosted models, API spend. Benchmark with production traffic and define a fallback path for latency-sensitive requests.
-</Warning>
 
-<Note>
-  All configuration snippets translate directly to the TypeScript SDK—swap dictionaries for objects while keeping the same keys (`provider`, `config`, `rerank` flags).
-</Note>
+重新排序增强型搜索在矢量检索后添加了第二个评分通道，因此 Mem0 可以首先返回最相关的记忆。当仅关键字相似性错过了细微差别时，或者当您需要最高置信度的上下文来进行代理决策时，请启用它。
 
----
+<信息>
+  **你会在以下情况下使用它......**
+  - 查询是细致入微的，需要超出向量距离的语义理解。
+  - 大型内存集合会产生太多接近的匹配项，无法手动查看。
+  - 您希望通过将排名委托给专用模型来获得跨提供商的一致评分。
+</信息>
 
-## Feature anatomy
+<警告>
+  重新排名会增加延迟，对于托管模型而言，还会增加 API 支出。对生产流量进行基准测试，并为延迟敏感的请求定义回退路径。</警告>
 
-- **Initial vector search:** Retrieve candidate memories by similarity.
-- **Reranker pass:** A specialized model scores each candidate against the original query.
-- **Reordered results:** Mem0 sorts responses using the reranker’s scores before returning them.
-- **Optional fallbacks:** Toggle reranking per request or disable it entirely if performance or cost becomes a concern.
-
-<AccordionGroup>
-  <Accordion title="Supported providers">
-    - **[Cohere](/components/rerankers/models/cohere)** – Multilingual hosted reranker with API-based scoring.  
-    - **[Sentence Transformer](/components/rerankers/models/sentence_transformer)** – Local Hugging Face cross-encoders for GPU or CPU.  
-    - **[Hugging Face](/components/rerankers/models/huggingface)** – Bring any hosted or on-prem reranker model ID.  
-    - **[LLM Reranker](/components/rerankers/models/llm_reranker)** – Use your preferred LLM (OpenAI, etc.) for prompt-driven scoring.  
-    - **[Zero Entropy](/components/rerankers/models/zero_entropy)** – High-quality neural reranking tuned for retrieval tasks.
-  </Accordion>
-  <Accordion title="Provider comparison">
-    | Provider | Latency | Quality | Cost | Local deploy |
-    | --- | --- | --- | --- | --- |
-    | Cohere | Medium | High | API cost | ❌ |
-    | Sentence Transformer | Low | Good | Free | ✅ |
-    | Hugging Face | Low–Medium | Variable | Free | ✅ |
-    | LLM Reranker | High | Very high | API cost | Depends |
-  </Accordion>
-</AccordionGroup>
+<注意>
+  所有配置片段都直接转换为 TypeScript SDK——交换对象的字典，同时保留相同的键（“provider”、“config”、“rerank”标志）。
+</注>
 
 ---
 
-## Configure it
+## 特征剖析- **初始向量搜索：** 通过相似性检索候选记忆。
+- **Reranker pass：** 专门的模型根据原始查询对每个候选者进行评分。
+- **重新排序的结果：** Mem0 在返回响应之前使用重新排序器的分数对响应进行排序。
+- **可选的后备措施：** 如果性能或成本成为问题，则切换每个请求的重新排名或完全禁用它。<手风琴组>
+  <Accordion title="支持的提供商">
+    - **[Cohere](/components/rerankers/models/cohere)** – 具有基于 API 评分的多语言托管重新排序器。  
+    - **[Sentence Transformer](/components/rerankers/models/sentence_transformer)** – 用于 GPU 或 CPU 的本地 Hugging Face 交叉编码器。  
+    - **[Hugging Face](/components/rerankers/models/huggingface)** – 携带任何托管或本地重新排序模型 ID。  
+    - **[LLM Reranker](/components/rerankers/models/llm_reranker)** – 使用您首选的 LLM（OpenAI 等）进行提示驱动评分。  
+    - **[零熵](/components/rerankers/models/zero_entropy)** – 针对检索任务调整的高质量神经重新排序。</手风琴>
+  <Accordion title="提供商比较">
+    |供应商|延迟 |品质 |成本|本地部署 |
+    | ---| ---| ---| ---| ---|
+    |连贯|中等|高| API成本| ❌ |
+    |句子变压器 |低|好 |免费| ✅ |
+    |拥抱脸|低-中|变量|免费| ✅ |
+    | LLM 重新排名 |高|非常高| API成本|取决于 |
+  </手风琴>
+</手风琴组>
 
-### Basic setup
+---
 
-```python
+## 配置它
+
+### 基本设置```python
 from mem0 import Memory
 
 config = {
@@ -69,18 +65,15 @@ config = {
 
 m = Memory.from_config(config)
 ```
+<信息图标=“检查”>
+  确认 `results["results"][0]["score"]` 反映了重排序器输出 - 如果该字段丢失，则不会应用重排序器。
+</信息>
 
-<Info icon="check">
-  Confirm `results["results"][0]["score"]` reflects the reranker output—if the field is missing, the reranker was not applied.
-</Info>
+<提示>
+  将“top_k”设置为仍捕获相关命中的最小候选池。较小的池不断降低重新排名成本。
+</提示>
 
-<Tip>
-  Set `top_k` to the smallest candidate pool that still captures relevant hits. Smaller pools keep reranking costs down.
-</Tip>
-
-### Provider-specific options
-
-```python
+### 特定于提供商的选项```python
 # Cohere reranker
 config = {
     "reranker": {
@@ -131,14 +124,11 @@ config = {
     }
 }
 ```
+<注意>
+  当您将这些配置插入生产项目时，将身份验证密钥保留在环境变量中。
+</注>
 
-<Note>
-  Keep authentication keys in environment variables when you plug these configs into production projects.
-</Note>
-
-### Full stack example
-
-```python
+### 全栈示例```python
 config = {
     "vector_store": {
         "provider": "qdrant",
@@ -174,14 +164,11 @@ config = {
 
 m = Memory.from_config(config)
 ```
+<信息图标=“检查”>
+  现在，快速搜索应该返回包含向量和重新排序分数的结果，让您可以立即比较改进情况。
+</信息>
 
-<Info icon="check">
-  A quick search should now return results with both vector and reranker scores, letting you compare improvements immediately.
-</Info>
-
-### Async support
-
-```python
+### 异步支持```python
 from mem0 import AsyncMemory
 
 async_memory = AsyncMemory.from_config(config)
@@ -196,14 +183,11 @@ async def search_with_rerank():
 import asyncio
 results = asyncio.run(search_with_rerank())
 ```
+<信息图标=“检查”>
+  检查异步响应以确认重新排名仍然适用；分数应与同步实现相匹配。
+</信息>
 
-<Info icon="check">
-  Inspect the async response to confirm reranking still applies; the scores should match the synchronous implementation.
-</Info>
-
-### Tune performance and cost
-
-```python
+### 调整性能和成本```python
 # GPU-friendly local reranker configuration
 config = {
     "reranker": {
@@ -224,28 +208,22 @@ def smart_search(query, user_id, use_rerank=None):
         use_rerank = len(query.split()) > 3
     return m.search(query, filters={"user_id": user_id}, rerank=use_rerank)
 ```
+<提示>
+  使用启发式方法（查询长度、用户级别）来决定何时重新排名，以便高信号查询受益，而无需对每个请求进行征税。
+</提示>
 
-<Tip>
-  Use heuristics (query length, user tier) to decide when to rerank so high-signal queries benefit without taxing every request.
-</Tip>
-
-### Handle failures gracefully
-
-```python
+### 优雅地处理失败```python
 try:
     results = m.search("test query", filters={"user_id": "alice"}, rerank=True)
 except Exception as exc:
     print(f"Reranking failed: {exc}")
     results = m.search("test query", filters={"user_id": "alice"}, rerank=False)
 ```
+<警告>
+  始终回退到仅向量搜索——与稍微不太相关的排序相比，删除的查询会带来更大的准确性问题。
+</警告>
 
-<Warning>
-  Always fall back to vector-only search—dropped queries introduce bigger accuracy issues than slightly less relevant ordering.
-</Warning>
-
-### Migrate from v0.x
-
-```python
+### 从 v0.x 迁移```python
 # Before: basic vector search
 results = m.search("query", filters={"user_id": "alice"})
 
@@ -262,14 +240,11 @@ config = {
 m = Memory.from_config(config)
 results = m.search("query", filters={"user_id": "alice"})
 ```
-
 ---
 
-## See it in action
+## 查看实际效果
 
-### Basic reranked search
-
-```python
+### 基本重排搜索```python
 results = m.search(
     "What are my food preferences?",
     filters={"user_id": "alice"}
@@ -279,14 +254,11 @@ for result in results["results"]:
     print(f"Memory: {result['memory']}")
     print(f"Score: {result['score']}")
 ```
+<信息图标=“检查”>
+  希望每个结果都会列出重新排序器调整的分数，以便您可以将排序与基线向量结果进行比较。
+</信息>
 
-<Info icon="check">
-  Expect each result to list the reranker-adjusted score so you can compare ordering against baseline vector results.
-</Info>
-
-### Toggle reranking per request
-
-```python
+### 根据请求切换重新排名```python
 results_with_rerank = m.search(
     "What movies do I like?",
     filters={"user_id": "alice"},
@@ -299,18 +271,15 @@ results_without_rerank = m.search(
     rerank=False
 )
 ```
+<提示>
+  在推出期间记录重新排名与未重新排名的列表，以便利益相关者可以在到处实施之前看到改进。
+</提示>
 
-<Tip>
-  Log the reranked vs. non-reranked lists during rollout so stakeholders can see the improvement before enforcing it everywhere.
-</Tip>
+<信息图标=“检查”>
+  您应该在两个列表中看到相同的记忆，但重新排序的响应将根据语义相关性对它们重新排序。
+</信息>
 
-<Info icon="check">
-  You should see the same memories in both lists, but the reranked response will reorder them based on semantic relevance.
-</Info>
-
-### Combine with metadata filters
-
-```python
+### 与元数据过滤器结合```python
 results = m.search(
     "important work tasks",
     filters={
@@ -324,16 +293,13 @@ results = m.search(
     top_k=20
 )
 ```
+<信息图标=“检查”>
+  验证过滤后的重新排名搜索仍然尊重每个元数据子句 - 重新排名仅对候选者重新排序，它永远不会绕过过滤器。
+</信息>
 
-<Info icon="check">
-  Verify filtered reranked searches still respect every metadata clause—reranking only reorders candidates, it never bypasses filters.
-</Info>
+### 现实世界的剧本
 
-### Real-world playbooks
-
-#### Customer support
-
-```python
+#### 客户支持```python
 config = {
     "reranker": {
         "provider": "cohere",
@@ -352,14 +318,11 @@ results = m.search(
     rerank=True
 )
 ```
+<信息图标=“检查”>
+  热门结果应突出显示与登录问题上下文匹配的票证，以便客服人员可以更快地做出响应。
+</信息>
 
-<Info icon="check">
-  Top results should highlight tickets matching the login issue context so agents can respond faster.
-</Info>
-
-#### Content recommendation
-
-```python
+####内容推荐```python
 results = m.search(
     "science fiction books with space exploration themes",
     filters={"user_id": "reader123", "content_type": "book_recommendation"},
@@ -371,14 +334,11 @@ for result in results["results"]:
     print(f"Recommendation: {result['memory']}")
     print(f"Relevance: {result['score']:.3f}")
 ```
+<信息图标=“检查”>
+  期望获得与所请求的主题和您应用的任何元数据限制相匹配的高分建议。
+</信息>
 
-<Info icon="check">
-  Expect high-scoring recommendations that match both the requested theme and any metadata limits you applied.
-</Info>
-
-#### Personal assistant
-
-```python
+#### 私人助理```python
 results = m.search(
     "What restaurants did I enjoy last month that had good vegetarian options?",
     filters={
@@ -392,41 +352,38 @@ results = m.search(
     rerank=True
 )
 ```
+<提示>
+  将此模式重复用于其他生活方式查询 - 交换过滤器和提示文本而不更改重新排名配置。
+</提示>
 
-<Tip>
-  Reuse this pattern for other lifestyle queries—swap the filters and prompt text without changing the rerank configuration.
-</Tip>
-
-<Note>
-  Each workflow keeps the same `m.search(...)` signature, so you can template these queries across agents with only the prompt and filters changing.
-</Note>
-
----
-
-## Verify the feature is working
-
-- Inspect result payloads for both `score` (vector) and reranker scores; mismatched fields indicate the reranker didn’t execute.
-- Track latency before and after enabling reranking to ensure SLAs hold.
-- Review provider logs or dashboards for throttling or quota warnings.
-- Run A/B comparisons (rerank on/off) to validate improved relevance before defaulting to reranked responses.
+<注意>
+  每个工作流程都保留相同的“m.search(...)”签名，因此您可以跨代理模板化这些查询，只需更改提示和过滤器即可。
+</注>
 
 ---
 
-## Best practices
+## 验证该功能是否正常工作
 
-1. **Start local:** Try Sentence Transformer models to prove value before paying for hosted APIs.
-2. **Monitor latency:** Add metrics around reranker duration so you notice regressions quickly.
-3. **Control spend:** Use `top_k` and selective toggles to cap hosted reranker costs.
-4. **Keep a fallback:** Always catch reranker failures and continue with vector-only ordering.
-5. **Experiment often:** Swap providers or models to find the best fit for your domain and language mix.
+- 检查“分数”（向量）和重新排序分数的结果有效负载；不匹配的字段表示重新排序器未执行。
+- 跟踪启用重新排名之前和之后的延迟，以确保 SLA 有效。
+- 查看提供商日志或仪表板以了解限制或配额警告。
+- 在默认重新排名响应之前，运行 A/B 比较（重新排名开/关）以验证相关性的改善。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Configure Rerankers" icon="sliders" href="/components/rerankers/config">
-    Review provider fields, defaults, and environment variables before going live.
-  </Card>
-  <Card title="Build a Custom LLM Reranker" icon="sparkles" href="/components/rerankers/models/llm_reranker">
-    Extend scoring with prompt-tuned LLM rerankers for niche workflows.
-  </Card>
-</CardGroup>
+## 最佳实践1. **从本地开始：** 在支付托管 API 费用之前尝试 Sentence Transformer 模型以证明其价值。
+2. **监控延迟：** 添加有关重新排序持续时间的指标，以便您快速注意到回归。
+3. **控制支出：** 使用“top_k”和选择性切换来限制托管重新排序成本。
+4. **保留后备：** 始终捕获重新排序器失败并继续仅向量排序。
+5. **经常进行实验：** 交换提供商或模型以找到最适合您的领域和语言组合的方案。
+
+---
+
+<卡组列={2}>
+  <Card title="配置重新排序器" icon="sliders" href="/components/rerankers/config">
+    在上线之前检查提供程序字段、默认值和环境变量。
+  </卡>
+  <Card title="构建自定义 LLM Reranker" icon="sparkles" href="/components/rerankers/models/llm_reranker">
+    通过针对利基工作流程进行及时调整的 LLM 重新排序器来扩展评分。
+  </卡>
+</卡组>

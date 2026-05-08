@@ -2,11 +2,14 @@
 title: "LM Studio"
 description: "Configure LM Studio as an embedding provider in Mem0 for local embedding generation with models like nomic-embed-text."
 ---
-You can use embedding models from LM Studio to run Mem0 locally.
 
-### Usage
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-```python
+
+
+您可以使用 LM Studio 中的嵌入模型在本地运行 Mem0。
+
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -30,13 +33,12 @@ messages = [
 ]
 m.add(messages, user_id="john")
 ```
+### 配置
 
-### Config
+以下是可用于配置 LM Studio 嵌入器的参数：
 
-Here are the parameters available for configuring LM Studio embedder:
-
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `model` | The name of the LM Studio model to use | `nomic-embed-text-v1.5-GGUF/nomic-embed-text-v1.5.f16.gguf` |
-| `embedding_dims` | Dimensions of the embedding model | `1536` |
-| `lmstudio_base_url` | Base URL for LM Studio connection | `http://localhost:1234/v1` |
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `模型` |要使用的 LM Studio 模型的名称 | `nomic-embed-text-v1.5-GGUF/nomic-embed-text-v1.5.f16.gguf` |
+| `embedding_dims` |嵌入模型的尺寸| `1536` |
+| `lmstudio_base_url` | LM Studio 连接的基本 URL | `http://localhost:1234/v1` |

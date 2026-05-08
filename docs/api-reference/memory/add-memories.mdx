@@ -4,29 +4,39 @@ description: "Add facts, messages, or metadata to a user memory store with async
 openapi: post /v3/memories/add/
 ---
 
-Extract and store memories from a conversation using the V3 additive pipeline. The endpoint uses single-pass ADD-only extraction — one LLM call, no UPDATE/DELETE. Memories accumulate over time; nothing is overwritten.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Endpoint
 
-- **Method**: `POST`
-- **URL**: `/v3/memories/add/`
-- **Content-Type**: `application/json`
 
-Processing is asynchronous. The response returns an `event_id` you can poll via `GET /v1/event/{event_id}/`.
 
-## Required headers
 
-| Header | Required | Description |
+
+
+
+
+
+使用 V3 附加管道从对话中提取并存储记忆。端点使用单遍仅添加提取 - 一次 LLM 调用，无更新/删除。记忆随着时间的推移而积累；没有任何内容被覆盖。
+
+## 端点
+
+- **方法**：`POST`
+- **网址**：`/v3/memories/add/`
+- **内容类型**：`application/json`
+
+处理是异步的。响应返回一个“event_id”，您可以通过“GET /v1/event/{event_id}/”进行轮询。
+
+## 必需的标头
+
+| 标题|必填 |描述 |
 | --- | --- | --- |
-| `Authorization: Token <MEM0_API_KEY>` | Yes | API key scoped to your workspace. |
-| `Accept: application/json` | Yes | Ensures a JSON response. |
+| `授权：令牌 <MEM0_API_KEY>` |是的 | API 密钥的范围仅限于您的工作区。 |
+| `接受：application/json` |是的 |确保 JSON 响应。 |
 
-## Request body
+## 请求正文
 
-Provide conversation messages for Mem0 to extract memories from. At least one entity ID (`user_id`, `agent_id`, `app_id`, or `run_id`) is required so the memory is scoped to a session. Entity IDs are accepted at the top level.
+为 Mem0 提供对话消息以从中提取记忆。至少需要一个实体 ID（“user_id”、“agent_id”、“app_id”或“run_id”），以便将内存范围限定为会话。实体 ID 在顶层被接受。
 
-<CodeGroup>
-```json Basic request
+<代码组>```json Basic request
 {
   "user_id": "alice",
   "messages": [
@@ -35,34 +45,32 @@ Provide conversation messages for Mem0 to extract memories from. At least one en
   "metadata": {
     "source": "onboarding_form"
   }
-}
-```
-</CodeGroup>
+}```
+</代码组>
 
-### Common fields
+### 公共字段
 
-| Field | Type | Required | Description |
+| 领域|类型 |必填 |描述 |
 | --- | --- | --- | --- |
-| `messages` | array | Yes | Conversation turns for Mem0 to extract memories from. Each object should include `role` and `content`. |
-| `user_id` | string | No* | Associates the memory with a user. |
-| `agent_id` | string | No* | Associates the memory with an agent. |
-| `run_id` | string | No* | Associates the memory with a run. |
-| `app_id` | string | No* | Associates the memory with an app. |
-| `metadata` | object | Optional | Custom key/value metadata (e.g., `{"topic": "preferences"}`). |
-| `infer` | boolean (default `true`) | Optional | Set to `false` to skip inference and store the provided text as-is. |
+| `消息` |数组|是的 |对话转向 Mem0 来提取记忆。每个对象应包含“角色”和“内容”。 |
+| `用户 ID` |字符串|否* |将内存与用户相关联。 |
+| `agent_id` |字符串|否* |将内存与代理关联起来。 |
+| `run_id` |字符串|否* |将内存与运行关联起来。 |
+| `app_id` |字符串|否* |将内存与应用程序关联。 |
+| `元数据` |对象|可选|自定义键/值元数据（例如，`{"topic": "preferences"}`）。 |
+| `推断` |布尔值（默认“true”）|可选|设置为“false”以跳过推理并按原样存储提供的文本。 |
 
-> \* At least one entity ID (`user_id`, `agent_id`, `app_id`, or `run_id`) is required.
+> \* 至少需要一个实体 ID（`user_id`、`agent_id`、`app_id` 或 `run_id`）。
 
-<Tip>
-  Need more details? See [all request parameters](#body-messages) below for complete field descriptions, types, and constraints.
-</Tip>
+<提示>
+需要更多详细信息吗？请参阅下面的[所有请求参数](#body-messages)，了解完整的字段描述、类型和约束。
+</提示>
 
-## Response
+## 回复
 
-The request is queued for background processing. The response contains an `event_id` for tracking status.
+该请求排队等待后台处理。响应包含用于跟踪状态的“event_id”。
 
-<CodeGroup>
-```json 200 response
+<代码组>```json 200 response
 {
   "message": "Memory processing has been queued for background execution",
   "status": "PENDING",
@@ -78,9 +86,8 @@ The request is queued for background processing. The response contains an `event
   }
 }
 ```
-</CodeGroup>
+</代码组>
 
-<Info>
-Poll the event status via `GET /v1/event/{event_id}/`. Status will be `SUCCEEDED` or `FAILED` once processing completes.
-</Info>
-
+<信息>
+通过“GET /v1/event/{event_id}/”轮询事件状态。处理完成后，状态将为“SUCCEEDED”或“FAILED”。
+</信息>

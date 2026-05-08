@@ -3,76 +3,76 @@ title: Overview
 description: 'Pick the right reranker path to boost Mem0 search relevance.'
 ---
 
-Mem0 rerankers rescore vector search hits so your agents surface the most relevant memories. Use this hub to decide when reranking helps, configure a provider, and fine-tune performance.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Info>
-Reranking trades extra latency for better precision. Start once you have baseline search working and measure before/after relevance.
-</Info>
 
-<CardGroup cols={3}>
-  <Card
-    title="Understand Reranking"
-    description="See how reranker-enhanced search changes your retrieval flow."
-    icon="search"
+
+Mem0 重新排名会对向量搜索命中进行重新评分，以便您的智能体呈现最相关的记忆。使用此中心来决定重新排名何时有帮助、配置提供程序并微调性能。
+
+<信息>
+重新排名会牺牲额外的延迟以获得更高的精度。一旦你有了基线搜索工作，就可以开始测量之前/之后的相关性。
+</信息><卡组列={3}>
+  <卡片
+    title="了解重新排名"
+    description="了解重新排序增强型搜索如何改变您的检索流程。"
+    图标=“搜索”
     href="/open-source/features/reranker-search"
   />
-  <Card
-    title="Configure Providers"
-    description="Add reranker blocks to your memory configuration."
-    icon="settings"
+  <卡片
+    title="配置提供商"
+    描述=“将重排序器块添加到您的内存配置中。”
+    图标=“设置”
     href="/components/rerankers/config"
   />
-  <Card
-    title="Optimize Performance"
-    description="Balance relevance, latency, and cost with tuning tactics."
-    icon="speedometer"
+  <卡片
+    title="优化性能"
+    description="通过调整策略平衡相关性、延迟和成本。"
+    图标=“速度计”
     href="/components/rerankers/optimization"
   />
-  <Card
-    title="Custom Prompts"
-    description="Shape LLM-based reranking with tailored instructions."
-    icon="code"
+  <卡片
+    title="自定义提示"
+    描述=“通过定制说明塑造基于法学硕士的重新排名。”
+    图标=“代码”
     href="/components/rerankers/custom-prompts"
   />
-  <Card
-    title="Zero Entropy Guide"
-    description="Adopt the managed neural reranker for production workloads."
-    icon="sparkles"
+  <卡片
+    title="零熵指南"
+    description="针对生产工作负载采用托管神经重新排序器。”
+    图标=“闪闪发光”
     href="/components/rerankers/models/zero_entropy"
   />
-  <Card
-    title="Sentence Transformers"
-    description="Keep reranking on-device with cross-encoder models."
-    icon="cpu"
+  <卡片
+    title="句子变形金刚"
+    描述 =“使用跨编码器模型在设备上保持重新排名。”
+    图标=“CPU”
     href="/components/rerankers/models/sentence_transformer"
   />
-</CardGroup>
+</卡组>
 
-## Picking the Right Reranker
+## 选择正确的重排序器- **API 优先** 当您需要最高质量并且可以吸收请求成本时（Cohere、零熵）。  
+- **自托管**，用于必须保留在您的硬件上的隐私敏感部署（Sentence Transformer、Hugging Face）。  
+- **LLM驱动**当您需要定制评分逻辑或复杂提示时。  
+- **混合**，仅在高级旅程上启用重新排名以控制支出。
 
-- **API-first** when you need top quality and can absorb request costs (Cohere, Zero Entropy).  
-- **Self-hosted** for privacy-sensitive deployments that must stay on your hardware (Sentence Transformer, Hugging Face).  
-- **LLM-driven** when you need bespoke scoring logic or complex prompts.  
-- **Hybrid** by enabling reranking only on premium journeys to control spend.
+## 实施清单
 
-## Implementation Checklist
+1. 确认基线搜索 KPI，以便您可以衡量提升情况。  
+2. 选择一个提供商并将“reranker”块添加到您的配置中。  
+3. 使用类似生产的查询批次测试延迟影响。  
+4. 通过“rerank”标志决定是否启用全局重新排名或每次搜索启用重新排名。
 
-1. Confirm baseline search KPIs so you can measure uplift.  
-2. Select a provider and add the `reranker` block to your config.  
-3. Test latency impact with production-like query batches.  
-4. Decide whether to enable reranking globally or per-search via the `rerank` flag.
-
-<CardGroup cols={2}>
-  <Card
-    title="Set Up Reranking"
-    description="Walk through the configuration fields and defaults."
-    icon="settings"
+<卡组列={2}>
+  <卡片
+    title="设置重新排名"
+    description="浏览配置字段和默认值。”
+    图标=“设置”
     href="/components/rerankers/config"
   />
-  <Card
-    title="Example: Reranker Search"
-    description="Follow the feature guide to see reranking in action."
-    icon="rocket"
+  <卡片
+    title="示例：重新排序搜索"
+    description="按照功能指南查看重新排名的实际效果。"
+    图标=“火箭”
     href="/open-source/features/reranker-search"
   />
-</CardGroup>
+</卡组>

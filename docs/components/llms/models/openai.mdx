@@ -3,14 +3,17 @@ title: OpenAI
 description: "Configure OpenAI as an LLM provider in Mem0 with support for GPT models and Openrouter compatibility."
 ---
 
-To use OpenAI LLM models, you have to set the `OPENAI_API_KEY` environment variable. You can obtain the OpenAI API key from the [OpenAI Platform](https://platform.openai.com/account/api-keys).
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-> **Note**: The following are currently unsupported with reasoning models `Parallel tool calling`,`temperature`, `top_p`, `presence_penalty`, `frequency_penalty`, `logprobs`, `top_logprobs`, `logit_bias`, `max_tokens`
 
-## Usage
 
-<CodeGroup>
-```python Python
+要使用 OpenAI LLM 模型，您必须设置“OPENAI_API_KEY”环境变量。您可以从[OpenAI Platform](https://platform.openai.com/account/api-keys)获取OpenAI API密钥。
+
+> **注意**：推理模型目前不支持以下内容`并行工具调用`、`温度`、`top_p`、`presence_penalty`、`frequity_penalty`、`logprobs`、`top_logprobs`、`logit_bias`、`max_tokens`
+
+## 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -72,11 +75,9 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-We also support the new [OpenAI structured-outputs](https://platform.openai.com/docs/guides/structured-outputs/introduction) model.
-
-```python
+我们还支持新的 [OpenAI 结构化输出](https://platform.openai.com/docs/guides/structed-outputs/introduction) 模型。```python
 import os
 from mem0 import Memory
 
@@ -94,7 +95,6 @@ config = {
 
 m = Memory.from_config(config)
 ```
+## 配置
 
-## Config
-
-All available parameters for the `openai` config are present in [Master List of All Params in Config](../config).
+`openai` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

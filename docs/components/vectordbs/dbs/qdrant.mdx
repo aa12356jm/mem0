@@ -2,12 +2,16 @@
 title: "Qdrant"
 description: "Use Qdrant as an open-source vector search engine in Mem0 for high-performance similarity search at scale."
 ---
-[Qdrant](https://qdrant.tech/) is an open-source vector search engine. It is designed to work with large-scale datasets and provides a high-performance search engine for vector data.
 
-### Usage
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<CodeGroup>
-```python Python
+
+
+[Qdrant](https://qdrant.tech/) 是一个开源矢量搜索引擎。它旨在处理大规模数据集，并为矢量数据提供高性能搜索引擎。
+
+### 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -58,36 +62,34 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-### Config
+### 配置
 
-Let's see the available parameters for the `qdrant` config:
-
-<Tabs>
-<Tab title="Python">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collection_name` | The name of the collection to store the vectors | `mem0` |
-| `embedding_model_dims` | Dimensions of the embedding model | `1536` |
-| `client` | Custom client for qdrant | `None` |
-| `host` | The host where the qdrant server is running | `None` |
-| `port` | The port where the qdrant server is running | `None` |
-| `path` | Path for the qdrant database | `/tmp/qdrant` |
-| `url` | Full URL for the qdrant server | `None` |
-| `api_key` | API key for the qdrant server | `None` |
-| `on_disk` | For enabling persistent storage | `False` |
-</Tab>
-<Tab title="TypeScript">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collectionName` | The name of the collection to store the vectors | `mem0` |
-| `embeddingModelDims` | Dimensions of the embedding model | `1536` |
-| `host` | The host where the Qdrant server is running | `None` |
-| `port` | The port where the Qdrant server is running | `None` |
-| `path` | Path for the Qdrant database | `/tmp/qdrant` |
-| `url` | Full URL for the Qdrant server | `None` |
-| `apiKey` | API key for the Qdrant server | `None` |
-| `onDisk` | For enabling persistent storage | `False` |
-</Tab>
-</Tabs>
+让我们看看“qdrant”配置的可用参数：<标签>
+<标签标题=“Python”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |存储向量的集合的名称 | `mem0` |
+| `embedding_model_dims` |嵌入模型的尺寸| `1536` |
+| `客户` | qdrant 的自定义客户端 | `无` |
+| `主机` |运行 qdrant 服务器的主机 | `无` |
+| `端口` | qdrant 服务器运行的端口 | `无` |
+| `路径` | qdrant 数据库的路径 | `/tmp/qdrant` |
+| `网址` | qdrant 服务器的完整 URL | `无` |
+| `api_key` | qdrant 服务器的 API 密钥 | `无` |
+| `磁盘上` |用于启用持久存储| ‘假’|
+</标签>
+<选项卡标题=“TypeScript”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |存储向量的集合的名称 | `mem0` |
+| `embeddingModelDims` |嵌入模型的尺寸| `1536` |
+| `主机` |运行 Qdrant 服务器的主机 | `无` |
+| `端口` | Qdrant 服务器运行的端口 | `无` |
+| `路径` | Qdrant 数据库的路径 | `/tmp/qdrant` |
+| `网址` | Qdrant 服务器的完整 URL | `无` |
+| `apiKey` | Qdrant 服务器的 API 密钥 | `无` |
+| `磁盘上` |用于启用持久存储| ‘假’|
+</标签>
+</标签>

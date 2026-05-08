@@ -3,11 +3,13 @@ title: Baidu VectorDB (Mochow)
 description: "Use Baidu Mochow as an enterprise vector database in Mem0 for high-performance vector storage and retrieval."
 ---
 
-[Baidu VectorDB](https://cloud.baidu.com/doc/VDB/index.html) is an enterprise-level distributed vector database service developed by Baidu Intelligent Cloud. It is powered by Baidu's proprietary "Mochow" vector database kernel, providing high performance, availability, and security for vector search.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Usage
 
-```python
+
+[Baidu VectorDB](https://cloud.baidu.com/doc/VDB/index.html)是百度智能云开发的企业级分布式矢量数据库服务。它由百度专有的“Mochow”矢量数据库内核提供支持，为矢量搜索提供高性能、可用​​性和安全性。
+
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -35,34 +37,33 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+### 配置
 
-### Config
+以下是配置百度VectorDB可用的参数：
 
-Here are the parameters available for configuring Baidu VectorDB:
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `端点` |百度 VectorDB 实例的端点 URL |必填 |
+| `帐户` |百度VectorDB帐号名 | `根` |
+| `api_key` |访问百度VectorDB的API密钥|必填 |
+| `数据库名称` |数据库名称 | `mem0` |
+| `表名` |表名 | `mem0_table` |
+| `embedding_model_dims` |嵌入模型的尺寸| `1536` |
+| `度量类型` |相似性搜索的距离度量 | 'L2' |
 
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `endpoint` | Endpoint URL for your Baidu VectorDB instance | Required |
-| `account` | Baidu VectorDB account name | `root` |
-| `api_key` | API key for accessing Baidu VectorDB | Required |
-| `database_name` | Name of the database | `mem0` |
-| `table_name` | Name of the table | `mem0_table` |
-| `embedding_model_dims` | Dimensions of the embedding model | `1536` |
-| `metric_type` | Distance metric for similarity search | `L2` |
+### 距离指标
 
-### Distance Metrics
+支持以下距离度量：
 
-The following distance metrics are supported:
+- `L2`：欧氏距离（默认）
+- `IP`：内积
+- `COSINE`：余弦相似度
 
-- `L2`: Euclidean distance (default)
-- `IP`: Inner product
-- `COSINE`: Cosine similarity
+### 索引配置
 
-### Index Configuration
+矢量索引自动配置以下 HNSW 参数：
 
-The vector index is automatically configured with the following HNSW parameters:
-
-- `m`: 16 (number of connections per element)
-- `efconstruction`: 200 (size of the dynamic candidate list)
-- `auto_build`: true (automatically build index)
-- `auto_build_index_policy`: Incremental build with 10000 rows increment
+- `m`: 16（每个元素的连接数）
+- `efconstruction`: 200（动态候选列表的大小）
+- `auto_build`: true (自动构建索引)
+- `auto_build_index_policy`：增量构建，增量为 10000 行

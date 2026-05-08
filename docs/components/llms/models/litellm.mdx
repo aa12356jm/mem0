@@ -2,11 +2,14 @@
 title: "LiteLLM"
 description: "Use LiteLLM as an LLM provider in Mem0 to access over 100 language models through a unified interface."
 ---
-[Litellm](https://litellm.vercel.app/docs/) is compatible with over 100 large language models (LLMs), all using a standardized input/output format. You can explore the [available models](https://litellm.vercel.app/docs/providers) to use with Litellm. Ensure you set the `API_KEY` for the model you choose to use.
 
-## Usage
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-```python
+
+
+[Litellm](https://litellm.vercel.app/docs/) 与 100 多种大型语言模型 (LLM) 兼容，全部使用标准化的输入/输出格式。您可以探索与 Litellm 一起使用的[可用模型](https://litellm.vercel.app/docs/providers)。确保为您选择使用的模型设置“API_KEY”。
+
+＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -32,7 +35,6 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+## 配置
 
-## Config
-
-All available parameters for the `litellm` config are present in [Master List of All Params in Config](../config).
+`litellm` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

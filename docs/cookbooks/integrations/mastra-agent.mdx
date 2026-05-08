@@ -3,30 +3,28 @@ title: Persistent Mastra Agents
 description: "Extend Mastra agents with persistent memories powered by Mem0."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-In this example you'll learn how to use Mem0 to add long-term memory capabilities to [Mastra's agent](https://mastra.ai/) via tool-use. This memory integration can work alongside Mastra's [agent memory features](https://mastra.ai/docs/agents/01-agent-memory).
 
-You can find the complete example code in the [Mastra repository](https://github.com/mastra-ai/mastra/tree/main/examples/memory-with-mem0).
 
-## Overview
+在此示例中，您将学习如何通过工具使用 Mem0 为 [Mastra 代理](https://mastra.ai/) 添加长期记忆功能。这种内存集成可以与 Mastra 的[代理内存功能](https://mastra.ai/docs/agents/01-agent-memory) 一起工作。
 
-This guide will show you how to integrate Mem0 with Mastra to add long-term memory capabilities to your agents. We'll create tools that allow agents to save and retrieve memories using Mem0's API.
+您可以在 [Mastra 存储库](https://github.com/mastra-ai/mastra/tree/main/examples/memory-with-mem0) 中找到完整的示例代码。
 
-## Installation
+## 概述
 
-**Install the Integration Package**
+本指南将向您展示如何将 Mem0 与 Mastra 集成，为您的代理添加长期记忆功能。我们将创建允许代理使用 Mem0 的 API 保存和检索记忆的工具。
 
-To install the Mem0 integration, run:
+## 安装
 
-```bash
+**安装集成包**
+
+要安装 Mem0 集成，请运行：```bash
 npm install @mastra/mem0
 ```
+**将集成添加到您的项目**
 
-**Add the Integration to Your Project**
-
-Create a new file for your integrations and import the integration:
-
-```typescript integrations/index.ts
+为您的集成创建一个新文件并导入集成：```typescript integrations/index.ts
 import { Mem0Integration } from "@mastra/mem0";
 
 export const mem0 = new Mem0Integration({
@@ -36,12 +34,9 @@ export const mem0 = new Mem0Integration({
   },
 });
 ```
+**使用工具或工作流程中的集成**
 
-**Use the Integration in Tools or Workflows**
-
-You can now use the integration when defining tools for your agents or in workflows.
-
-```typescript tools/index.ts
+现在，您可以在为代理或工作流程定义工具时使用集成。```typescript tools/index.ts
 import { createTool } from "@mastra/core";
 import { z } from "zod";
 import { mem0 } from "../integrations";
@@ -86,10 +81,7 @@ export const mem0MemorizeTool = createTool({
   },
 });
 ```
-
-**Create a New Agent**
-
-```typescript agents/index.ts
+**创建新代理**```typescript agents/index.ts
 import { openai } from '@ai-sdk/openai';
 import { Agent } from '@mastra/core/agent';
 import { mem0MemorizeTool, mem0RememberTool } from '../tools';
@@ -103,10 +95,7 @@ export const mem0Agent = new Agent({
   tools: { mem0RememberTool, mem0MemorizeTool },
 });
 ```
-
-**Run the Agent**
-
-```typescript index.ts
+**运行代理**```typescript index.ts
 import { Mastra } from '@mastra/core/mastra';
 import { createLogger } from '@mastra/core/logger';
 
@@ -120,19 +109,18 @@ export const mastra = new Mastra({
   }),
 });
 ```
-
-In the example above:
-- We import the `@mastra/mem0` integration
-- We define two tools that use the Mem0 API client to create new memories and recall previously saved memories
-- The tool accepts `question` as an input and returns the memory as a string
+在上面的例子中：
+- 我们导入`@mastra/mem0`集成
+- 我们定义了两个工具，使用 Mem0 API 客户端创建新的记忆并调用以前保存的记忆
+- 该工具接受“问题”作为输入并以字符串形式返回内存
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Partition Memories by Entity" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
-    Separate user, agent, and app memories to keep multi-agent flows clean.
-  </Card>
+<卡组列={2}>
+  <Card title="按实体划分记忆" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
+    分离用户、代理和应用程序内存，以保持多代理流程干净。
+  </卡>
   <Card title="Agents SDK Tool with Mem0" icon="robot" href="/cookbooks/integrations/agents-sdk-tool">
-    Explore tool-calling patterns with the OpenAI Agents SDK.
-  </Card>
-</CardGroup>
+    使用 OpenAI Agents SDK 探索工具调用模式。
+  </卡>
+</卡组>

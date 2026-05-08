@@ -3,13 +3,13 @@ title: Vertex AI Vector Search
 description: "Use Google Cloud Vertex AI Vector Search as a managed vector store in Mem0 with endpoint and index configuration."
 ---
 
-
-### Usage
-
-To use Google Cloud Vertex AI Vector Search with `mem0`, you need to configure the `vector_store` in your `mem0` config:
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
 
-```python
+
+### 用法
+
+要将 Google Cloud Vertex AI 矢量搜索与“mem0”一起使用，您需要在“mem0”配置中配置“vector_store”：```python
 import os
 from mem0 import Memory
 
@@ -33,17 +33,15 @@ config = {
 m = Memory.from_config(config)
 m.add("Your text here", user_id="user", metadata={"category": "example"})
 ```
+### 必需参数
 
-
-### Required Parameters
-
-| Parameter | Description | Required |
-|-----------|-------------|----------|
-| `endpoint_id` | Vector Search endpoint ID | Yes |
-| `index_id` | Vector Search index ID | Yes |
-| `deployment_index_id` | Deployment-specific index ID | Yes |
-| `project_id` | Google Cloud project ID | Yes |
-| `project_number` | Google Cloud project number | Yes |
-| `vector_search_api_endpoint` | Vector search API endpoint | Yes (for get operations) |
-| `region` | Google Cloud region | No (defaults to GOOGLE_CLOUD_REGION) |
-| `credentials_path` | Path to service account credentials | No (defaults to GOOGLE_APPLICATION_CREDENTIALS) |
+|参数|描述 |必填 |
+|------------|-------------|----------|
+| `端点_id` |矢量搜索端点 ID |是的 |
+| `index_id` |矢量搜索索引 ID |是的 |
+| `deployment_index_id` |特定于部署的索引 ID |是的 |
+| `project_id` | Google Cloud 项目 ID |是的 |
+| `项目编号` | Google Cloud 项目编号 |是的 |
+| `vector_search_api_endpoint` |矢量搜索 API 端点 |是（对于获取操作）|
+| `地区` | Google Cloud 区域 |否（默认为 GOOGLE_CLOUD_REGION）|
+| `凭证路径` |服务帐户凭据的路径 |否（默认为 GOOGLE_APPLICATION_CREDENTIALS）|

@@ -2,17 +2,18 @@
 title: "Weaviate"
 description: "Use Weaviate as an open-source vector search engine in Mem0 for storing and retrieving vector embeddings."
 ---
-[Weaviate](https://weaviate.io/) is an open-source vector search engine. It allows efficient storage and retrieval of high-dimensional vector embeddings, enabling powerful search and retrieval capabilities.
+
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
 
-### Installation
-```bash
+
+[Weaviate](https://weaviate.io/) 是一个开源矢量搜索引擎。它允许高效存储和检索高维向量嵌入，从而实现强大的搜索和检索功能。
+
+
+＃＃＃ 安装```bash
 pip install weaviate weaviate-client
 ```
-
-### Usage
-
-```python Python
+＃＃＃ 用法```python Python
 import os
 from mem0 import Memory
 
@@ -38,14 +39,13 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+### 配置
 
-### Config
+以下是可用于配置 Weaviate 的参数：
 
-Here are the parameters available for configuring Weaviate:
-
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collection_name` | The name of the collection to store the vectors | `mem0` |
-| `embedding_model_dims` | Dimensions of the embedding model | `1536` |
-| `cluster_url` | URL for the Weaviate server | `None` |
-| `auth_client_secret` | API key for Weaviate authentication | `None` |
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |存储向量的集合的名称 | `mem0` |
+| `embedding_model_dims` |嵌入模型的尺寸| `1536` |
+| `cluster_url` | Weaviate 服务器的 URL | `无` |
+| `auth_client_secret` |用于 Weaviate 身份验证的 API 密钥 | `无` |

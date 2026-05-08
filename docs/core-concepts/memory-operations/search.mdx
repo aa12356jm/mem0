@@ -5,52 +5,50 @@ icon: "magnifying-glass"
 iconType: "solid"
 ---
 
-# How Mem0 Searches Memory
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0's search operation lets agents ask natural-language questions and get back the memories that matter most. Like a smart librarian, it finds exactly what you need from everything you've stored.
 
-<Info>
-  **Why it matters**
-  - Retrieves the right facts without rebuilding prompts from scratch.
-  - Supports both managed Platform and OSS so you can test locally and deploy at scale.
-  - Keeps results relevant with filters, rerankers, and thresholds.
-</Info>
 
-## Key terms
+# Mem0 如何搜索内存
 
-- **Query** – Natural-language question or statement you pass to `search`.
-- **Filters** – JSON logic (AND/OR, comparison operators) that narrows results by user, categories, dates, etc.
-- **top_k / threshold** – Controls how many memories return and the minimum similarity score.
-- **Rerank** – Optional second pass that boosts precision when a reranker is configured.
+Mem0 的搜索操作让代理可以提出自然语言问题并找回最重要的记忆。就像一个聪明的图书管理员一样，它可以从您存储的所有内容中准确找到您需要的内容。
 
-## Architecture
+<信息>
+  **为什么重要**
+  - 检索正确的事实，无需从头开始重建提示。
+  - 支持托管平台和 OSS，因此您可以在本地测试并大规模部署。
+  - 保持结果与过滤器、重新排序器和阈值相关。
+</信息>
 
-<Frame caption="Architecture diagram illustrating the memory search process.">
+## 关键术语
+
+- **查询** – 您传递给“搜索”的自然语言问题或语句。
+- **过滤器** – JSON 逻辑（AND/OR、比较运算符），按用户、类别、日期等缩小结果范围。
+- **top_k/threshold** – 控制返回的记忆数量和最小相似度分数。
+- **重新排序** – 可选的第二遍，可在配置重新排序器时提高精度。## 架构
+
+<Frame title="说明内存搜索过程的架构图。">
   <img src="../../images/search_architecture.png" />
-</Frame>
+</框架><步骤>
+<Step title="查询处理">
+Mem0 清理并丰富您的自然语言查询，以便下游嵌入搜索准确。
+</步骤>
+<步骤标题=“矢量搜索”>
+嵌入使用范围数据集中的余弦相似度来定位最接近的记忆。
+</步骤>
+<Step title="过滤和重新排名">
+逻辑过滤缩小候选人范围；重新排序或阈值微调排序。
+</步骤>
+<步骤标题=“结果交付”>
+格式化的记忆（带有元数据和时间戳）返回给您的代理或呼叫服务。
+</步骤>
+</步骤>
 
-<Steps>
-<Step title="Query processing">
-Mem0 cleans and enriches your natural-language query so the downstream embedding search is accurate.
-</Step>
-<Step title="Vector search">
-Embeddings locate the closest memories using cosine similarity across your scoped dataset.
-</Step>
-<Step title="Filtering & reranking">
-Logical filters narrow candidates; rerankers or thresholds fine-tune ordering.
-</Step>
-<Step title="Results delivery">
-Formatted memories (with metadata and timestamps) return to your agent or calling service.
-</Step>
-</Steps>
+对于托管平台 API 和 OSS SDK，该管道的运行方式相同。
 
-This pipeline runs the same way for the hosted Platform API and the OSS SDK.
+## 它是如何工作的？
 
-## How does it work?
-
-Search converts your natural language question into a vector embedding, then finds memories with similar embeddings in your database. The results are ranked by similarity score and can be further refined with filters or reranking.
-
-```python
+搜索将您的自然语言问题转换为向量嵌入，然后在数据库中查找具有相似嵌入的记忆。结果按相似度得分进行排名，并且可以通过过滤器或重新排名进一步细化。```python
 # Minimal example that shows the concept in action
 # Platform API
 client.search("What are Alice's hobbies?", filters={"user_id": "alice"})
@@ -58,32 +56,28 @@ client.search("What are Alice's hobbies?", filters={"user_id": "alice"})
 # OSS
 m.search("What are Alice's hobbies?", filters={"user_id": "alice"})
 ```
+<提示>
+  始终至少提供一个“user_id”过滤器来将搜索范围限制到正确的用户记忆。这可以防止用户之间的交叉污染。
+</提示>
 
-<Tip>
-  Always provide at least a `user_id` filter to scope searches to the right user's memories. This prevents cross-contamination between users.
-</Tip>
+## 什么时候应该使用它？
 
-## When should you use it?
+- **上下文检索** - 当您的代理需要过去的上下文来生成更好的响应时
+- **个性化** - 回忆用户偏好、历史记录或过去的交互
+- **事实检查** - 在响应之前根据存储的记忆验证信息
+- **决策支持** - 当代理需要相关背景信息来做出决策时
 
-- **Context retrieval** - When your agent needs past context to generate better responses
-- **Personalization** - To recall user preferences, history, or past interactions
-- **Fact checking** - To verify information against stored memories before responding
-- **Decision support** - When agents need relevant background information to make decisions
+## 平台与 OSS 使用情况|能力| Mem0平台|内存0 OSS |
+| ---| ---| ---|
+| **搜索/get_all 上的实体 ID** |里面 `filters={"user_id": "alice"}` |内部 `filters={"user_id": "alice"}` （与 v3 中的平台一致 — 顶级 kwargs 引发 `ValueError`）|
+| **过滤语法** |具有字段级访问的逻辑运算符（“AND”、“OR”、比较）|基本字段过滤器，通过 Python 钩子扩展 |
+| **重新排名** |使用托管重新排序器目录切换“rerank=True” |需要配置本地或第三方重新排名器 |
+| **阈值** |请求级配置（`threshold`、`top_k`）|通过SDK参数控制|
+| **响应元数据** |包括置信度分数、时间戳、仪表板可见性 |由您的存储后端决定 |
 
-## Platform vs OSS usage
+## 使用 Mem0 平台搜索
 
-| Capability | Mem0 Platform | Mem0 OSS |
-| --- | --- | --- |
-| **Entity IDs on search / get_all** | Inside `filters={"user_id": "alice"}` | Inside `filters={"user_id": "alice"}` (aligned with Platform in v3 — top-level kwargs raise `ValueError`) |
-| **Filter syntax** | Logical operators (`AND`, `OR`, comparisons) with field-level access | Basic field filters, extend via Python hooks |
-| **Reranking** | Toggle `rerank=True` with managed reranker catalog | Requires configuring local or third-party rerankers |
-| **Thresholds** | Request-level configuration (`threshold`, `top_k`) | Controlled via SDK parameters |
-| **Response metadata** | Includes confidence scores, timestamps, dashboard visibility | Determined by your storage backend |
-
-## Search with Mem0 Platform
-
-<CodeGroup>
-```python Python
+<代码组>```python Python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your-api-key")
@@ -115,12 +109,11 @@ const results = await client.search(query, {
   filters
 });
 ```
-</CodeGroup>
+</代码组>
 
-## Search with Mem0 Open Source
+## 使用 Mem0 开源搜索
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 from mem0 import Memory
 
 m = Memory()
@@ -150,20 +143,19 @@ const memories = memory.search("food preferences", {
     filters: { userId: "alice", categories: { contains: "diet" } },
 });
 ```
-</CodeGroup>
+</代码组>
 
-<Info icon="check">
-  Expect an array of memory documents. Platform responses include vectors, metadata, and timestamps; OSS returns your stored schema.
-</Info>
+<信息图标=“检查”>
+  期望内存文档数组。平台响应包括向量、元数据和时间戳； OSS 返回您存储的模式。
+</信息>
 
-## Filter patterns
+## 过滤模式
 
-Filters help narrow down search results. Common use cases:
+过滤器有助于缩小搜索结果范围。常见用例：
 
-**Filter by Session Context:**
+**按会话上下文过滤：**
 
-*Platform API:*
-```python
+*平台API：*```python
 # Get memories from a specific agent session
 client.search("query", filters={
     "AND": [
@@ -173,9 +165,7 @@ client.search("query", filters={
     ]
 })
 ```
-
-*OSS:*
-```python
+*操作系统：*```python
 # Get memories from a specific agent session — entity IDs combined in filters
 m.search("query", filters={
     "user_id": "alice",
@@ -183,9 +173,7 @@ m.search("query", filters={
     "run_id": "session-123",
 })
 ```
-
-**Filter by Date Range:**
-```python
+**按日期范围过滤：**```python
 # Platform only - date filtering
 client.search("recent memories", filters={
     "AND": [
@@ -194,9 +182,7 @@ client.search("recent memories", filters={
     ]
 })
 ```
-
-**Filter by Categories:**
-```python
+**按类别过滤：**```python
 # Platform only - category filtering
 client.search("preferences", filters={
     "AND": [
@@ -205,50 +191,46 @@ client.search("preferences", filters={
     ]
 })
 ```
+## 更好的搜索技巧
 
-## Tips for better search
-
-- **Use natural language**: Mem0 understands intent, so describe what you're looking for naturally
-- **Scope with user ID**: Always provide `user_id` to scope search to relevant memories
-  - **Platform API**: Use `filters={"user_id": "alice"}`
-  - **OSS**: Use `user_id="alice"` as parameter
-- **Combine filters**: Use AND/OR logic to create precise queries (Platform)
-- **Consider wildcard filters**: Use wildcard filters (e.g., `run_id: "*"`) for broader matches
-- **Tune parameters**: Adjust `top_k` for result count, `threshold` for relevance cutoff
-- **Enable reranking**: Use `rerank=True` (default) when you have a reranker configured
+- **使用自然语言**：Mem0 理解意图，因此自然地描述您正在寻找的内容
+- **带有用户 ID 的范围**：始终提供 `user_id` 以将搜索范围搜索到相关内存
+  - **平台 API**：使用 `filters={"user_id": "alice"}`
+  - **OSS**：使用 `user_id="alice"` 作为参数
+- **组合过滤器**：使用 AND/OR 逻辑创建精确查询（平台）
+- **考虑通配符过滤器**：使用通配符过滤器（例如`run_id：“*”`）进行更广泛的匹配
+- **调整参数**：调整结果计数的“top_k”，相关性截止的“threshold”
+- **启用重新排名**：当您配置了重新排名器时，使用“rerank=True”（默认）
 
 <Callout type="tip" icon="plug">
-  **MCP Alternative**: With <Link href="/platform/mem0-mcp">Mem0 MCP</Link>, AI agents can search their own memories proactively when needed.
-</Callout>
+  **MCP 替代方案**：通过 <Link href="/platform/mem0-mcp">Mem0 MCP</Link>，AI 代理可以在需要时主动搜索自己的内存。</标注>
 
-### More Details
+### 更多细节
 
-For the full list of filter logic, comparison operators, and optional search parameters, see the
-[Search Memory API Reference](/api-reference/memory/search-memories).
+有关过滤器逻辑、比较运算符和可选搜索参数的完整列表，请参阅
+[搜索内存 API 参考](/api-reference/memory/search-memories)。
 
-## Put it into practice
+## 付诸实践- 重新访问<Link href="/core-concepts/memory-operations/add">添加内存</Link>指南，以确保捕获您期望检索的上下文。
+- 在<Link href="/platform/features/advanced-retrieval">高级检索</Link>中配置重新排序器和过滤器以获得更高的精度。
 
-- Revisit the <Link href="/core-concepts/memory-operations/add">Add Memory</Link> guide to ensure you capture the context you expect to retrieve.
-- Configure rerankers and filters in <Link href="/platform/features/advanced-retrieval">Advanced Retrieval</Link> for higher precision.
+## 现场观看
 
-## See it live
+- <Link href="/cookbooks/operations/support-inbox">Support Inbox with Mem0</Link> 演示了使用重新排序器进行范围搜索。
+- <Link href="/cookbooks/integrations/tavily-search">Tavily Search with Mem0</Link> 显示实际的混合搜索。
 
-- <Link href="/cookbooks/operations/support-inbox">Support Inbox with Mem0</Link> demonstrates scoped search with rerankers.
-- <Link href="/cookbooks/integrations/tavily-search">Tavily Search with Mem0</Link> shows hybrid search in action.
+{/* DEBUG：验证 CTA 目标 */}
 
-{/* DEBUG: verify CTA targets */}
-
-<CardGroup cols={2}>
-  <Card
-    title="Search Memory API"
-    description="Complete API reference with all filter operators and parameters."
-    icon="book"
+<卡组列={2}>
+  <卡片
+    title =“搜索内存API”
+    description="包含所有过滤器运算符和参数的完整 API 参考。”
+    图标=“书”
     href="/api-reference/memory/search-memories"
   />
-  <Card
-    title="Support Inbox Cookbook"
-    description="Build a complete support system with scoped search and reranking."
-    icon="rocket"
+  <卡片
+    title="支持收件箱食谱"
+    description="通过范围搜索和重新排名构建完整的支持系统。"
+    图标=“火箭”
     href="/cookbooks/operations/support-inbox"
   />
-</CardGroup>
+</卡组>

@@ -3,12 +3,15 @@ title: LM Studio
 description: "Configure LM Studio as an LLM provider in Mem0 for running local language models via an OpenAI-compatible API."
 ---
 
-To use LM Studio with Mem0, you'll need to have LM Studio running locally with its server enabled. LM Studio provides a way to run local LLMs with an OpenAI-compatible API.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Usage
 
-<CodeGroup>
-```python Python
+
+要将 LM Studio 与 Mem0 结合使用，您需要让 LM Studio 在本地运行并启用其服务器。 LM Studio 提供了一种使用 OpenAI 兼容 API 运行本地 LLM 的方法。
+
+## 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -36,13 +39,11 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
-</CodeGroup>
+</代码组>
 
-### Running Completely Locally
+### 完全本地运行
 
-You can also use LM Studio for both LLM and embedding to run Mem0 entirely locally:
-
-```python
+您还可以使用 LM Studio 进行 LLM 和嵌入，以完全在本地运行 Mem0：```python
 from mem0 import Memory
 
 # No external API keys needed!
@@ -64,21 +65,20 @@ messages = [
 ]
 m.add(messages, user_id="alice123", metadata={"category": "movies"})
 ```
+<注意>
+  当使用 LM Studio 进行 LLM 和嵌入时，请确保您拥有：
+  1. 加载用于生成响应的 LLM 模型
+  2. 为向量嵌入加载的嵌入模型
+  3. 服务器启用可访问的正确端点
+</注>
 
-<Note>
-  When using LM Studio for both LLM and embedding, make sure you have:
-  1. An LLM model loaded for generating responses
-  2. An embedding model loaded for vector embeddings
-  3. The server enabled with the correct endpoints accessible
-</Note>
+<注意>
+  要使用 LM Studio，您需要：
+  1.下载并安装【LM Studio】(https://lmstudio.ai/)
+  2. 从“服务器”选项卡启动本地服务器
+  3. 在配置中设置适当的 `lmstudio_base_url` （默认值通常是 http://localhost:1234/v1）
+</注>
 
-<Note>
-  To use LM Studio, you need to:
-  1. Download and install [LM Studio](https://lmstudio.ai/)
-  2. Start a local server from the "Server" tab
-  3. Set the appropriate `lmstudio_base_url` in your configuration (default is usually http://localhost:1234/v1)
-</Note>
+## 配置
 
-## Config
-
-All available parameters for the `lmstudio` config are present in [Master List of All Params in Config](../config).
+`lmstudio` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

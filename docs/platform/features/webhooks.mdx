@@ -3,18 +3,20 @@ title: Webhooks
 description: 'Configure and manage webhooks to receive real-time notifications about memory events'
 ---
 
-## Overview
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Webhooks enable real-time notifications for memory events in your Mem0 project. Webhooks are configured at the project level, meaning each webhook is tied to a specific project and receives events solely from that project. You can configure webhooks to send HTTP POST requests to your specified URLs whenever memories are created, updated, deleted, or categorized.
 
-## Managing Webhooks
 
-### Create Webhook
+## 概述
 
-Create a webhook for your project. It will receive events only from that project:
-<CodeGroup>
+Webhook 可为 Mem0 项目中的内存事件启用实时通知。 Webhook 在项目级别进行配置，这意味着每个 Webhook 都与特定项目相关联，并且仅接收来自该项目的事件。您可以配置 Webhook，以便在创建、更新、删除或分类记忆时向您指定的 URL 发送 HTTP POST 请求。
 
-```python Python
+## 管理 Webhooks
+
+### 创建 Webhook
+
+为您的项目创建一个 webhook。它将仅接收来自该项目的事件：
+<代码组>```python Python
 import os
 from mem0 import MemoryClient
 
@@ -58,16 +60,13 @@ console.log(webhook);
   "updated_at": "2025-02-18T23:06:41.479361-08:00"
 }
 ```
+</代码组>
 
-</CodeGroup>
+### 获取 Webhook
 
-### Get Webhooks
+检索项目的所有 Webhooks：
 
-Retrieve all webhooks for your project:
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 # Get webhooks for a specific project
 webhooks = client.get_webhooks(project_id="proj_123")
 print(webhooks)
@@ -95,16 +94,13 @@ console.log(webhooks);
 ]
 
 ```
+</代码组>
 
-</CodeGroup>
+### 更新 Webhook
 
-### Update Webhook
+通过指定“webhook_id”来更新现有 Webhook 的配置：
 
-Update an existing webhook’s configuration by specifying its `webhook_id`:
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 # Update webhook for a specific project
 updated_webhook = client.update_webhook(
     name="Updated Logger",
@@ -131,16 +127,13 @@ console.log(updatedWebhook);
   "message": "Webhook updated successfully"
 }
 ```
+</代码组>
 
-</CodeGroup>
+### 删除 Webhook
 
-### Delete Webhook
+通过提供“webhook_id”来删除 Webhook：
 
-Delete a webhook by providing its `webhook_id`:
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 # Delete webhook from a specific project
 response = client.delete_webhook(webhook_id="wh_123")
 print(response)
@@ -157,24 +150,22 @@ console.log(response);
   "message": "Webhook deleted successfully"
 }
 ```
+</代码组>
 
-</CodeGroup>
+## 事件类型
 
-## Event Types
+Mem0 支持以下 Webhook 事件类型：
 
-Mem0 supports the following event types for webhooks:
+- `memory_add`：添加内存时触发。
+- `memory_update`：更新现有内存时触发。
+- `memory_delete`：删除内存时触发。
+- `memory_categorize`：当内存被分类时触发。
 
-- `memory_add`: Triggered when a memory is added.
-- `memory_update`: Triggered when an existing memory is updated.
-- `memory_delete`: Triggered when a memory is deleted.
-- `memory_categorize`: Triggered when a memory is categorized.
+## Webhook 负载
 
-## Webhook Payload
+当发生内存事件时，Mem0 会向您的 Webhook URL 发送一个 HTTP POST 请求，其中包含以下负载：
 
-When a memory event occurs, Mem0 sends an HTTP POST request to your webhook URL with the following payload:
-
-**Memory add/update/delete payload:**
-```json
+**内存添加/更新/删除有效负载：**```json
 {
     "event_details": {
         "id": "a1b2c3d4-e5f6-4g7h-8i9j-k0l1m2n3o4p5",
@@ -185,9 +176,7 @@ When a memory event occurs, Mem0 sends an HTTP POST request to your webhook URL 
     }
 }
 ```
-
-**Memory categorize payload:**
-```json
+**内存分类有效负载：**```json
 {
     "event_details": {
         "event": "CATEGORIZE",
@@ -196,14 +185,13 @@ When a memory event occurs, Mem0 sends an HTTP POST request to your webhook URL 
     }
 }
 ```
+## 最佳实践
 
-## Best Practices
+1. **实现重试逻辑**：确保您的 webhook 端点可以处理临时故障。
+2. **验证 Webhook 来源**：实施安全措施以验证 Webhook 请求是否源自 Mem0。
+3. **异步处理事件**：异步处理 webhook 事件以避免超时并确保可靠处理。
+4. **监控 Webhook 运行状况**：定期检查您的 Webhook 日志，以确保功能正常并及时解决传送失败问题。
 
-1. **Implement Retry Logic**: Ensure your webhook endpoint can handle temporary failures.
-2. **Verify Webhook Source**: Implement security measures to verify that webhook requests originate from Mem0.
-3. **Process Events Asynchronously**: Process webhook events asynchronously to avoid timeouts and ensure reliable handling.
-4. **Monitor Webhook Health**: Regularly review your webhook logs to ensure functionality and promptly address delivery failures.
+如果您有任何疑问，请随时通过以下方式之一与我们联系：
 
-If you have any questions, please feel free to reach out to us using one of the following methods:
-
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

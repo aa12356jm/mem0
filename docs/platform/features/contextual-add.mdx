@@ -3,12 +3,15 @@ title: Contextual Memory Creation
 description: "Add messages with automatic context management - no manual history tracking required"
 ---
 
-## What is Contextual Memory Creation?
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Contextual memory creation automatically manages message history, allowing you to focus on building AI experiences without manually tracking interactions. Simply send new messages, and Mem0 handles the context automatically.
 
-<CodeGroup>
-```python Python
+
+## 什么是情境记忆创建？
+
+上下文记忆创建会自动管理消息历史记录，让您能够专注于构建 AI 体验，而无需手动跟踪交互。只需发送新消息，Mem0 就会自动处理上下文。
+
+<代码组>```python Python
 # Just send new messages - Mem0 handles the context
 messages = [
     {"role": "user", "content": "I love Italian food, especially pasta"},
@@ -27,22 +30,21 @@ const messages = [
 
 await client.add(messages, { userId: "user123", version: "v2" });
 ```
-</CodeGroup>
+</代码组>
 
-## Why Use Contextual Memory Creation?
+## 为什么要使用情境记忆创建？
 
-- **Simple**: Send only new messages, no manual history tracking
-- **Efficient**: Smaller payloads and faster processing
-- **Automatic**: Context management handled by Mem0
-- **Reliable**: No risk of missing interaction history
-- **Scalable**: Works seamlessly as your application grows
+- **简单**：仅发送新消息，无需手动历史记录跟踪
+- **高效**：更小的有效负载和更快的处理速度
+- **自动**：由 Mem0 处理的上下文管理
+- **可靠**：没有丢失交互历史记录的风险
+- **可扩展**：随着应用程序的增长无缝工作
 
-## How It Works
+## 它是如何工作的
 
-### Basic Usage
+### 基本用法
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 # First interaction
 messages1 = [
     {"role": "user", "content": "Hi, I'm Sarah from New York"},
@@ -75,18 +77,17 @@ const messages2 = [
 await client.add(messages2, { userId: "sarah", version: "v2" });
 // Mem0 automatically knows Sarah is from New York and can use this context
 ```
-</CodeGroup>
+</代码组>
 
-## Organization Strategies
+## 组织策略
 
-Choose the right approach based on your application's needs:
+根据您的应用程序需求选择正确的方法：
 
-### User-Level Memories (`user_id` only)
+### 用户级内存（仅`user_id`）
 
-**Best for:** Personal preferences, profile information, long-term user data
+**最适合：** 个人偏好、个人资料信息、长期用户数据
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 # Persistent user memories across all interactions
 messages = [
     {"role": "user", "content": "I'm allergic to nuts and dairy"},
@@ -107,14 +108,13 @@ const messages = [
 await client.add(messages, { userId: "user123", version: "v2" });
 // This allergy info will be available in ALL future interactions
 ```
-</CodeGroup>
+</代码组>
 
-### Session-Specific Memories (`user_id` + `run_id`)
+### 会话特定内存（`user_id` + `run_id`）
 
-**Best for:** Task-specific context, separate interaction threads, project-based sessions
+**最适合：** 特定于任务的上下文、单独的交互线程、基于项目的会话
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 # Trip planning session
 messages1 = [
     {"role": "user", "content": "I want to plan a 5-day trip to Tokyo"},
@@ -159,13 +159,12 @@ const workMessages = [
 ];
 await client.add(workMessages, { userId: "user123", runId: "q4-marketing", version: "v2" });
 ```
-</CodeGroup>
+</代码组>
 
-## Real-World Use Cases
+## 实际用例
 
-<Tabs>
-  <Tab title="Customer Support">
-```python Python
+<标签>
+  <标签标题=“客户支持”>```python Python
 # Support ticket context - keeps interaction focused
 messages = [
     {"role": "user", "content": "My subscription isn't working"},
@@ -179,9 +178,8 @@ client.add(messages,
     run_id="ticket-2024-001"
 )
 ```
-  </Tab>
-  <Tab title="Personal AI Assistant">
-```python Python
+</标签>
+  <Tab title="个人人工智能助理">```python Python
 # Personal preferences (persistent across all interactions)
 preference_messages = [
     {"role": "user", "content": "I prefer morning workouts and vegetarian meals"},
@@ -201,9 +199,8 @@ client.add(planning_messages,
     run_id="daily-plan-2024-01-15"
 )
 ```
-  </Tab>
-  <Tab title="Educational Platform">
-```python Python
+</标签>
+  <Tab title="教育平台">```python Python
 # Student profile (persistent)
 profile_messages = [
     {"role": "user", "content": "I'm studying computer science and struggle with math"},
@@ -223,29 +220,29 @@ client.add(lesson_messages,
     run_id="algorithms-lesson-1"
 )
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-## Best Practices
+## 最佳实践
 
-### ✅ Do
-- **Organize by context scope**: Use `user_id` only for persistent data, add `run_id` for session-specific context
-- **Keep messages focused** on the current interaction
-- **Test with real interaction flows** to ensure context works as expected
+### ✅ 做
+- **按上下文范围组织**：仅将“user_id”用于持久数据，为特定于会话的上下文添加“run_id”
+- **让消息集中**在当前交互上
+- **使用真实的交互流程进行测试**以确保上下文按预期工作
 
-### ❌ Don't
-- Send duplicate messages or interaction history
-- Skip identifiers like `user_id` or `run_id` that scope the memory
-- Mix contextual and non-contextual approaches in the same application
+### ❌不要
+- 发送重复的消息或交互历史记录
+- 跳过诸如“user_id”或“run_id”之类的内存范围标识符
+- 在同一应用程序中混合上下文和非上下文方法
 
-## Troubleshooting
+## 故障排除
 
-| Issue | Solution |
-|-------|----------|
-| **Context not working** | Ensure each call uses the same `user_id` / `run_id` combo; version is automatic |
-| **Wrong context retrieved** | Check if you need separate `run_id` values for different interaction topics |
-| **Missing interaction history** | Verify all messages in the interaction thread use the same `user_id` and `run_id` |
-| **Too much irrelevant context** | Use more specific `run_id` values to separate different interaction types |
+|问题 |解决方案 |
+|--------|----------|
+| **上下文不起作用** |确保每个调用使用相同的“user_id”/“run_id”组合；版本是自动的 |
+| **检索到错误的上下文** |检查不同的交互主题是否需要单独的“run_id”值 |
+| **缺少交互历史记录** |验证交互线程中的所有消息都使用相同的“user_id”和“run_id” |
+| **太多不相关的上下文** |使用更具体的“run_id”值来分隔不同的交互类型 |
 
 
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

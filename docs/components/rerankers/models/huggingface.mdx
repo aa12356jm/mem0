@@ -3,15 +3,17 @@ title: Hugging Face Reranker
 description: 'Access thousands of reranking models from Hugging Face Hub'
 ---
 
-## Overview
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-The Hugging Face reranker provider gives you access to thousands of reranking models available on the Hugging Face Hub. This includes popular models like BAAI's BGE rerankers and other state-of-the-art cross-encoder models.
 
-## Configuration
 
-### Basic Setup
+## 概述
 
-```python
+Hugging Face 重新排序器提供商使您可以访问 Hugging Face Hub 上提供的数千个重新排序模型。这包括流行的模型，如 BAAI 的 BGE 重新排序器和其他最先进的交叉编码器模型。
+
+## 配置
+
+### 基本设置```python
 from mem0 import Memory
 
 config = {
@@ -26,20 +28,17 @@ config = {
 
 m = Memory.from_config(config)
 ```
+### 配置参数
 
-### Configuration Parameters
+|参数|类型 |默认|描述 |
+|------------|------|---------|------------|
+| `模型` | STR |必填 |拥抱脸模型标识符|
+| `设备` | STR | “CPU” |运行模型的设备（“cpu”、“cuda”、“mps”）|
+| `batch_size` |整数 | 32 | 32加工批量大小|
+| `最大长度` |整数 | 512 | 512最大输入序列长度|
+| `信任远程代码` |布尔 |假|允许远程执行代码 |
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `model` | str | Required | Hugging Face model identifier |
-| `device` | str | "cpu" | Device to run model on ("cpu", "cuda", "mps") |
-| `batch_size` | int | 32 | Batch size for processing |
-| `max_length` | int | 512 | Maximum input sequence length |
-| `trust_remote_code` | bool | False | Allow remote code execution |
-
-### Advanced Configuration
-
-```python
+### 高级配置```python
 config = {
     "reranker": {
         "provider": "huggingface",
@@ -56,12 +55,9 @@ config = {
     }
 }
 ```
+## 热门型号
 
-## Popular Models
-
-### BGE Rerankers (Recommended)
-
-```python
+### BGE 重新排名（推荐）```python
 # Base model - good balance of speed and quality
 config = {
     "reranker": {
@@ -95,10 +91,7 @@ config = {
     }
 }
 ```
-
-### Multilingual Models
-
-```python
+### 多语言模型```python
 # Multilingual BGE reranker
 config = {
     "reranker": {
@@ -110,10 +103,7 @@ config = {
     }
 }
 ```
-
-### Domain-Specific Models
-
-```python
+### 特定领域模型```python
 # For code search
 config = {
     "reranker": {
@@ -136,12 +126,9 @@ config = {
     }
 }
 ```
+## 用法示例
 
-## Usage Examples
-
-### Basic Usage
-
-```python
+### 基本用法```python
 from mem0 import Memory
 
 m = Memory.from_config(config)
@@ -162,10 +149,7 @@ for result in results["results"]:
     print(f"Memory: {result['memory']}")
     print(f"Score: {result['score']:.3f}")
 ```
-
-### Batch Processing
-
-```python
+### 批处理```python
 # Process multiple queries efficiently
 queries = [
     "What are my hobbies?",
@@ -178,12 +162,9 @@ for query in queries:
     result = m.search(query, filters={"user_id": "alice"}, rerank=True)
     results.append(result)
 ```
+## 性能优化
 
-## Performance Optimization
-
-### GPU Acceleration
-
-```python
+### GPU 加速```python
 # Use GPU for better performance
 config = {
     "reranker": {
@@ -196,10 +177,7 @@ config = {
     }
 }
 ```
-
-### Memory Optimization
-
-```python
+### 内存优化```python
 # For limited memory environments
 config = {
     "reranker": {
@@ -216,19 +194,16 @@ config = {
     }
 }
 ```
+## 型号对比
 
-## Model Comparison
+|型号|尺寸|品质 |速度|内存|最适合 |
+|--------|------|---------|--------|---------|----------|
+| bge-reranker-基础 | 278M |好 |快|低|一般用途 |
+| bge-reranker-大 | 560M |更好 |中等|中等|高品质需求|
+| bge-reranker-v2-m3 | bge-reranker-v2-m3 | 568M |最佳|中等|中等|最新改进|
+| bge-reranker-v2-多语言 | 568M |好 |中等|中等|多种语言 |
 
-| Model | Size | Quality | Speed | Memory | Best For |
-|-------|------|---------|-------|---------|----------|
-| bge-reranker-base | 278M | Good | Fast | Low | General use |
-| bge-reranker-large | 560M | Better | Medium | Medium | High quality needs |
-| bge-reranker-v2-m3 | 568M | Best | Medium | Medium | Latest improvements |
-| bge-reranker-v2-multilingual | 568M | Good | Medium | Medium | Multiple languages |
-
-## Error Handling
-
-```python
+## 错误处理```python
 try:
     results = m.search(
         "test query",
@@ -244,12 +219,9 @@ except Exception as e:
         rerank=False
     )
 ```
+## 定制模型
 
-## Custom Models
-
-### Using Private Models
-
-```python
+### 使用私有模型```python
 # Use a private model from Hugging Face
 config = {
     "reranker": {
@@ -262,10 +234,7 @@ config = {
     }
 }
 ```
-
-### Local Model Path
-
-```python
+### 本地模型路径```python
 # Use a locally downloaded model
 config = {
     "reranker": {
@@ -277,21 +246,19 @@ config = {
     }
 }
 ```
+## 最佳实践
 
-## Best Practices
+1. **选择正确的型号**：根据您的需求平衡质量与速度
+2. **使用 GPU**：对于较大的模型，速度明显快于 CPU
+3. **优化批量大小**：根据您的硬件能力进行调整
+4. **监控内存**：观察大型模型的 GPU/CPU 内存使用情况
+5. **缓存模型**：下载一次，重复使用，避免重复下载
 
-1. **Choose the Right Model**: Balance quality vs speed based on your needs
-2. **Use GPU**: Significantly faster than CPU for larger models
-3. **Optimize Batch Size**: Tune based on your hardware capabilities
-4. **Monitor Memory**: Watch GPU/CPU memory usage with large models
-5. **Cache Models**: Download once and reuse to avoid repeated downloads
+## 故障排除
 
-## Troubleshooting
+### 常见问题
 
-### Common Issues
-
-**Out of Memory Error**
-```python
+**内存不足错误**```python
 # Reduce batch size and sequence length
 config = {
     "reranker": {
@@ -304,9 +271,7 @@ config = {
     }
 }
 ```
-
-**Model Download Issues**
-```python
+**模型下载问题**```python
 # Set cache directory
 import os
 os.environ["TRANSFORMERS_CACHE"] = "/path/to/cache"
@@ -322,9 +287,7 @@ config = {
     }
 }
 ```
-
-**CUDA Not Available**
-```python
+**CUDA 不可用**```python
 import torch
 
 config = {
@@ -337,14 +300,13 @@ config = {
     }
 }
 ```
+## 后续步骤
 
-## Next Steps
-
-<CardGroup cols={2}>
-  <Card title="Reranker Overview" icon="sort" href="/components/rerankers/overview">
-    Learn about reranking concepts
-  </Card>
-  <Card title="Configuration Guide" icon="gear" href="/components/rerankers/config">
-    Detailed configuration options
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="Reranker 概述" icon="sort" href="/components/rerankers/overview">
+    了解重新排列概念
+  </卡>
+  <Card title="配置指南" icon="gear" href="/components/rerankers/config">
+    详细配置选项
+  </卡>
+</卡组>

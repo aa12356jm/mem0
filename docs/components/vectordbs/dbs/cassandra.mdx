@@ -3,11 +3,13 @@ title: Apache Cassandra
 description: "Use Apache Cassandra as a distributed vector store in Mem0 with semantic search over large-scale datasets."
 ---
 
-[Apache Cassandra](https://cassandra.apache.org/) is a highly scalable, distributed NoSQL database designed for handling large amounts of data across many commodity servers with no single point of failure. It supports vector storage for semantic search capabilities in AI applications and can scale to massive datasets with linear performance improvements.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Usage
 
-```python
+
+[Apache Cassandra](https://cassandra.apache.org/) 是一种高度可扩展的分布式 NoSQL 数据库，旨在跨多个商用服务器处理大量数据，且不会出现单点故障。它支持人工智能应用中语义搜索功能的矢量存储，并且可以通过线性性能改进扩展到海量数据集。
+
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -36,12 +38,9 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+#### 使用 DataStax Astra DB
 
-#### Using DataStax Astra DB
-
-For managed Cassandra with DataStax Astra DB:
-
-```python
+对于带有 DataStax Astra DB 的托管 Cassandra：```python
 config = {
     "vector_store": {
         "provider": "cassandra",
@@ -56,33 +55,29 @@ config = {
     }
 }
 ```
+<注意>
+使用 DataStax Astra DB 时，提供安全连接捆绑路径。当提供安全连接捆绑包时，将忽略 contact_points 参数。</注>
 
-<Note>
-When using DataStax Astra DB, provide the secure connect bundle path. The contact_points parameter is ignored when a secure connect bundle is provided.
-</Note>
+### 配置
 
-### Config
+以下是可用于配置 Apache Cassandra 的参数：
 
-Here are the parameters available for configuring Apache Cassandra:
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `接触点` |联系点 IP 地址列表 |必填 |
+| `端口` |卡桑德拉端口| `9042` |
+| `用户名` |数据库用户名| `无` |
+| `密码` |数据库密码| `无` |
+| `键空间` |键空间名称 | `"mem0"` |
+| `集合名称` |存储向量的表名 | `“回忆”` |
+| `embedding_model_dims` |嵌入向量的维度 | `1536` |
+| `secure_connect_bundle` | Astra DB 安全连接包的路径 | `无` |
+| `协议版本` | CQL协议版本 | `4` |
+| `load_balancing_policy` |自定义负载均衡策略| `无` |
 
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `contact_points` | List of contact point IP addresses | Required |
-| `port` | Cassandra port | `9042` |
-| `username` | Database username | `None` |
-| `password` | Database password | `None` |
-| `keyspace` | Keyspace name | `"mem0"` |
-| `collection_name` | Table name for storing vectors | `"memories"` |
-| `embedding_model_dims` | Dimensions of embedding vectors | `1536` |
-| `secure_connect_bundle` | Path to Astra DB secure connect bundle | `None` |
-| `protocol_version` | CQL protocol version | `4` |
-| `load_balancing_policy` | Custom load balancing policy | `None` |
+### 设置
 
-### Setup
-
-#### Option 1: Local Cassandra Setup using Docker:
-
-```bash
+#### 选项 1：使用 Docker 进行本地 Cassandra 设置：```bash
 # Pull and run Cassandra container
 docker run --name mem0-cassandra \
     -p 9042:9042 \
@@ -96,22 +91,20 @@ docker exec -it mem0-cassandra cqlsh
 CREATE KEYSPACE IF NOT EXISTS mem0
 WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 ```
+#### 选项 2：DataStax Astra DB（托管云）：
 
-#### Option 2: DataStax Astra DB (Managed Cloud):
+1. 注册[DataStax Astra](https://astra.datastax.com/)
+2.创建新数据库
+3. 下载安全连接包
+4. 生成应用令牌
 
-1. Sign up at [DataStax Astra](https://astra.datastax.com/)
-2. Create a new database
-3. Download the secure connect bundle
-4. Generate an application token
+<提示>
+对于生产部署，使用 DataStax Astra DB 实现完全托管的 Cassandra，并具有自动扩展、备份和安全性。
+</提示>
 
-<Tip>
-For production deployments, use DataStax Astra DB for fully managed Cassandra with automatic scaling, backups, and security.
-</Tip>
+#### 选项 3：本地安装 Cassandra：
 
-#### Option 3: Install Cassandra Locally:
-
-**Ubuntu/Debian:**
-```bash
+**Ubuntu/Debian：**```bash
 # Add Apache Cassandra repository
 echo "deb https://downloads.apache.org/cassandra/debian 40x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
 curl https://downloads.apache.org/cassandra/KEYS | sudo apt-key add -
@@ -126,9 +119,7 @@ sudo systemctl start cassandra
 # Verify installation
 nodetool status
 ```
-
-**macOS:**
-```bash
+**苹果系统：**```bash
 # Using Homebrew
 brew install cassandra
 
@@ -138,25 +129,19 @@ brew services start cassandra
 # Connect to CQL shell
 cqlsh
 ```
+### Python客户端安装
 
-### Python Client Installation
-
-Install the required Python package:
-
-```bash
+安装所需的Python包：```bash
 pip install cassandra-driver
 ```
+### 性能考虑因素
 
-### Performance Considerations
+- **复制因子**：对于生产，使用至少 3 的复制因子
+- **一致性级别**：一致性和性能之间的平衡（推荐QUORUM）
+- **分区**：Cassandra 自动跨节点分配数据
+- **扩展**：添加节点以线性增加容量和性能
 
-- **Replication Factor**: For production, use replication factor of at least 3
-- **Consistency Level**: Balance between consistency and performance (QUORUM recommended)
-- **Partitioning**: Cassandra automatically distributes data across nodes
-- **Scaling**: Add nodes to linearly increase capacity and performance
-
-### Advanced Configuration
-
-```python
+### 高级配置```python
 from cassandra.policies import DCAwareRoundRobinPolicy
 
 config = {
@@ -175,8 +160,6 @@ config = {
     }
 }
 ```
-
-<Warning>
-For production use, configure appropriate replication strategies and consistency levels based on your availability and consistency requirements.
-</Warning>
-
+<警告>
+对于生产使用，请根据您的可用性和一致性要求配置适当的复制策略和一致性级别。
+</警告>

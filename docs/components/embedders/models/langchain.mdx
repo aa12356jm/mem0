@@ -3,14 +3,17 @@ title: LangChain
 description: "Use LangChain as an embedding provider in Mem0 to access a wide range of models through a unified interface."
 ---
 
-Mem0 supports LangChain as a provider to access a wide range of embedding models. LangChain is a framework for developing applications powered by language models, making it easy to integrate various embedding providers through a consistent interface.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-For a complete list of available embedding models supported by LangChain, refer to the [LangChain Text Embedding documentation](https://python.langchain.com/docs/integrations/text_embedding/).
 
-## Usage
 
-<CodeGroup>
-```python Python
+Mem0支持LangChain作为提供者来访问各种嵌入模型。 LangChain 是一个用于开发由语言模型支持的应用程序的框架，可以通过一致的接口轻松集成各种嵌入提供程序。
+
+有关 LangChain 支持的可用嵌入模型的完整列表，请参阅 [LangChain 文本嵌入文档](https://python.langchain.com/docs/integrations/text_embedding/)。
+
+## 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 from langchain_openai import OpenAIEmbeddings
@@ -73,38 +76,36 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-## Supported LangChain Embedding Providers
+## 支持的 LangChain 嵌入提供商
 
-LangChain supports a wide range of embedding providers, including:
+LangChain支持广泛的嵌入提供商，包括：
 
-- OpenAI (`OpenAIEmbeddings`)
-- Cohere (`CohereEmbeddings`)
-- Google (`VertexAIEmbeddings`)
-- Hugging Face (`HuggingFaceEmbeddings`)
-- Sentence Transformers (`HuggingFaceEmbeddings`)
-- Azure OpenAI (`AzureOpenAIEmbeddings`)
-- Ollama (`OllamaEmbeddings`)
-- Together (`TogetherEmbeddings`)
-- And many more
+- OpenAI（`OpenAIEmbeddings`）
+- Cohere（“CohereEmbeddings”）
+- 谷歌（`VertexAIEmbeddings`）
+- 拥抱脸部（`HuggingFaceEmbeddings`）
+- 句子变压器（`HuggingFaceEmbeddings`）
+- Azure OpenAI（“AzureOpenAIEmbeddings”）
+- Ollama（`OllamaEmbeddings`）
+- 一起（`TogetherEmbeddings`）
+- 还有更多
 
-You can use any of these model instances directly in your configuration. For a complete and up-to-date list of available embedding providers, refer to the [LangChain Text Embedding documentation](https://python.langchain.com/docs/integrations/text_embedding/).
+您可以直接在配置中使用这些模型实例中的任何一个。有关可用嵌入提供程序的完整且最新的列表，请参阅 [LangChain 文本嵌入文档](https://python.langchain.com/docs/integrations/text_embedding/)。
 
-## Provider-Specific Configuration
+## 特定于提供商的配置
 
-When using LangChain as an embedder provider, you'll need to:
+当使用 LangChain 作为嵌入器提供者时，您需要：
 
-1. Set the appropriate environment variables for your chosen embedding provider
-2. Import and initialize the specific model class you want to use
-3. Pass the initialized model instance to the config
+1. 为您选择的嵌入提供程序设置适当的环境变量
+2.导入并初始化您要使用的特定模型类
+3. 将初始化的模型实例传递给config
 
-### Examples with Different Providers
+### 不同提供商的示例
 
-<CodeGroup>
-#### HuggingFace Embeddings
-
-```python Python
+<代码组>
+#### HuggingFace 嵌入```python Python
 from langchain_huggingface import HuggingFaceEmbeddings
 
 # Initialize a HuggingFace embeddings model
@@ -144,12 +145,10 @@ const config = {
   },
 };
 ```
-</CodeGroup>
+</代码组>
 
-<CodeGroup>
-#### Ollama Embeddings
-
-```python Python
+<代码组>
+#### Ollama 嵌入```python Python
 from langchain_ollama import OllamaEmbeddings
 
 # Initialize an Ollama embeddings model
@@ -186,12 +185,12 @@ const config = {
   },
 };
 ```
-</CodeGroup>
+</代码组>
 
-<Note>
-  Make sure to install the necessary LangChain packages and any provider-specific dependencies.
-</Note>
+<注意>
+  确保安装必要的 LangChain 软件包和任何特定于提供商的依赖项。
+</注>
 
-## Config
+## 配置
 
-All available parameters for the `langchain` embedder config are present in [Master List of All Params in Config](../config).
+`langchain` 嵌入器配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

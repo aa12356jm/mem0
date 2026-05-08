@@ -3,35 +3,34 @@ title: Memory Timestamps
 description: 'Add timestamps to your memories to maintain chronological accuracy and historical context'
 ---
 
-## Overview
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-The Memory Timestamps feature allows you to specify when a memory was created, regardless of when it's actually added to the system. This powerful capability enables you to:
 
-- Maintain accurate chronological ordering of memories
-- Import historical data with proper timestamps
-- Create memories that reflect when events actually occurred
-- Build timelines with precise temporal information
 
-By leveraging custom timestamps, you can ensure that your memory system maintains an accurate representation of when information was generated or events occurred.
+## 概述
 
-## Benefits of Custom Timestamps
+内存时间戳功能允许您指定内存的创建时间，而不管内存实际添加到系统的时间。这种强大的功能使您能够：
 
-Custom timestamps offer several important benefits:
+- 保持记忆的准确时间顺序
+- 导入具有正确时间戳的历史数据
+- 创建反映事件实际发生时间的记忆
+- 使用精确的时间信息构建时间表
 
-- **Historical Accuracy**: Preserve the exact timing of past events and information.
-- **Data Migration**: Seamlessly migrate existing data while maintaining original timestamps.
-- **Time-Sensitive Analysis**: Enable time-based analysis and pattern recognition across memories.
-- **Consistent Chronology**: Maintain proper ordering of memories for coherent storytelling.
+通过利用自定义时间戳，您可以确保您的内存系统能够准确表示信息生成时间或事件发生时间。
 
-## Using Custom Timestamps
+## 自定义时间戳的好处
 
-When adding new memories, you can specify a custom timestamp to indicate when the memory was created. This timestamp will be used instead of the current time.
+自定义时间戳有几个重要的好处：
 
-### Adding Memories with Custom Timestamps
+- **历史准确性**：保留过去事件和信息的准确时间。
+- **数据迁移**：无缝迁移现有数据，同时保留原始时间戳。- **时间敏感分析**：启用跨内存的基于时间的分析和模式识别。
+- **一致的时间顺序**：保持记忆的正确顺序，以实现连贯的故事讲述。
 
-<CodeGroup>
+## 使用自定义时间戳添加新内存时，您可以指定自定义时间戳来指示内存的创建时间。将使用该时间戳代替当前时间。
 
-```python Python
+### 使用自定义时间戳添加记忆
+
+<代码组>```python Python
 import os
 import time
 from datetime import datetime, timedelta
@@ -103,18 +102,15 @@ curl -X POST "https://api.mem0.ai/v1/memories/" \
     ]
 }
 ```
+</代码组>
 
-</CodeGroup>
+### 时间戳格式
 
-### Timestamp Format
+指定自定义时间戳时，您应该提供 Unix 时间戳（自纪元以来的秒数）。这是一个整数，表示自 1970 年 1 月 1 日 (UTC) 以来经过的秒数。
 
-When specifying a custom timestamp, you should provide a Unix timestamp (seconds since epoch). This is an integer representing the number of seconds that have elapsed since January 1, 1970 (UTC).
+例如，创建时间戳为2023年1月1日的内存：
 
-For example, to create a memory with a timestamp of January 1, 2023:
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 # January 1, 2023 timestamp
 january_2023_timestamp = 1672531200  # Unix timestamp for 2023-01-01 00:00:00 UTC
 
@@ -135,9 +131,8 @@ client.add(messages, { userId: "user1", timestamp: january2023Timestamp })
     .then(response => console.log(response))
     .catch(error => console.error(error));
 ```
+</代码组>
 
-</CodeGroup>
+如果您有任何疑问，请随时通过以下方式之一与我们联系：
 
-If you have any questions, please feel free to reach out to us using one of the following methods:
-
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

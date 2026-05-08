@@ -4,99 +4,100 @@ description: "Major product launches, headline features, and milestones for Mem0
 mode: "wide"
 ---
 
-<Update label="2026-04-14" description="Mem0 SDK v2.0.0 / v3.0.0">
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-**New Memory Algorithm — State-of-the-Art Accuracy at ~3-4x Lower Cost**
 
-Ground-up rewrite of the memory pipeline with 20+ point benchmark improvements:
 
-- **LoCoMo:** 71.4 → **91.6** (+20) — multi-turn conversation recall
-- **LongMemEval:** 67.8 → **93.4** (+26) — long-term memory across sessions
-- **BEAM (1M tokens):** **64.1** — production-scale memory evaluation
-- **Agent memories are first-class** — Previous algorithm: 46% on assistant recall. New: **100%**
-- **Temporal reasoning works** — "Where did I live before SF?" Previous: 51%. New: **93%**
-- **~3-4x fewer tokens** — Under 7K tokens per retrieval vs 25K+ for full-context approaches
-- **ADD-only extraction** — Memories accumulate; nothing is overwritten or deleted
-- **Hybrid retrieval** — Semantic + BM25 keyword + entity boost, scored in parallel
-- **Entity linking** — Entities extracted, embedded, and linked across memories
 
-Breaking changes: Graph memory removed from OSS, `search()` defaults changed, deprecated params removed. See [migration guide](/migration/oss-v2-to-v3).
 
-</Update>
 
-<Update label="2026-04-06" description="Mem0 Skill Graph">
 
-**Mem0 Skill Graph — In-Context Documentation for AI Agents**
 
-AI coding agents in Claude Code, Cursor, and Codex can now access Mem0 knowledge directly in their workflow — no doc searching required. Three interconnected skills launched:
+<更新标签=“2026-04-14”描述=“Mem0 SDK v2.0.0 / v3.0.0”>
 
-- **mem0 Core Skill** — Complete Python and TypeScript SDK reference, REST API patterns, and integration guides for LangChain, CrewAI, Autogen, and more
-- **mem0-cli Skill** — Terminal command reference, configuration walkthroughs, and CI/CD recipes
-- **mem0-vercel-ai-sdk Skill** — Vercel AI SDK provider API, memory-augmented generation patterns, and multi-provider setup
+**新的内存算法 - 最先进的精度，成本降低约 3-4 倍**
 
-</Update>
+内存管道的彻底重写，基准测试改进了 20 多个点：
 
-<Update label="2026-04-06" description="Mem0 CLI v0.2.2">
+- **LoCoMo：** 71.4 → **91.6** (+20) — 多轮对话回忆
+- **LongMemEval:** 67.8 → **93.4** (+26) — 跨会话的长期记忆
+- **BEAM（1M 代币）：** **64.1** — 生产规模内存评估
+- **代理记忆是一流的** — 之前的算法：助理回忆率为 46%。新：**100%**
+- **时间推理有效**——“在 SF 之前我住在哪里？”上一个：51%。新：**93%**
+- **~减少 3-4 倍的标记** — 每次检索少于 7K 个标记，而全上下文方法则需要超过 25K 个标记
+- **仅添加提取** - 记忆积累；没有任何内容被覆盖或删除
+- **混合检索** — 语义 + BM25 关键字 + 实体提升，并行评分
+- **实体链接** — 跨内存提取、嵌入和链接的实体
 
-**Official Mem0 CLI — Now on PyPI and npm**
+重大更改：从 OSS 中删除了图形内存，更改了“search()”默认值，删除了已弃用的参数。请参阅[迁移指南](/migration/oss-v2-to-v3)。
 
-A full-featured command-line interface for Mem0, available in both Python and Node.js:
+</更新>
 
-- **Install:** `pip install mem0-cli` or `npm install -g @mem0/cli`
-- **Full command suite** — `add`, `search`, `list`, `get`, `update`, `delete`, `import`, `config`, `init`, `status`, `entity`, `event`
-- **Interactive setup** — `mem0 init` with email verification or direct API key entry
-- **Works everywhere** — Platform (Mem0 Cloud) and self-hosted OSS modes
-- **Scriptable** — `--json` flag for CI/CD pipelines and automation
-- **Dual SDK** — Same commands, same experience across Python and Node.js
+<更新标签=“2026-04-06”描述=“Mem0技能图”>
 
-</Update>
+**Mem0 技能图 — AI 代理的上下文文档**
 
-<Update label="2026-04-06" description="OpenClaw v1.0.4">
+Claude Code、Cursor 和 Codex 中的 AI 编码代理现在可以直接在其工作流程中访问 Mem0 知识，无需进行文档搜索。推出了三种相互关联的技能：
 
-**OpenClaw Plugin — Production-Ready**
+- **mem0 核心技能** — 完整的 Python 和 TypeScript SDK 参考、REST API 模式以及 LangChain、CrewAI、Autogen 等的集成指南
+- **mem0-cli 技能** — 终端命令参考、配置演练和 CI/CD 配方
+- **mem0-vercel-ai-sdk 技能** — Vercel AI SDK 提供商 API、内存增强生成模式和多提供商设置
 
-The OpenClaw Mem0 plugin went from initial release to production-ready in one week (v1.0.0 → v1.0.4):
+</更新>
 
-- **Skills-based memory architecture** — New extraction pipeline with skill-loader, batched extraction, and domain-aware memory triage
-- **Dream gate** — Automatic memory consolidation during idle periods for higher-quality long-term recall
-- **Interactive CLI** — `openclaw mem0 init`, `status`, `config`, `import`, and `event` commands
-- **Unified tool naming** — `memory_add` and `memory_delete` replace 4 legacy tools, matching the platform API
-- **Security hardened** — Path traversal protection, pinned dependencies, 329 tests across 10 files
+<更新标签=“2026-04-06”描述=“Mem0 CLI v0.2.2”>
 
-</Update>
+**官方 Mem0 CLI — 现在在 PyPI 和 npm 上**Mem0 的全功能命令行界面，可在 Python 和 Node.js 中使用：- **安装：** `pip install mem0-cli` 或 `npm install -g @mem0/cli`
+- **完整命令套件** — `add`、`search`、`list`、`get`、`update`、`delete`、`import`、`config`、`init`、`status`、`entity`、`event`
+- **交互式设置** - `mem0 init` 带有电子邮件验证或直接 API 密钥输入
+- **随处可用** — 平台（Mem0 Cloud）和自托管 OSS 模式
+- **可编写脚本** — 用于 CI/CD 管道和自动化的 `--json` 标志
+- **双 SDK** — 相同的命令，相同的 Python 和 Node.js 体验
 
-<Update label="2026-04-02" description="Mem0 Plugin for AI Editors">
+</更新>
 
-**Mem0 Plugin for Claude Code, Cursor, and Codex**
+<更新标签=“2026-04-06”描述=“OpenClaw v1.0.4”>
 
-Launched a unified Mem0 plugin across three major AI development environments — Claude Code and Cursor first (March 25), then Codex (April 2):
+**OpenClaw 插件 — 生产就绪**
 
-- **9 MCP memory tools** — add, search, get, update, delete, bulk delete, entity management via `mcp.mem0.ai`
-- **Lifecycle hooks** — Automatic memory capture at session start, context compaction, task completion, and session end
-- **Cloud MCP server** — Managed endpoint replaces local MCP and Smithery setup
-- **Streamable HTTP transport** — New MCP transport protocol for real-time streaming
-- **Codex-specific skill** — Dedicated skill in `mem0-plugin/skills/mem0-codex` for Codex workflows
+OpenClaw Mem0 插件从最初发布到生产就绪仅用了一周时间（v1.0.0 → v1.0.4）：
 
-</Update>
+- **基于技能的内存架构** - 具有技能加载器、批量提取和域感知内存分类的新提取管道
+- **梦想之门** — 在空闲期间自动进行内存整合，以实现更高质量的长期回忆
+- **交互式 CLI** — `openclaw mem0 init`、`status`、`config`、`import` 和 `event` 命令
+- **统一工具命名** — `memory_add` 和 `memory_delete` 替换 4 个旧版工具，匹配平台 API
+- **安全性强化** — 路径遍历保护、固定依赖项、跨 10 个文件进行 329 项测试
 
-<Update label="2026-03-21" description="New Providers">
+</更新>
 
-**Apache AGE, Turbopuffer, MiniMax, and pgvector for Node.js**
+<更新标签=“2026-04-02”描述=“AI 编辑器的 Mem0 插件”>
 
-Major expansion of the provider ecosystem:
+**用于 Claude 代码、光标和 Codex 的 Mem0 插件**
 
-- **Apache AGE** — New graph store support, bringing the total to 4 graph store backends (Neo4j, Memgraph, Kuzu, Apache AGE)
-- **Turbopuffer** — New vector database provider for Python SDK
-- **MiniMax** — New LLM provider with dedicated AWS Bedrock support
-- **pgvector for Node.js** — PostgreSQL vector support added to the TypeScript OSS SDK
-- **Reasoning models** — `reasoning_effort` parameter for OpenAI o1/o3-style models
+在三个主要 AI 开发环境中推出了统一的 Mem0 插件 - 首先是 Claude Code 和 Cursor（3 月 25 日），然后是 Codex（4 月 2 日）：- **9 MCP 内存工具** — 通过“mcp.mem0.ai”添加、搜索、获取、更新、删除、批量删除、实体管理
+- **生命周期挂钩** - 在会话开始、上下文压缩、任务完成和会话结束时自动捕获内存
+- **云 MCP 服务器** — 托管端点取代了本地 MCP 和 Smithery 设置
+- **可流式 HTTP 传输** — 用于实时流式传输的新 MCP 传输协议
+- **Codex 特定技能** — Codex 工作流程的“mem0-plugin/skills/mem0-codex”专用技能
 
-</Update>
+</更新><更新标签=“2026-03-21”描述=“新提供商”>
 
-<Update label="2026-03-14" description="Mem0 Platform Skill">
+**适用于 Node.js 的 Apache AGE、Turbopuffer、MiniMax 和 pgvector**
 
-**Mem0 Platform Skill on skills.sh**
+提供商生态系统的重大扩展：
 
-First skill launch — a dedicated Mem0 skill providing platform API reference, quickstart patterns, and integration examples directly inside agent sessions. Available on [skills.sh](https://skills.sh) for any compatible AI coding agent.
+- **Apache AGE** — 新的图形存储支持，使图形存储后端总数达到 4 个（Neo4j、Memgraph、Kuzu、Apache AGE）
+- **Turbobuffer** — Python SDK 的新矢量数据库提供程序
+- **MiniMax** — 具有专门 AWS Bedrock 支持的新 LLM 提供商
+- **pgvector for Node.js** — TypeScript OSS SDK 中添加了 PostgreSQL 矢量支持
+- **推理模型** — OpenAI o1/o3 风格模型的 `reasoning_effort` 参数
 
-</Update>
+</更新>
+
+<更新标签=“2026-03-14”描述=“Mem0平台技能”>
+
+**skills.sh 上的 Mem0 平台技能**
+
+第一项技能启动 - 专门的 Mem0 技能，直接在代理会话内提供平台 API 参考、快速入门模式和集成示例。可在 [skills.sh](https://skills.sh) 上找到任何兼容的 AI 编码代理。
+
+</更新>

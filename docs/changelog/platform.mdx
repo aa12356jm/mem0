@@ -4,294 +4,280 @@ description: "Release notes for the Mem0 hosted platform — backend, dashboard,
 mode: "wide"
 ---
 
-<Update label="2026-04-16" description="">
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-**Improvements:**
-- **UI:** Removed Graph Memory tab, page, and all references from dashboard, sidebar, project settings, playground, and billing
 
-</Update>
 
-<Update label="2025-07-23" description="">
 
-**Bug Fixes:**
-- **Memory:** Fixed ADD functionality
+**改进：**
+- **UI：**删除了图形内存选项卡、页面以及仪表板、侧边栏、项目设置、游乐场和计费中的所有引用
 
-</Update>
+</更新>
 
-<Update label="2025-07-19" description="">
+<更新标签=“2025-07-23”描述=“”>
 
-**New Features:**
-- **UI:** Added Settings UI and latency display
-- **Performance:** Neo4j query optimization
+**错误修复：**
+- **内存：**修复了ADD功能
 
-**Bug Fixes:**
-- **OpenMemory:** Fixed OMM raising unnecessary exceptions
+</更新>
 
-</Update>
+<更新标签=“2025-07-19”描述=“”>
 
-<Update label="2025-07-18" description="">
+**新功能：**
+- **UI：** 添加了设置 UI 和延迟显示
+- **性能：** Neo4j 查询优化
 
-**Improvements:**
-- **UI:** Updated Event UI
-- **Performance:** Fixed N+1 query issue in semantic_search_v2 by optimizing MemorySerializer field selection
+**错误修复：**
+- **OpenMemory：** 修复了 OMM 引发不必要的异常的问题
 
-**Bug Fixes:**
-- **Memory:** Fixed duplicate memory index sentry error
+</更新>
 
-</Update>
+<更新标签=“2025-07-18”描述=“”>
 
-<Update label="2025-07-17" description="">
+**改进：**
+- **用户界面：**更新了活动用户界面
+- **性能：** 通过优化 MemorySerializer 字段选择，修复了 Semantic_search_v2 中的 N+1 查询问题
 
-**New Features:**
-- **UI:** New Settings Page
-- **Memory:** Duplicate memories entities support
+**错误修复：**
+- **内存：**修复了重复内存索引哨兵错误
 
-**Improvements:**
-- **Performance:** Optimized semantic search and get_all APIs by eliminating N+1 queries
+</更新>
 
-</Update>
+<更新标签=“2025-07-17”描述=“”>
 
-<Update label="2025-07-16" description="">
+**新功能：**
+- **用户界面：** 新设置页面
+- **内存：** 重复内存实体支持
 
-**New Features:**
-- **Database:** Implemented read replica routing with enhanced logging and app-specific DB routing
+**改进：**
+- **性能：** 通过消除 N+1 查询优化语义搜索和 get_all API
 
-**Improvements:**
-- **Performance:** Improved query performance in search v2 and get all v2 endpoints
+</更新>
 
-**Bug Fixes:**
-- **API:** Fixed pagination for get all API
+<更新标签=“2025-07-16”描述=“”>**新功能：**
+- **数据库：** 通过增强的日志记录和特定于应用程序的数据库路由实现了只读副本路由
 
-</Update>
+**改进：**
+- **性能：** 改进了搜索 v2 中的查询性能并获取所有 v2 端点
 
-<Update label="2025-07-12" description="">
+**错误修复：**
+- **API：** 修复了获取所有 API 的分页
 
-**Bug Fixes:**
-- **Graph:** Fixed social graph bugs and connection issues
+</更新>
 
-</Update>
+<更新标签=“2025-07-12”描述=“”>
 
-<Update label="2025-07-11" description="">
+**错误修复：**
+- **图表：**修复了社交图表错误和连接问题
 
-**Improvements:**
-- **Rate Limiting:** New rate limit for V2 Search
+</更新>
 
-**Bug Fixes:**
-- **Slack:** Fixed Slack rate limit error with backend improvements
+<更新标签=“2025-07-11”描述=“”>
 
-</Update>
+**改进：**
+- **速率限制：** V2 搜索的新速率限制
 
-<Update label="2025-07-10" description="">
+**错误修复：**
+- **Slack：** 通过后端改进修复了 Slack 速率限制错误
 
-**Improvements:**
-- **Performance:** 
-  - Changed connection pooling time to 5 minutes
-  - Separated graph lambdas for better performance
+</更新>
 
-</Update>
+<更新标签=“2025-07-10”描述=“”>
 
-<Update label="2025-07-09" description="">
+**改进：**
+- **性能：** 
+  - 将连接池时间更改为 5 分钟
+  - 分离图 lambda 以获得更好的性能
 
-**Improvements:**
-- **Graph:** Graph Optimizations V2 and memory improvements
+</更新>
 
-</Update>
+<更新标签=“2025-07-09”描述=“”>
 
-<Update label="2025-07-08" description="">
+**改进：**
+- **图表：** 图表优化 V2 和内存改进
 
-**New Features:**
-- **Database:** Added read replica support for improved database performance
-- **UI:** Implemented UI changes for Users Page
-- **Feedback:** Enabled feedback functionality
+</更新>
 
-**Bug Fixes:**
-- **Serializer:** Fixed GET ALL Serializer
+<更新标签=“2025-07-08”描述=“”>**新功能：**
+- **数据库：** 添加了只读副本支持以提高数据库性能
+- **UI：** 对用户页面实施了 UI 更改
+- **反馈：**启用反馈功能**错误修复：**
+- **序列化器：** 修复了 GET ALL 序列化器
 
-</Update>
+</更新>
 
-<Update label="2025-07-05" description="">
+<更新标签=“2025-07-05”描述=“”>
 
-**New Features:**
-- **UI:** User Page Revamp and New Users Page
+**新功能：**
+- **UI：** 用户页面改造和新用户页面
 
-</Update>
+</更新>
 
-<Update label="2025-07-04" description="">
+<更新标签=“2025-07-04”描述=“”>
 
-**New Features:**
-- **Users:** New Users Page implementation
-- **Tools:** Added script to backfill memory categories
+**新功能：**
+- **用户：**新用户页面实施
+- **工具：**添加脚本来回填内存类别
 
-**Bug Fixes:**
-- **Filters:** Fixed Filters Get All functionality
+**错误修复：**
+- **过滤器：**固定过滤器获取所有功能
 
-</Update>
+</更新>
 
-<Update label="2025-07-03" description="">
+<更新标签=“2025-07-03”描述=“”>
 
-**Improvements:**
-- **Graph:** Graph Memory optimization
-- **Memory:** Fixed exact memories and semantically similar memories retrieval
+**改进：**
+- **图形：**图形内存优化
+- **记忆：**修复了精确记忆和语义相似记忆检索
 
-</Update>
+</更新>
 
-<Update label="2025-07-02" description="">
+<更新标签=“2025-07-02”描述=“”>
 
-**Improvements:**
-- **Categorization:** Refactored categorization logic to utilize Gemini 2.5 Flash and improve message handling
+**改进：**
+- **分类：** 重构分类逻辑以利用 Gemini 2。5 Flash并改进消息处理
 
-</Update>
+</更新>
 
-<Update label="2025-07-01" description="">
+<更新标签=“2025-07-01”描述=“”>
 
-**Bug Fixes:**
-- **Memory:** Fixed old_memory issue in Async memory addition lambda
-- **Events:** Fixed missing events
+**错误修复：**
+- **内存：**修复了异步内存添加 lambda 中的 old_memory 问题
+- **事件：**修复了缺失的事件
 
-</Update>
+</更新>
 
-<Update label="2025-06-30" description="">
+<更新标签=“2025-06-30”描述=“”>
 
-**Improvements:**
-- **Graph:** Improvements to graph memory and added user to LTM-STM
+**改进：**
+- **图表：** 改进图表内存并为 LTM-STM 添加用户
 
-</Update>
+</更新>
 
-<Update label="2025-06-28" description="">
+<更新标签=“2025-06-28”描述=“”>**新功能：**
+- **图表：** 在图表内存添加中添加了对 SQS 的支持
+- **测试：** 添加了 Locust 负载测试脚本和 Grafana 仪表板
 
-**New Features:**
-- **Graph:** Added support for SQS in graph memory addition
-- **Testing:** Added Locust load testing script and Grafana Dashboard
+</更新>
 
-</Update>
+<更新标签=“2025-06-27”描述=“”>
 
-<Update label="2025-06-27" description="">
+**改进：**
+- **速率限制：** ADD API 的速率限制更新为 1000/分钟
+- **性能：** 改进了 Neo4j 性能
 
-**Improvements:**
-- **Rate Limiting:** Updated rate limiting for ADD API to 1000/min
-- **Performance:** Improved Neo4j performance
+</更新>
 
-</Update>
+<更新标签=“2025-06-26”描述=“”>
 
-<Update label="2025-06-26" description="">
+**新功能：**
+- **内存：** 从抽屉功能编辑内存
+- **API：** 添加了主题建议 API 端点
 
-**New Features:**
-- **Memory:** Edit Memory From Drawer functionality
-- **API:** Added Topic Suggestions API Endpoint
+</更新>
 
-</Update>
+<更新标签=“2025-06-25”描述=“”>
 
-<Update label="2025-06-25" description="">
+**新功能：**
+- **群聊：** 具有演员感知记忆的群聊 v2
+- **内存：** 内存中的可编辑元数据
+- **UI：** 记忆动作徽章
 
-**New Features:**
-- **Group Chat:** Group-Chat v2 with Actor-Aware Memories
-- **Memory:** Editable Metadata in Memories
-- **UI:** Memory Actions Badges
+</更新>
 
-</Update>
+<更新标签=“2025-06-19”描述=“”>
 
-<Update label="2025-06-19" description="">
+**新功能：**
+- **速率限制：**实施全面的速率限制系统
 
-**New Features:**
-- **Rate Limiting:** Implemented comprehensive rate limiting system
+**改进：**
+- **性能：**添加了内存统计查询的性能索引
 
-**Improvements:**
-- **Performance:** Added performance indexes for memory stats query
+**错误修复：**
+- **搜索：**修复了不尊重 top-k 参数的搜索事件</更新>
 
-**Bug Fixes:**
-- **Search:** Fixed search events not respecting top-k parameter
+<更新标签=“2025-06-18”描述=“”>**新功能：**
+- **内存管理：** 实施了用于内存清理的 OpenAI Batch API，并带有回退功能
+- **Playground：** 在 Playground 上添加了 Claude 4 支持
 
-</Update>
+**改进：**
+- **内存：** 添加了更新内存元数据的功能
 
-<Update label="2025-06-18" description="">
+</更新>
 
-**New Features:**
-- **Memory Management:** Implemented OpenAI Batch API for Memory Cleaning with fallback
-- **Playground:** Added Claude 4 support on Playground
+<更新标签=“2025-06-17”描述=“”>
 
-**Improvements:**
-- **Memory:** Added ability to update memory metadata
+**新功能：**
+- **用户界面：**新的回忆页面用户界面设计
 
-</Update>
+</更新>
 
-<Update label="2025-06-17" description="">
+<更新标签=“2025-06-16”描述=“”>
 
-**New Features:**
-- **UI:** New Memories Page UI design
+**改进：**
+- **基础设施：** 迁移到应用程序负载均衡器 (ALB)
 
-</Update>
+</更新>
 
-<Update label="2025-06-16" description="">
+<更新标签=“2025-06-13”描述=“”>
 
-**Improvements:**
-- **Infrastructure:** Migrated to Application Load Balancer (ALB)
+**改进：**
+- **内存管理：** 通过余弦相似度回退增强内存管理
 
-</Update>
+</更新>
 
-<Update label="2025-06-13" description="">
+<更新标签=“2025-06-11”描述=“”>
 
-**Improvements:**
-- **Memory Management:** Enhanced Memory Management with Cosine Similarity Fallback
+**新功能：**
+- **OMM：** 添加了 OMM 脚本和 UI 功能
 
-</Update>
+**改进：**
+- **API：** 添加过滤器验证到semantic_search_v2端点
 
-<Update label="2025-06-11" description="">
+</更新>
 
-**New Features:**
-- **OMM:** Added OMM Script and UI functionality
+<更新标签=“2025-06-09”描述=“”>
 
-**Improvements:**
-- **API:** Added filters validation to semantic_search_v2 endpoint
+**新功能：**
+- **对讲：** 设置 ADD 和 SEARCH 操作的对讲事件
+- **OpenMemory：**添加了Posthog集成和反馈功能
+- **MCP：** 带反馈支持的新 JavaScript MCP 服务器**改进：**
+- **结构化数据：** 内存管理中增强的结构化数据处理
 
-</Update>
+</更新>
 
-<Update label="2025-06-09" description="">
+<更新标签=“2025-06-06”描述=“”>
 
-**New Features:**
-- **Intercom:** Set Intercom events for ADD and SEARCH operations
-- **OpenMemory:** Added Posthog integration and feedback functionality
-- **MCP:** New JavaScript MCP Server with feedback support
+**新功能：**
+- **OAuth：** 添加了 Mem0 OAuth 集成
+- **OMM：** 为已删除的内存添加了 OMM-Mem0 同步
 
-**Improvements:**
-- **Structured Data:** Enhanced structured data handling in memory management
+</更新>
 
-</Update>
+<更新标签=“2025-06-05”描述=“”>
 
-<Update label="2025-06-06" description="">
+**新功能：**
+- **过滤器：** 在 V2 视图中实现了通配符过滤器并重构了过滤器逻辑
 
-**New Features:**
-- **OAuth:** Added Mem0 OAuth integration
-- **OMM:** Added OMM-Mem0 sync for deleted memories
+</更新>
 
-</Update>
+<更新标签=“2025-06-02”描述=“”>
 
-<Update label="2025-06-05" description="">
+**新功能：**
+- **OpenMemory 云：** 添加了 OpenMemory 云支持
+- **结构化数据：** 在内存模型中添加了“structural_attributes”字段
 
-**New Features:**
-- **Filters:** Implemented Wildcard Filters and refactored filter logic in V2 Views
+</更新>
 
-</Update>
+<更新标签=“2025-05-30”描述=“”>
 
-<Update label="2025-06-02" description="">
+**新功能：**
+- **项目：** 添加版本和enable_graph到项目视图
+- **OpenMemory：** 添加了 Postgres 对 OpenMemory 的支持
 
-**New Features:**
-- **OpenMemory Cloud:** Added OpenMemory Cloud support
-- **Structured Data:** Added 'structured_attributes' field to Memory model
+</更新>
 
-</Update>
+<更新标签=“2025-05-19”描述=“”>**错误修复：**
+- **核心：**修复了 user_id、agent_id、run_id 和 app_id 中的 unicode 错误
 
-<Update label="2025-05-30" description="">
-
-**New Features:**
-- **Projects:** Added version and enable_graph to project views
-- **OpenMemory:** Added Postgres support for OpenMemory
-
-</Update>
-
-<Update label="2025-05-19" description="">
-
-**Bug Fixes:**
-- **Core:** Fixed unicode error in user_id, agent_id, run_id and app_id
-
-</Update>
-
+</更新>

@@ -4,162 +4,155 @@ description: "Compare Mem0 Platform and Open Source to choose the right solution
 icon: "code-compare"
 ---
 
-## Which Mem0 is right for you?
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0 offers two powerful ways to add memory to your AI applications. Choose based on your priorities:
 
-<CardGroup cols={2}>
-  <Card
-    title="Mem0 Platform"
-    icon="cloud"
-    href="/platform/quickstart"
+
+## 哪个 Mem0 适合您？
+
+Mem0 提供了两种强大的方法来为 AI 应用程序添加内存。根据您的优先级进行选择：
+
+<卡组列={2}>
+  <卡片
+    title="Mem0 平台"
+    图标=“云”
+    href="/平台/快速启动"
   >
-    **Managed, hassle-free**
+    **托管，无忧**
 
-    Get started in 5 minutes with our hosted solution. Perfect for fast iteration and production apps.
-  </Card>
+    5 分钟内即可开始使用我们的托管解决方案。非常适合快速迭代和生产应用程序。
+  </卡>
 
-  <Card
-    title="Open Source"
-    icon="code-branch"
-    href="/open-source/python-quickstart"
+  <卡片
+    标题=“开源”
+    图标=“代码分支”
+    href="/开源/python-quickstart"
   >
-    **Self-hosted, full control**
+    **自托管，完全控制**
 
-    Deploy on your infrastructure. Choose your vector DB, LLM, and configure everything.
-  </Card>
-</CardGroup>
+    部署在您的基础设施上。选择您的矢量数据库、法学硕士，并配置一切。</卡>
+</卡组>
 
 ---
 
-## Feature Comparison
+## 功能比较
 
-<AccordionGroup>
-  <Accordion title="Setup & Getting Started" icon="rocket">
-    | Feature | Platform | Open Source |
+<手风琴组>
+  <Accordion title="安装和入门" icon="rocket">
+    |特色 |平台|开源 |
     |---------|----------|-------------|
-    | **Time to first memory** | 5 minutes | 15-30 minutes |
-    | **Infrastructure needed** | None | Vector DB + Python/Node env |
-    | **API key setup** | One environment variable | Configure LLM + embedder + vector DB |
-    | **Maintenance** | Fully managed by Mem0 | Self-managed |
-  </Accordion>
-
-  <Accordion title="Core Memory Features" icon="brain">
-    | Feature | Platform | Open Source |
+    | **第一次记忆的时间** | 5 分钟 | 15-30 分钟 |
+    | **需要基础设施** |无 | Vector DB + Python/Node 环境 |
+    | **API 密钥设置** |一个环境变量 |配置LLM+嵌入器+矢量DB |
+    | **维护** |完全由 Mem0 管理 |自我管理|
+  </手风琴><Accordion title="核心内存功能" icon="brain">
+    |特色 |平台|开源 |
     |---------|----------|-------------|
-    | **User & agent memories** | ✅ | ✅ |
-    | **Smart deduplication** | ✅ | ✅ |
-    | **Semantic search** | ✅ | ✅ |
-    | **Memory updates** | ✅ | ✅ |
-    | **Multi-language SDKs** | Python, JavaScript | Python, JavaScript |
-  </Accordion>
+    | **用户和代理记忆** | ✅ | ✅ |
+    | **智能重复数据删除** | ✅ | ✅ |
+    | **语义搜索** | ✅ | ✅ |
+    | **内存更新** | ✅ | ✅ |
+    | **多语言 SDK** | Python、JavaScript | Python、JavaScript |
+  </手风琴>
 
-  <Accordion title="Advanced Capabilities" icon="sparkles">
-    | Feature | Platform | Open Source |
+  <Accordion title="高级功能" icon="sparkles">
+    |特色 |平台|开源 |
     |---------|----------|-------------|
-    | **Graph Memory** | ✅ (Managed) | ✅ (Self-configured) |
-    | **Multimodal support** | ✅ | ✅ |
-    | **Custom categories** | ✅ | Limited |
-    | **Advanced retrieval** | ✅ | ✅ |
-    | **Memory filters v2** | ✅ | ⚠️ (via metadata) |
-    | **Webhooks** | ✅ | ❌ |
-    | **Memory export** | ✅ | ❌ |
-  </Accordion>
-
-  <Accordion title="Infrastructure & Scaling" icon="server">
-    | Feature | Platform | Open Source |
+    | **图形内存** | ✅（托管）| ✅（自行配置）|
+    | **多式联运支持** | ✅ | ✅ |
+    | **自定义类别** | ✅ |有限公司|
+    | **高级检索** | ✅ | ✅ |
+    | **内存过滤器 v2** | ✅ | ⚠️（通过元数据）|
+    | **网络钩子** | ✅ | ❌ |
+    | **内存导出** | ✅ | ❌ |
+  </手风琴><Accordion title="基础设施和扩展" icon="服务器">
+    |特色 |平台|开源 |
     |---------|----------|-------------|
-    | **Hosting** | Managed by Mem0 | Self-hosted |
-    | **Auto-scaling** | ✅ | Manual |
-    | **High availability** | ✅ Built-in | DIY setup |
-    | **Vector DB choice** | Managed | Qdrant, Chroma, Pinecone, Milvus, +20 more |
-    | **LLM choice** | Managed (optimized) | OpenAI, Anthropic, Ollama, Together, +10 more |
-    | **Data residency** | US (expandable) | Your choice |
-  </Accordion>
+    | **托管** |由 Mem0 管理 |自托管 |
+    | **自动缩放** | ✅ |手册|
+    | **高可用性** | ✅ 内置 | DIY设置|
+    | **矢量数据库选择** |管理 | Qdrant、Chroma、Pinecone、Milvus 和其他 20 多个 |
+    | **法学硕士选择** |托管（优化）| OpenAI、Anthropic、Ollama、Together 和其他 10 家 |
+    | **数据驻留** |美国（可扩展）|您的选择|
+  </手风琴>
 
-  <Accordion title="Pricing & Cost" icon="dollar-sign">
-    | Aspect | Platform | Open Source |
+  <Accordion title="定价和成本" icon="dollar-sign">
+    |方面|平台|开源 |
     |--------|----------|-------------|
-    | **License** | Usage-based pricing | Apache 2.0 (free) |
-    | **Infrastructure costs** | Included in pricing | You pay for VectorDB + LLM + hosting |
-    | **Support** | Included | Community + GitHub |
-    | **Best for** | Fast iteration, production apps | Cost-sensitive, custom requirements |
-  </Accordion>
-
-  <Accordion title="Development & Integration" icon="code">
-    | Feature | Platform | Open Source |
+    | **许可证** |基于使用的定价 |阿帕奇2.0（免费）|
+    | **基础设施成本** |包含在定价中 |您支付 VectorDB + LLM + 托管费用 |
+    | **支持** |包含 |社区 + GitHub |
+    | **最适合** |快速迭代、生产应用程序 |成本敏感的定制要求 |
+  </手风琴><Accordion title="开发与集成" icon="code">
+    |特色 |平台|开源 |
     |---------|----------|-------------|
-    | **REST API** | ✅ | ✅ (via feature flag) |
+    | **REST API** | ✅ | ✅（通过功能标志）|
     | **Python SDK** | ✅ | ✅ |
     | **JavaScript SDK** | ✅ | ✅ |
-    | **Framework integrations** | LangChain, CrewAI, LlamaIndex, +15 | Same |
-    | **Dashboard** | ✅ Web-based | ❌ |
-    | **Analytics** | ✅ Built-in | DIY |
-  </Accordion>
-</AccordionGroup>
+    | **框架集成** | LangChain、CrewAI、LlamaIndex、+15 |相同|
+    | **仪表板** | ✅ 基于网络 | ❌ |
+    | **分析** | ✅ 内置 | DIY |
+  </手风琴>
+</手风琴组>
 
 ---
 
-## Decision Guide
+## 决策指南
 
-### Choose **Platform** if you want:
+### 如果您需要，请选择 **平台**：
 
-<CardGroup cols={2}>
-  <Card icon="bolt" title="Fast Time to Market">
-    Get your AI app with memory live in hours, not weeks. No infrastructure setup needed.
-  </Card>
+<卡组列={2}>
+  <Card icon="bolt" title="快速上市">
+    让您的具有记忆功能的 AI 应用程序在数小时内（而不是数周）内上线。无需基础设施设置。
+  </卡>
 
-  <Card icon="shield" title="Production-Ready">
-    Auto-scaling, high availability, and managed infrastructure out of the box.
-  </Card>
+  <Card icon="shield" title="生产就绪">
+    自动扩展、高可用性和开箱即用的托管基础设施。</卡>
 
-  <Card icon="chart-line" title="Built-in Analytics">
-    Track memory usage, query patterns, and user engagement through our dashboard.
-  </Card>
+  <Card icon="chart-line" title="内置分析">
+    通过我们的仪表板跟踪内存使用情况、查询模式和用户参与度。
+  </卡>
 
-  <Card icon="webhook" title="Advanced Features">
-    Access to webhooks, memory export, custom categories, and priority support.
-  </Card>
-</CardGroup>
+  <Card icon="webhook" title="高级功能">
+    访问网络钩子、内存导出、自定义类别和优先级支持。
+  </卡>
+</卡组>
 
-### Choose **Open Source** if you need:
+### 如果您需要，请选择**开源**：<卡组列={2}>
+  <Card icon="lock" title="完全数据控制">
+    将所有内容托管在您的基础设施上。完整的数据驻留和隐私控制。
+  </卡>
 
-<CardGroup cols={2}>
-  <Card icon="lock" title="Full Data Control">
-    Host everything on your infrastructure. Complete data residency and privacy control.
-  </Card>
+  <Card icon="扳手" title="自定义配置">
+    选择您自己的矢量数据库、LLM 提供商、嵌入器和部署策略。
+  </卡>
 
-  <Card icon="wrench" title="Custom Configuration">
-    Choose your own vector DB, LLM provider, embedder, and deployment strategy.
-  </Card>
+  <Card icon="code" title="扩展性">
+    修改代码库、添加自定义功能并回馈社区。
+  </卡>
 
-  <Card icon="code" title="Extensibility">
-    Modify the codebase, add custom features, and contribute back to the community.
-  </Card>
-
-  <Card icon="dollar-sign" title="Cost Optimization">
-    Use local LLMs (Ollama), self-hosted vector DBs, and optimize for your specific use case.
-  </Card>
-</CardGroup>
+  <Card icon="dollar-sign" title="成本优化">
+    使用本地 LLM (Ollama)、自托管向量数据库，并针对您的特定用例进行优化。
+  </卡>
+</卡组>
 
 ---
 
-## Still not sure?
+## 还是不确定？
 
-<CardGroup cols={2}>
-  <Card
-    title="Try Platform Free"
-    icon="rocket"
+<卡组列={2}>
+  <卡片
+    title="免费试用平台"
+    图标=“火箭”
     href="https://app.mem0.ai/login?utm_source=oss&utm_medium=platform-vs-oss"
   >
-    Sign up and test the Platform with our free tier. No credit card required.
-  </Card>
+    使用我们的免费套餐注册并测试平台。无需信用卡。</卡>
 
-  <Card
-    title="Explore Open Source"
-    icon="github"
+  <卡片
+    title="探索开源"
+    图标=“github”
     href="https://github.com/mem0ai/mem0"
   >
-    Clone the repo and run locally to see how it works. Star us while you're there!
-  </Card>
-</CardGroup>
+    克隆存储库并在本地运行以查看其工作原理。当您在场时，给我们加注星标吧！
+  </卡>
+</卡组>

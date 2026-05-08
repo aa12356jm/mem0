@@ -3,173 +3,146 @@ title: Codex
 description: "Add persistent memory to OpenAI Codex with the Mem0 plugin — MCP server, memory protocol skill, and plugin marketplace support."
 ---
 
-Add persistent memory to [**OpenAI Codex**](https://openai.com/index/codex/) with the Mem0 plugin. Codex forgets everything between tasks — this plugin fixes that by connecting to Mem0's cloud memory layer via MCP and using a skill-based memory protocol to automatically retrieve context and store learnings.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-1. **MCP Server** — Connect to Mem0's remote MCP server for memory tools (add, search, update, delete)
-2. **Memory Protocol Skill** — Instructs the agent to retrieve memories at task start, store learnings on completion, and capture session state before context loss
-3. **Plugin Marketplace** — Install via Codex's repo-level or personal plugin marketplace
-4. **Zero local dependencies** — Cloud-hosted MCP server, no local setup required
 
-## Prerequisites
+使用 Mem0 插件将持久内存添加到 [**OpenAI Codex**](https://openai.com/index/codex/)。 Codex 会忘记任务之间的所有内容 - 该插件通过 MCP 连接到 Mem0 的云存储层并使用基于技能的内存协议自动检索上下文并存储学习内容来解决这个问题。
 
-Before setting up Mem0 with Codex, ensure you have:
+## 概述
 
-1. A Mem0 Platform account and API key:
-   - <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-codex" rel="nofollow">Sign up at app.mem0.ai</a>
-   - <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-codex" rel="nofollow">Get your API key</a> (starts with `m0-`)
+1. **MCP服务器** — 连接Mem0的远程MCP服务器以获取内存工具（添加、搜索、更新、删除）
+2. **记忆协议技能** - 指示代理在任务开始时检索记忆，在完成时存储学习内容，并在上下文丢失之前捕获会话状态
+3. **插件市场** — 通过 Codex 的存储库级或个人插件市场安装
+4. **零本地依赖** — 云托管的 MCP 服务器，无需本地设置
 
-2. OpenAI Codex access
+## 先决条件
 
-3. Your API key exported in your shell:
+在使用 Codex 设置 Mem0 之前，请确保您拥有：
 
-```bash
+1. Mem0 平台帐户和 API 密钥：
+   - <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-codex" rel="nofollow">在 app.mem0.ai 注册</a>
+   - <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-codex" rel="nofollow">获取您的 API 密钥</a>（以 `m0-` 开头）
+
+2. OpenAI Codex 访问3. 在 shell 中导出您的 API 密钥：```bash
 export MEM0_API_KEY="m0-your-api-key"
 ```
+## 安装
 
-## Installation
+### 选项 A — 直接 MCP（推荐）
 
-### Option A — Direct MCP (Recommended)
-
-The fastest way to connect Codex to Mem0 — no downloads, no marketplace. Codex reads MCP servers from `~/.codex/config.toml` as TOML. Add:
-
-```toml
+将 Codex 连接到 Mem0 的最快方式 — 无需下载，无需市场。 Codex 从 `~/.codex/config.toml` 读取 MCP 服务器作为 TOML。添加：```toml
 [mcp_servers.mem0]
 url = "https://mcp.mem0.ai/mcp"
 bearer_token_env_var = "MEM0_API_KEY"
 ```
+确保在启动 Codex 的 shell 中导出了“MEM0_API_KEY”，然后重新启动 Codex。
 
-Make sure `MEM0_API_KEY` is exported in the shell you launch Codex from, then restart Codex.
+<信息>
+  Codex 的“codex mcp add”CLI 仅支持 stdio MCP 服务器。由于 Mem0 的 MCP 是 HTTP/可流式传输，因此您可以通过直接编辑 `config.toml` 来配置它（或通过 Codex 应用程序中的 **插件 → 连接到自定义 MCP → 可流式传输 HTTP** UI）。
+</信息>
 
-<Info>
-  Codex's `codex mcp add` CLI only supports stdio MCP servers. Because Mem0's MCP is HTTP/streamable, you configure it by editing `config.toml` directly (or via the **Plugins → Connect to a custom MCP → Streamable HTTP** UI in the Codex app).
-</Info>
+### 选项 B — 旁加载插件（高级）
 
-### Option B — Sideload the Plugin (Advanced)
+为了获得完整的插件体验 - MCP 服务器 **加上** Mem0 SDK 技能、内存协议技能和选择加入生命周期挂钩 - 从本地克隆旁加载插件。 Mem0 存储库已在 [`.agents/plugins/marketplace.json`](https://github.com/mem0ai/mem0/blob/main/.agents/plugins/marketplace.json) 中发布了市场清单，因此无需手动编写 JSON。这遵循 Codex [build-plugins](https://developers.openai.com/codex/plugins/build) 本地测试工作流程。<信息>
+  不要将选项 B 与选项 A 结合起来。插件清单通过 [`.codex-mcp.json`](https://github.com/mem0ai/mem0/blob/main/mem0-plugin/.codex-mcp.json) 声明其 MCP 服务器，因此 Codex 在插件加载时自动注册 `mem0` MCP 服务器。将相同的“[mcp_servers.mem0]”块添加到“~/.codex/config.toml”将创建重复注册。
+</信息>
 
-For the full plugin experience — MCP server **plus** the Mem0 SDK skill, memory protocol skill, and opt-in lifecycle hooks — sideload the plugin from a local clone. The Mem0 repo already ships a marketplace manifest at [`.agents/plugins/marketplace.json`](https://github.com/mem0ai/mem0/blob/main/.agents/plugins/marketplace.json), so there's no JSON to author by hand. This follows the Codex [build-plugins](https://developers.openai.com/codex/plugins/build) local-testing workflow.
-
-<Info>
-  Don't combine Option B with Option A. The plugin manifest declares its MCP server via [`.codex-mcp.json`](https://github.com/mem0ai/mem0/blob/main/mem0-plugin/.codex-mcp.json), so Codex auto-registers the `mem0` MCP server when the plugin loads. Adding the same `[mcp_servers.mem0]` block to `~/.codex/config.toml` will create a duplicate registration.
-</Info>
-
-**Step 1.** Clone the Mem0 repository anywhere on disk:
-
-```bash
+**步骤 1.** 将 Mem0 存储库克隆到磁盘上的任意位置：```bash
 git clone https://github.com/mem0ai/mem0.git ~/codex-plugins/mem0-source
 ```
-
-**Step 2.** Register the bundled marketplace with Codex's CLI:
-
-```bash
+**步骤 2.** 使用 Codex 的 CLI 注册捆绑市场：```bash
 codex plugin marketplace add ~/codex-plugins/mem0-source
 ```
+这将 Codex 指向存储库的“.agents/plugins/marketplace.json”。捆绑文件使用 `path: "./mem0-plugin"`，Codex 相对于克隆根解析该路径。
 
-This points Codex at the repo's `.agents/plugins/marketplace.json`. The bundled file uses `path: "./mem0-plugin"`, which Codex resolves relative to the clone root.
+<信息>
+  **为什么我们建议这样做而不是手动编写`~/.agents/plugins/marketplace.json`：** Codex 要求任何市场清单中的`source.path` 都是**相对**（以`./` 开头）并且**位于市场根目录内**。存储库的捆绑清单已经满足了这一点 - 市场根目录是克隆目录，并且“mem0-plugin/”位于其中。对于个人“~/.agents/plugins/marketplace.json”，根目录是“~/”，克隆也必须位于“~/”下。 CLI 形式回避了这个限制。
+</信息>
 
-<Info>
-  **Why we recommend this over hand-authoring `~/.agents/plugins/marketplace.json`:** Codex requires `source.path` in any marketplace manifest to be **relative** (starting with `./`) and **inside the marketplace root**. The repo's bundled manifest already satisfies this — the marketplace root is the clone directory, and `mem0-plugin/` lives inside it. With a personal `~/.agents/plugins/marketplace.json`, the root is `~/` and the clone has to live under `~/` too. The CLI form sidesteps that constraint.
-</Info>
+**步骤 3.** 重新启动 Codex，运行 `/plugins`，浏览 `Mem0 Plugins` 市场，然后安装 **Mem0**。
 
-**Step 3.** Restart Codex, run `/plugins`, browse the `Mem0 Plugins` marketplace, and install **Mem0**.
-
-**Step 4 (optional) — enable lifecycle hooks.** Codex doesn't auto-wire hooks from plugin manifests; it only reads them from `~/.codex/hooks.json` (or `<repo>/.codex/hooks.json`). Run the bundled installer once to merge the Mem0 entries into your global hooks file:
-
-```bash
+**第 4 步（可选）- 启用生命周期挂钩。** Codex 不会从插件清单中自动连接挂钩；它只从“~/.codex/hooks.json”（或“<repo>/.codex/hooks.json”）读取它们。运行一次捆绑安装程序，将 Mem0 条目合并到全局挂钩文件中：```bash
 python3 ~/codex-plugins/mem0-source/mem0-plugin/scripts/install_codex_hooks.py
 ```
-
-Then enable the hooks feature flag in `~/.codex/config.toml`:
-
-```toml
+然后在`~/.codex/config.toml`中启用hooks功能标志：```toml
 [features]
 codex_hooks = true
 ```
+重新启动法典。安装程序会注册三个指向克隆内脚本的钩子：
 
-Restart Codex. The installer registers three hooks pointing at scripts inside your clone:
+|活动 |行为 |
+|--------|----------|
+| `会话开始` |加载先前的记忆作为引导上下文 |
+| `用户提示提交` |在每次提示之前注入相关记忆 |
+| `停止` |提醒代理在回合结束时坚持学习 |
 
-| Event | Behavior |
-|-------|----------|
-| `SessionStart` | Loads prior memories as bootstrap context |
-| `UserPromptSubmit` | Injects relevant memories before each prompt |
-| `Stop` | Reminds the agent to persist learnings at turn end |
+重新运行安装程序是幂等的。要删除挂钩：`python3 ~/codex-plugins/mem0-source/mem0-plugin/scripts/install_codex_hooks.py --uninstall`。
 
-Re-running the installer is idempotent. To remove the hooks: `python3 ~/codex-plugins/mem0-source/mem0-plugin/scripts/install_codex_hooks.py --uninstall`.
+<警告>
+  hooks 文件将绝对路径存储到克隆中（例如“~/codex-plugins/mem0-source/mem0-plugin/scripts/...”）。如果您移动或删除克隆，挂钩将悄无声息地中断 - 从新位置重新运行安装程序，或先运行“--uninstall”。
+</警告>
 
-<Warning>
-  The hooks file stores absolute paths into your clone (e.g. `~/codex-plugins/mem0-source/mem0-plugin/scripts/...`). If you move or delete the clone, the hooks will break silently — re-run the installer from the new location, or run `--uninstall` first.
-</Warning>
+### 管理插件
 
-### Managing the Plugin
-
-Codex provides CLI commands for managing marketplaces after install:
-
-```bash
+Codex 提供 CLI 命令用于在安装后管理市场：```bash
 codex plugin marketplace upgrade               # pull latest plugin versions
 codex plugin marketplace remove mem0-plugins   # unregister the marketplace
 ```
+要将更新拉到插件源本身，请在克隆 (`~/codex-plugins/mem0-source`) 中使用 `git pull`，然后运行 ​​`codex 插件市场升级` 来刷新 Codex 的插件缓存。插件缓存在 `~/.codex/plugins/cache/<marketplace>/<plugin>/<version>/` 中。
 
-To pull updates to the plugin source itself, `git pull` inside your clone (`~/codex-plugins/mem0-source`) and then run `codex plugin marketplace upgrade` to refresh Codex's plugin cache. Plugins are cached at `~/.codex/plugins/cache/<marketplace>/<plugin>/<version>/`.
+<信息图标=“检查”>
+  在任一选项之后，启动一个新的 Codex 任务并询问：*“列出我的 mem0 实体”* 或 *“搜索我的记忆中的 hello”*。如果“mem0”工具出现并响应，则一切就绪。
+</信息>
 
-<Info icon="check">
-  After either option, start a new Codex task and ask: *"List my mem0 entities"* or *"Search my memories for hello"*. If the `mem0` tools appear and respond, you're all set.
-</Info>
+## 包含什么
 
-## What's Included
+|组件|旁载插件 |直接MCP |
+|------------|:-----------------:|:----------:|
+| MCP 服务器（9 个内存工具）|是的 |是的 |
+|内存协议技能|是的 |没有 |
+| Mem0 SDK技巧 |是的 |没有 |
+|生命周期挂钩（选择加入）|是的 |没有 |
 
-| Component | Sideloaded Plugin | Direct MCP |
-|-----------|:-----------------:|:----------:|
-| MCP Server (9 memory tools) | Yes | Yes |
-| Memory Protocol Skill | Yes | No |
-| Mem0 SDK Skill | Yes | No |
-| Lifecycle Hooks (opt-in) | Yes | No |
+## 可用的 MCP 工具
 
-## Available MCP Tools
-
-Once installed, the following tools are available in every Codex session:
-
-| Tool | Description |
+安装后，每个 Codex 会话中都可以使用以下工具：|工具|描述 |
 |------|-------------|
-| `add_memory` | Save text or conversation history for a user/agent |
-| `search_memories` | Semantic search across memories with filters |
-| `get_memories` | List memories with filters and pagination |
-| `get_memory` | Retrieve a specific memory by ID |
-| `update_memory` | Overwrite a memory's text by ID |
-| `delete_memory` | Delete a single memory by ID |
-| `delete_all_memories` | Bulk delete all memories in scope |
-| `delete_entities` | Delete a user/agent/app/run entity and its memories |
-| `list_entities` | List users/agents/apps/runs stored in Mem0 |
+| `添加内存` |保存用户/代理的文本或对话历史记录 |
+| `搜索记忆` |使用过滤器跨记忆进行语义搜索 |
+| `获取记忆` |使用过滤器和分页列出记忆 |
+| `获取内存` |通过ID检索特定内存|
+| `更新内存` |按 ID 覆盖内存文本 |
+| `删除内存` |通过ID删除单个内存|
+| `删除所有记忆` |批量删除范围内的所有内存|
+| `删除实体` |删除用户/代理/应用程序/运行实体及其内存 |
+| `列表实体` |列出存储在 Mem0 中的用户/代理/应用程序/运行 |
 
-## Memory Protocol Skill
+## 内存协议技巧
 
-When the plugin is sideloaded, the memory protocol skill instructs the agent to:
+当插件被侧面加载时，内存协议技能指示代理：
 
-### On Every New Task
-1. Call `search_memories` with a query related to the current task to load relevant context
-2. Review returned memories to understand what was learned in prior sessions
-3. Optionally call `get_memories` to browse all stored memories
+### 每一个新任务
+1. 使用与当前任务相关的查询调用“search_memories”来加载相关上下文
+2.回顾返回的记忆以了解之前课程中学到的内容
+3. 可以选择调用 `get_memories` 来浏览所有存储的内存
 
-### After Completing Significant Work
-Store key learnings using `add_memory` with structured metadata:
-
-| What to store | Metadata type |
+### 完成重要工作后
+使用“add_memory”和结构化元数据存储关键知识：|储存什么 |元数据类型 |
 |--------------|---------------|
-| Architectural decisions | `{"type": "decision"}` |
-| Strategies that worked | `{"type": "task_learning"}` |
-| Failed approaches | `{"type": "anti_pattern"}` |
-| User preferences observed | `{"type": "user_preference"}` |
-| Environment discoveries | `{"type": "environmental"}` |
-| Conventions established | `{"type": "convention"}` |
+|架构决策 | `{"type": "决定"}` |
+|有效的策略| `{"type": "task_learning"}` |
+|失败的方法| `{"type": "anti_pattern"}` |
+|观察用户偏好 | `{"type": "user_preference"}` |
+|环境发现| `{"type": "环境"}` |
+|建立的公约| `{"type": "convention"}` |
 
-### Before Losing Context
-Store a comprehensive session summary including goals, accomplishments, decisions, files modified, and current state with metadata `{"type": "session_state"}`.
+### 在失去上下文之前
+使用元数据“{"type":"session_state"}`存储全面的会话摘要，包括目标、成就、决策、修改的文件和当前状态。
 
-## Plugin Manifest
+## 插件清单
 
-The Codex plugin manifest (`.codex-plugin/plugin.json`) follows the Codex plugin specification:
-
-```json
+Codex 插件清单 (`.codex-plugin/plugin.json`) 遵循 Codex 插件规范：```json
 {
   "name": "mem0",
   "version": "0.1.0",
@@ -184,10 +157,7 @@ The Codex plugin manifest (`.codex-plugin/plugin.json`) follows the Codex plugin
   }
 }
 ```
-
-## Example Workflow
-
-```text
+## 工作流程示例```text
 # Task 1: Setting up a new service
 You: Create a REST API for the notifications service using Express and TypeScript.
 
@@ -203,23 +173,18 @@ You: Add WebSocket support for real-time notification delivery.
 # Codex searches memories, retrieves the architecture decisions and conventions.
 # Follows the same patterns established in the first task.
 ```
-
-## Troubleshooting
-
-- **"Connection failed"** — Verify `MEM0_API_KEY` is set in your shell: `echo $MEM0_API_KEY`
-- **No tools appearing** — Restart your Codex session after plugin installation
-- **Duplicate `mem0` MCP server / "tool collision" errors** — You combined Option A (Direct MCP) with Option B (sideload). The sideloaded plugin auto-registers `mem0` from `.codex-mcp.json`, so remove the `[mcp_servers.mem0]` block from `~/.codex/config.toml`.
-- **`plugin/read failed in TUI`** — Codex can't find the plugin directory the marketplace points at. If you used `codex plugin marketplace add <path>`, confirm the path is your clone root and that `<clone>/.agents/plugins/marketplace.json` exists. If you hand-authored `~/.agents/plugins/marketplace.json`, `source.path` must be relative (start with `./`), inside the marketplace root (`~/` for personal installs), and end in `mem0-plugin` — e.g. `"./codex-plugins/mem0-source/mem0-plugin"`.
-- **Plugin not found in `/plugins`** — Run `codex plugin marketplace add ~/path/to/clone` again, or confirm the marketplace was registered with `codex plugin marketplace remove mem0-plugins` then re-add.
-- **Skills not loading** — Verify the `skills` field in `plugin.json` points to a valid directory containing `SKILL.md` files.
-- **Hooks not firing** — Confirm `codex_hooks = true` is in `~/.codex/config.toml` under `[features]`, and that `~/.codex/hooks.json` contains the Mem0 entries (re-run the installer if not). Restart Codex after enabling the flag.
-- **Hooks broke after moving the clone** — The installer bakes absolute paths into `~/.codex/hooks.json` pointing at scripts inside your clone. If you moved or renamed the clone directory, run `python3 <new-clone>/mem0-plugin/scripts/install_codex_hooks.py` from the new location — the installer is idempotent and replaces the old entries.
-
-<CardGroup cols={2}>
-  <Card title="Mem0 MCP Setup" icon="puzzle-piece" href="/platform/mem0-mcp">
-    Detailed MCP configuration for all clients
-  </Card>
-  <Card title="Claude Code Integration" icon={<svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.92888 16.2181L9.86008 14.0122L9.92585 13.8199L9.86008 13.7137H9.66782L9.01009 13.6732L6.76369 13.6125L4.81581 13.5315L2.92863 13.4303L2.45304 13.3292L2.00781 12.7423L2.05335 12.4488L2.45304 12.1807L3.02476 12.2313L4.28962 12.3173L6.18692 12.4488L7.56309 12.5298L9.60204 12.7423H9.92585L9.97138 12.6107L9.86008 12.5298L9.77407 12.4488L7.811 11.1182L5.68603 9.71165L4.57295 8.90214L3.97088 8.49233L3.66731 8.10781L3.53577 7.26794L4.08219 6.66587L4.81581 6.71646L5.00301 6.76706L5.74674 7.33877L7.33541 8.56822L9.40979 10.0962L9.71335 10.3491L9.83478 10.2631L9.84996 10.2024L9.71335 9.97475L8.5851 7.93579L7.38095 5.86141L6.84465 5.00131L6.70298 4.48524C6.65239 4.27275 6.61697 4.09567 6.61697 3.87811L7.23928 3.03318L7.58332 2.92188L8.41307 3.03318L8.76218 3.33675L9.27824 4.5156L10.113 6.37242L11.4083 8.89708L11.7877 9.64588L11.9901 10.339L12.066 10.5515H12.1975V10.4301L12.3038 9.00839L12.5011 7.26288L12.6934 5.01649L12.7591 4.38406L13.0728 3.62514L13.6951 3.21532L14.1808 3.44806L14.5805 4.01978L14.5249 4.38912L14.2871 5.93225L13.8216 8.35066L13.5181 9.96969H13.6951L13.8975 9.76731L14.7171 8.67953L16.0933 6.95931L16.7005 6.27629L17.4088 5.52243L17.8641 5.16321H18.7242L19.3567 6.10427L19.0733 7.07568L18.1879 8.19888L17.4543 9.15006L16.4019 10.5667L15.7442 11.7L15.8049 11.7911L15.9618 11.7759L18.3397 11.27L19.6248 11.0372L21.1578 10.7741L21.851 11.0979L21.9269 11.4268L21.6537 12.0997L20.0144 12.5045L18.0918 12.889L15.2282 13.567L15.1927 13.5923L15.2332 13.6428L16.5234 13.7643L17.0749 13.7946H18.4257L20.9403 13.9818L21.598 14.4169L21.9926 14.9482L21.9269 15.3529L20.915 15.869L19.5489 15.5452L16.3615 14.7863L15.2686 14.5131H15.1168V14.6041L16.0275 15.4946L17.6972 17.0023L19.7867 18.9451L19.893 19.4258L19.6248 19.8053L19.3415 19.7648L17.5049 18.3835L16.7966 17.7612L15.1927 16.4104H15.0865V16.552L15.4558 17.0934L17.4088 20.0279L17.51 20.9285L17.3683 21.2219L16.8624 21.399L16.3058 21.2978L15.1624 19.6939L13.9835 17.8877L13.0324 16.2687L12.916 16.3345L12.3544 22.3805L12.0913 22.6891L11.4842 22.9219L10.9782 22.5374L10.7101 21.915L10.9782 20.6856L11.302 19.0818L11.5651 17.8068L11.8029 16.2232L11.9446 15.697L11.9345 15.6616L11.8181 15.6767L10.6241 17.316L8.80771 19.7698L7.37083 21.3079L7.02679 21.4445L6.42977 21.1359L6.48542 20.5844L6.81935 20.0936L8.80771 17.5639L10.0068 15.9955L10.7809 15.0898L10.7758 14.9583H10.7303L5.44824 18.3886L4.50718 18.51L4.10242 18.1306L4.15302 17.5083L4.34528 17.3059L5.93394 16.213L5.92888 16.2181Z" fill="currentColor"/></svg>} href="/integrations/claude-code">
-    Add Mem0 memory to Claude Code workflows
-  </Card>
-</CardGroup>
+## 故障排除- **“连接失败”** — 验证您的 shell 中是否设置了“MEM0_API_KEY”：“echo $MEM0_API_KEY”
+- **没有出现工具** — 安装插件后重新启动 Codex 会话
+- **重复 `mem0` MCP 服务器/“工具冲突”错误** — 您将选项 A（直接 MCP）与选项 B（旁载）结合起来。侧面加载的插件会自动从“.codex-mcp.json”注册“mem0”，因此从“~/.codex/config.toml”中删除“[mcp_servers.mem0]”块。
+- **`TUI 中插件/读取失败`** — Codex 找不到市场指向的插件目录。如果您使用了“codexpluginmarketplaceadd<path>”，请确认该路径是您的克隆根目录并且“<clone>/.agents/plugins/marketplace.json”存在。如果您手动编写了“~/.agents/plugins/marketplace.json”，则“source.path”必须是相对的（以“./”开头），位于市场根目录内（个人安装为“~/”），并以“mem0-plugin”结尾——例如`”。/codex-plugins/mem0-source/mem0-plugin"`.
+- **在`/plugins`中找不到插件** — 再次运行`codex plugin market add ~/path/to/clone`，或确认市场已使用`codex plugin market remove mem0-plugins`注册，然后重新添加。
+- **技能未加载** — 验证“plugin.json”中的“skills”字段是否指向包含“SKILL.md”文件的有效目录。
+- **Hooks 未触发** — 确认 `codex_hooks = true` 位于 `[features]` 下的 `~/.codex/config.toml` 中，并且 `~/.codex/hooks.json` 包含 Mem0 条目（如果没有，请重新运行安装程序）。启用该标志后重新启动 Codex。
+- **移动克隆后挂钩损坏** — 安装程序将绝对路径烘焙到指向克隆内脚本的“~/.codex/hooks.json”中。如果您移动或重命名了克隆目录，请运行“python3 <new-clone>/mem0-plugin/scripts/install_codex_hooks”。py` 从新位置 - 安装程序是幂等的并替换旧条目。<卡组列={2}>
+  <Card title="Mem0 MCP 设置" icon="puzzle-piece" href="/platform/mem0-mcp">
+    所有客户端的详细 MCP 配置
+  </卡>
+  <Card title="Claude 代码集成" icon={<svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.92888 16.2181L9.86008 14.0122L9.92585 13.8199L9.86008 13.7137H9.66782L9.01009 13.6732L6.76369 13.6125L4.81581 13.5315L2.92863 13.4303L2.45304 13.3292L2.00781 12.7423L2.05335 12.4488L2.45304 12.1807L3.02476 12.2313L4.28962 12.3173L6.18692 12.4488L7.56309 12.5298L9.60204 12.7423H9.92585L9.97138 12.6107L9.86008 12.5298L9.77407 12.4488L7.811 11.1182L5.68603 9.71165L4.57295 8.90214L3.97088 8.49233L3.66731 8.10781L3.53577 7.26794L4.08219 6.66587L4.81581 6.71646L5.00301 6.76706L5.74674 7.33877L7.33541 8.56822L9.40979 10.0962L9.71335 10.3491L9.83478 10.2631L9.84996 10.2024L9.71335 9.97475L8.5851 7.93579L7.38095 5.86141L6.84465 5.00131L6.70298 4.48524C6.65239 4.27275 6.61697 4.09567 6.61697 3.87811L7.23928 3.03318L7.58332 2.92188L8.41307 3.03318L8.76218 3.33675L9.27824 4.5156L10.113 6.37242L11.4083 8.89708L11.7877 9.64588L11.9901 10.339L12.066 10.5515H12.1975V10.4301L12.3038 9.00839L12.5011 7.26288L12.6934 5.01649L12.7591 4.38406L13.0728 3.62514L13.6951 3.21532L14.1808 3.44806L14.5805 4.01978L14.5249 4.38912L14.2871 5.93225L13.8216 8.35066L13.5181 9.96969H13.6951L13.8975 9.76731L14.7171 8.67953L16.0933 6.95931L16.7005 6.27629L17.4088 5.52243L17.8641 5.16321H18.7242L19.3567 6.10427L19.0733 7.07568L18.1879 8.19888L17.4543 9.15006L16.4019 10.5667L15.7442 11.7L15.8049 11.7911L15.9618 11.7759L18.3397 11.27L19.6248 11.0372L21.1578 10.7741L21.851 11.0979L21.9269 11.4268L21.6537 12.0997L20.0144 12.5045L18.0918 12.889L15.2282 13.567L15.1927 13.5923L15.2332 13.6428L16.5234 13.7643L17。0749 13.7946H18.4257L20.9403 13.9818L21.598 14.4169L21.9926 14.9482L21.9269 15.3529L20.915 15.869L19.5489 15.5452L16.3615 14.7863L15.2686 14.5131H15.1168V14.6041L16.0275 15.4946L17.6972 17.0023L19.7867 18.9451L19.893 19.4258L19.6248 19.8053L19.3415 19.7648L17.5049 18.3835L16.7966 17.7612L15.1927 16.4104H15.0865V16.552L15.4558 17.0934L17.4088 20.0279L17.51 20.9285L17.3683 21.2219L16.8624 21.399L16.3058 21.2978L15.1624 19.6939L13.9835 17.8877L13.0324 16.2687L12.916 16.3345L12.3544 22.3805L12.0913 22.6891L11.4842 22.9219L10.9782 22.5374L10.7101 21.915L10.9782 20.6856L11.302 19.0818L11.5651 17.8068L11.8029 16.2232L11.9446 15.697L11.9345 15.6616L11.8181 15.6767L10.6241 17.316L8.80771 19.7698L7.37083 21.3079L7.02679 21.4445L6.42977 21.1359L6.48542 20.5844L6.81935 20.0936L8.80771 17.5639L10.0068 15.9955L10.7809 15.0898L10.7758 14.9583H10.7303L5.44824 18.3886L4.50718 18.51L4.10242 18.1306L4。15302 17.5083L4.34528 17.3059L5.93394 16.213L5.92888 16.2181Z" fill="currentColor"/></svg>} href="/integrations/claude-code">
+    将 Mem0 内存添加到 Claude Code 工作流程
+  </卡>
+</卡组>

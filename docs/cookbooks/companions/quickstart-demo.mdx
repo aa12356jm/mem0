@@ -3,78 +3,70 @@ title: Interactive Memory Demo
 description: "Spin up the showcase companion app to see Mem0 memories in action."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-You can create a personalized AI Companion using Mem0. This guide will walk you through the necessary steps and provide the complete setup instructions to get you started.
 
-<video
-  autoPlay
-  muted
-  loop
-  playsInline
-  className="w-full aspect-video rounded-lg"
-  src="https://github.com/user-attachments/assets/cebc4f8e-bdb9-4837-868d-13c5ab7bb433"
-></video>
 
-You can try the [Mem0 Demo](https://mem0-4vmi.vercel.app) live here.
+您可以使用 Mem0 创建个性化的 AI Companion。本指南将引导您完成必要的步骤，并提供完整的设置说明以帮助您入门。
 
-## Overview
+<视频
+  自动播放
+  静音
+  循环
+  内联播放
+  className =“w-全宽高比-视频圆形-lg”
+  src =“https://github.com/user-attachments/assets/cebc4f8e-bdb9-4837-868d-13c5ab7bb433”
+></视频>
 
-The Personalized AI Companion leverages Mem0 to retain information across interactions, enabling a tailored learning experience. It creates memories for each user interaction and integrates with OpenAI's GPT models to provide detailed and context-aware responses to user queries.
+您可以在这里尝试 [Mem0 演示](https://mem0-4vmi.vercel.app)。
 
-## Setup
+## 概述
 
-Before you begin, follow these steps to set up the demo application:
+个性化 AI Companion 利用 Mem0 在交互过程中保留信息，从而实现量身定制的学习体验。它为每个用户交互创建记忆，并与 OpenAI 的 GPT 模型集成，为用户查询提供详细的上下文感知响应。
 
-1. Clone the Mem0 repository:
-   ```bash
+## 设置
+
+在开始之前，请按照以下步骤设置演示应用程序：
+
+1. 克隆 Mem0 存储库：   ```bash
    git clone https://github.com/mem0ai/mem0.git
    ```
-
-2. Navigate to the demo application folder:
-   ```bash
+2. 导航到演示应用程序文件夹：   ```bash
    cd mem0/examples/mem0-demo
    ```
-
-3. Install dependencies:
-   ```bash
+3.安装依赖项：   ```bash
    pnpm install
    ```
-
-4. Set up environment variables by creating a `.env` file in the project root with the following content:
-   ```bash
+4. 通过在项目根目录中创建包含以下内容的 `.env` 文件来设置环境变量：   ```bash
    OPENAI_API_KEY=your_openai_api_key
    MEM0_API_KEY=your_mem0_api_key
    ```
-   You can obtain your `MEM0_API_KEY` by signing up at <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=cookbook-companions-quickstart" rel="nofollow">Mem0 API Dashboard</a>.
+您可以通过在 <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=cookbook-companions-quickstart" rel="nofollow">Mem0 API Dashboard</a> 注册来获取“MEM0_API_KEY”。
 
-5. Start the development server:
-   ```bash
+5.启动开发服务器：   ```bash
    pnpm run dev
    ```
+## 增强 Next.js 应用程序
 
-## Enhancing the Next.js Application
+演示运行后，您可以通过修改“mem0-demo”文件夹中的组件来自定义和增强 Next.js 应用程序。考虑：
+- 添加新的记忆功能以改善上下文保留
+- 自定义 UI 以更好地满足您的应用程序需求
+- 集成其他 API 或第三方服务以扩展功能
 
-Once the demo is running, you can customize and enhance the Next.js application by modifying the components in the `mem0-demo` folder. Consider:
-- Adding new memory features to improve contextual retention
-- Customizing the UI to better suit your application needs
-- Integrating additional APIs or third-party services to extend functionality
+## 完整代码
 
-## Full Code
+您可以在 GitHub 上找到此演示的完整源代码：
+[Mem0 演示 GitHub](https://github.com/mem0ai/mem0/tree/main/examples/mem0-demo)
 
-You can find the complete source code for this demo on GitHub:
-[Mem0 Demo GitHub](https://github.com/mem0ai/mem0/tree/main/examples/mem0-demo)
+## 结论
 
-## Conclusion
+此设置演示了如何构建一个 AI Companion，使用 Mem0 在交互过程中维护内存。该系统不断适应用户交互，使未来的响应更加相关和个性化。试验该应用程序并进一步增强它以适合您的用例！
 
-This setup demonstrates how to build an AI Companion that maintains memory across interactions using Mem0. The system continuously adapts to user interactions, making future responses more relevant and personalized. Experiment with the application and enhance it further to suit your use case!
-
----
-
-<CardGroup cols={2}>
-  <Card title="Build a Mem0 Companion" icon="users" href="/cookbooks/essentials/building-ai-companion">
-    Deep dive into production patterns for fitness coaches, tutors, and assistants.
-  </Card>
+---<卡组列={2}>
+  <Card title="构建 Mem0 伴侣" icon="users" href="/cookbooks/essentials/building-ai-companion">
+    深入探讨健身教练、导师和助理的生产模式。
+  </卡>
   <Card title="Node.js Companion with Mem0" icon="code" href="/cookbooks/companions/nodejs-companion">
-    Implement a command-line companion using the Node.js SDK.
-  </Card>
-</CardGroup>
+    使用 Node.js SDK 实现命令行伴侣。
+  </卡>
+</卡组>

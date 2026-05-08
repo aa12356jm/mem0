@@ -5,68 +5,64 @@ icon: "puzzle-piece"
 estimatedTime: "~2 minutes"
 ---
 
-<Info>
-  **Prerequisites**
-  - Mem0 Platform account (<a href="https://app.mem0.ai?utm_source=oss&utm_medium=platform-mem0-mcp" rel="nofollow">Sign up here</a>)
-  - API key (<a href="https://app.mem0.ai/settings/api-keys?utm_source=oss&utm_medium=platform-mem0-mcp" rel="nofollow">Get one from dashboard</a>)
-  - Node.js 14+ (for npx)
-  - An MCP-compatible client (Claude, Claude Code, Codex, Cursor, Windsurf, VS Code, OpenCode)
-</Info>
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## What is Mem0 MCP?
 
-Mem0 MCP Server exposes Mem0's memory capabilities as MCP tools, letting AI agents decide when to save, search, or update information. The cloud-hosted MCP server requires no local installation — just connect and start using memory.
 
-## Quick Setup
+<信息>
+  **先决条件**
+  - Mem0 平台帐户（<a href="https://app.mem0.ai?utm_source=oss&utm_medium=platform-mem0-mcp" rel="nofollow">在此注册</a>）
+  - API 密钥（<a href="https://app.mem0.ai/settings/api-keys?utm_source=oss&utm_medium=platform-mem0-mcp" rel="nofollow">从仪表板获取一个</a>）
+  - Node.js 14+（对于 npx）
+  - 兼容 MCP 的客户端（Claude、Claude Code、Codex、Cursor、Windsurf、VS Code、OpenCode）
+</信息>
 
-Add Mem0 MCP to your preferred clients with a single command:
+## Mem0 MCP 是什么？
 
-```bash
+Mem0 MCP 服务器将 Mem0 的内存功能公开为 MCP 工具，让 AI 代理决定何时保存、搜索或更新信息。云托管的 MCP 服务器无需本地安装 - 只需连接并开始使用内存。
+
+## 快速设置
+
+使用单个命令将 Mem0 MCP 添加到您的首选客户端：```bash
 npx mcp-add \
   --name mem0-mcp \
   --type http \
   --url "https://mcp.mem0.ai/mcp" \
   --clients "claude,claude code,cursor,windsurf,vscode,opencode"
 ```
+这会立即自动为所有支持的客户端配置 Mem0 MCP。## 可用工具
 
-This automatically configures Mem0 MCP for all supported clients at once.
+MCP 服务器向您的 AI 客户端公开这些内存工具：
 
-## Available Tools
-
-The MCP server exposes these memory tools to your AI client:
-
-| Tool | Description |
+|工具|描述 |
 |------|-------------|
-| `add_memory` | Save text or conversation history for a user/agent |
-| `search_memories` | Semantic search across existing memories with filters |
-| `get_memories` | List memories with structured filters and pagination |
-| `get_memory` | Retrieve one memory by its `memory_id` |
-| `update_memory` | Overwrite a memory's text after confirming the ID |
-| `delete_memory` | Delete a single memory by `memory_id` |
-| `delete_all_memories` | Bulk delete all memories in scope |
-| `delete_entities` | Delete a user/agent/app/run entity and its memories |
-| `list_entities` | Enumerate users/agents/apps/runs stored in Mem0 |
-| `list_events` | List memory operation events with filters and pagination |
-| `get_event_status` | Check the status of an async memory operation by `event_id` |
+| `添加内存` |保存用户/代理的文本或对话历史记录 |
+| `搜索记忆` |使用过滤器对现有记忆进行语义搜索 |
+| `获取记忆` |使用结构化过滤器和分页列出记忆 |
+| `获取内存` |通过“memory_id”检索一个内存 |
+| `更新内存` |确认ID后覆盖内存文本|
+| `删除内存` |通过 `memory_id` 删除单个内存 |
+| `删除所有记忆` |批量删除范围内的所有内存|
+| `删除实体` |删除用户/代理/应用程序/运行实体及其内存 |
+| `列表实体` |枚举存储在 Mem0 | 中的用户/代理/应用程序/运行
+| `列表事件` |使用过滤器和分页列出内存操作事件 |
+| `获取事件状态` |通过`event_id`检查异步内存操作的状态 |
 
 ---
 
-## Client-Specific Setup
+## 客户端特定设置
 
-You can also configure individual clients:
+您还可以配置单独的客户端：
 
-<AccordionGroup>
-  <Accordion title="Claude Desktop">
-    ```bash
+<手风琴组>
+  <手风琴标题=“Claude 桌面”>    ```bash
     npx mcp-add \
       --name mem0-mcp \
       --type http \
       --url "https://mcp.mem0.ai/mcp" \
       --clients "claude"
     ```
-
-    Or manually add to your Claude Desktop configuration (`claude_desktop_config.json`):
-    ```json
+或者手动添加到您的 Claude Desktop 配置（`claude_desktop_config.json`）：    ```json
     {
       "mcpServers": {
         "mem0-mcp": {
@@ -76,56 +72,46 @@ You can also configure individual clients:
       }
     }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Claude Code">
-    ```bash
+  <手风琴标题=“Claude Code”>    ```bash
     npx mcp-add \
       --name mem0-mcp \
       --type http \
       --url "https://mcp.mem0.ai/mcp" \
       --clients "claude code"
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Codex">
-    **Direct MCP (fastest, MCP only).** Codex reads MCP servers from `~/.codex/config.toml` as TOML (not JSON). Add:
-
-    ```toml
+  <手风琴标题=“法典”>
+    **直接 MCP（最快，仅限 MCP）。** Codex 从 `~/.codex/config.toml` 作为 TOML（而非 JSON）读取 MCP 服务器。添加：    ```toml
     [mcp_servers.mem0]
     url = "https://mcp.mem0.ai/mcp"
     bearer_token_env_var = "MEM0_API_KEY"
     ```
+在启动 Codex 的 shell 中导出“MEM0_API_KEY”，然后重新启动 Codex。 `codex mcp add` 仅支持 stdio 服务器，因此必须直接通过 `config.toml` 添加 HTTP 服务器，或者通过 Codex 应用程序中的 **插件 → 连接到自定义 MCP → Streamable HTTP** UI 添加。
 
-    Export `MEM0_API_KEY` in the shell you launch Codex from, then restart Codex. `codex mcp add` only supports stdio servers, so HTTP servers must be added via `config.toml` directly — or via the **Plugins → Connect to a custom MCP → Streamable HTTP** UI in the Codex app.
+    <注意>
+      Codex 使用服务器名称“mem0”（不像本页上的其他客户端那样使用“mem0-mcp”），因此如果您稍后旁加载它，它会与捆绑插件注册的名称相匹配。
+    </注>
 
-    <Note>
-      Codex uses the server name `mem0` (not `mem0-mcp` like the other clients on this page) so it matches the name the bundled plugin registers if you ever sideload it later.
-    </Note>
-
-    **Sideloaded plugin (full experience).** If you want the memory protocol skill, Mem0 SDK skill, and opt-in lifecycle hooks alongside the MCP server, sideload the plugin from a clone of `mem0ai/mem0`. The repo ships a marketplace manifest at `.agents/plugins/marketplace.json`, so you can register it with one CLI call:
-
-    ```bash
+    **侧载插件（完整体验）。** 如果您想要内存协议技能、Mem0 SDK 技能和选择加入生命周期挂钩以及 MCP 服务器，请从“mem0ai/mem0”的克隆侧载插件。该存储库在“.agents/plugins/marketplace.json”处提供了一个市场清单，因此您可以通过一个 CLI 调用来注册它：    ```bash
     git clone https://github.com/mem0ai/mem0.git ~/codex-plugins/mem0-source
     codex plugin marketplace add ~/codex-plugins/mem0-source
     ```
+然后运行“codex”和“/plugins”，浏览 **Mem0 插件** 市场，并安装 **Mem0**。不要将其与上面的 Direct MCP 设置结合起来 - 侧面加载插件通过 `.codex-mcp.json` 自动注册 `mem0`，因此手动 `[mcp_servers.mem0]` 块将创建一个副本。
 
-    Then run `codex` and `/plugins`, browse the **Mem0 Plugins** marketplace, and install **Mem0**. Don't combine this with the Direct MCP setup above — the sideloaded plugin auto-registers `mem0` via `.codex-mcp.json`, so a manual `[mcp_servers.mem0]` block would create a duplicate.
+    有关完整详细信息、生命周期挂钩设置和管理命令（“codex 插件市场升级”/“删除”），请参阅 [Codex 集成指南](/integrations/codex)。
+  </手风琴>
 
-    See the [Codex integration guide](/integrations/codex) for full details, lifecycle-hook setup, and management commands (`codex plugin marketplace upgrade` / `remove`).
-  </Accordion>
-
-  <Accordion title="Cursor">
-    ```bash
+  <手风琴标题=“光标”>    ```bash
     npx mcp-add \
       --name mem0-mcp \
       --type http \
       --url "https://mcp.mem0.ai/mcp" \
       --clients "cursor"
     ```
-
-    Or go to Cursor → Settings → MCP and add:
-    ```json
+或者转到光标 → 设置 → MCP 并添加：    ```json
     {
       "mcpServers": {
         "mem0-mcp": {
@@ -135,52 +121,47 @@ You can also configure individual clients:
       }
     }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Windsurf">
-    ```bash
+  <手风琴标题=“风帆”>    ```bash
     npx mcp-add \
       --name mem0-mcp \
       --type http \
       --url "https://mcp.mem0.ai/mcp" \
       --clients "windsurf"
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="VS Code">
-    ```bash
+  <手风琴标题=“VS代码”>    ```bash
     npx mcp-add \
       --name mem0-mcp \
       --type http \
       --url "https://mcp.mem0.ai/mcp" \
       --clients "vscode"
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="OpenCode">
-    ```bash
+  <手风琴标题=“OpenCode”>    ```bash
     npx mcp-add \
       --name mem0-mcp \
       --type http \
       --url "https://mcp.mem0.ai/mcp" \
       --clients "opencode"
     ```
-  </Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
 ---
 
-## Verify Your Setup
+## 验证您的设置
 
-Once configured, your AI client can:
-- Automatically save information with `add_memory`
-- Search memories with `search_memories`
-- Update memories with `update_memory`
-- Delete memories with `delete_memory`
+配置完成后，您的 AI 客户端可以：
+- 使用“add_memory”自动保存信息
+- 使用“search_memories”搜索记忆
+- 使用“update_memory”更新内存
+- 使用“delete_memory”删除内存
 
-**Sample Interactions:**
-
-```
+**交互示例：**```
 User: Remember that I love tiramisu
 Agent: Got it! I've saved that you love tiramisu.
 
@@ -190,39 +171,36 @@ Agent: Based on your memories, you love tiramisu.
 User: Update my project: the mobile app is now 80% complete
 Agent: Updated your project status successfully.
 ```
-
-<Info icon="check">
-  If you get "Connection failed", ensure you have a valid API key from <a href="https://app.mem0.ai/settings/api-keys?utm_source=oss&utm_medium=platform-mem0-mcp" rel="nofollow">Mem0 Dashboard</a>.
-</Info>
-
----
-
-## Quick Recovery
-
-- **"Connection refused"** → Check your internet connection and ensure the MCP client is correctly configured
-- **"Invalid API key"** → Get a new key from <a href="https://app.mem0.ai/settings/api-keys?utm_source=oss&utm_medium=platform-mem0-mcp" rel="nofollow">Mem0 Dashboard</a>
-- **"npx command not found"** → Install Node.js from [nodejs.org](https://nodejs.org)
+<信息图标=“检查”>
+  如果您收到“连接失败”消息，请确保您拥有 <a href="https://app.mem0.ai/settings/api-keys?utm_source=oss&utm_medium=platform-mem0-mcp" rel="nofollow">Mem0 仪表板</a> 中的有效 API 密钥。
+</信息>
 
 ---
 
-## Next Steps
+## 快速恢复
 
-<CardGroup cols={2}>
-  <Card
-    title="MCP Integration Feature"
-    description="Learn about MCP configuration options and advanced patterns"
-    icon="plug"
+- **“连接被拒绝”** → 检查您的互联网连接并确保 MCP 客户端配置正确
+- **“无效的 API 密钥”** → 从 <a href="https://app.mem0.ai/settings/api-keys?utm_source=oss&utm_medium=platform-mem0-mcp" rel="nofollow">Mem0 仪表板</a> 获取新密钥
+- **“找不到 npx 命令”** → 从 [nodejs.org](https://nodejs.org) 安装 Node.js。组织）
+
+---
+
+## 后续步骤
+
+<卡组列={2}>
+  <卡片
+    title="MCP 集成功能"
+    description="了解 MCP 配置选项和高级模式"
+    图标=“插头”
     href="/platform/features/mcp-integration"
   />
-  <Card
-    title="Gemini 3 with Mem0 MCP"
-    description="See how to integrate Gemini 3 with Mem0 MCP server"
-    icon="book-open"
+  <卡片
+    title="Gemini 3 与 Mem0 MCP"
+    description="查看如何将 Gemini 3 与 Mem0 MCP 服务器集成"
+    图标=“书本打开”
     href="/cookbooks/frameworks/gemini-3-with-mem0-mcp"
   />
-</CardGroup>
+</卡组>
 
-## Additional Resources
-
-- **[Platform Quickstart](/platform/quickstart)** - Direct API integration guide
-- **[MCP Specification](https://modelcontextprotocol.io)** - Learn about MCP protocol
+## 其他资源- **[平台快速入门](/platform/quickstart)** - 直接 API 集成指南
+- **[MCP 规范](https://modelcontextprotocol.io)** - 了解 MCP 协议

@@ -5,59 +5,59 @@ icon: "plus"
 iconType: "solid"
 ---
 
-# How Mem0 Adds Memory
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Adding memory is how Mem0 captures useful details from a conversation so your agents can reuse them later. Think of it as saving the important sentences from a chat transcript into a structured notebook your agent can search.
 
-<Info>
-  **Why it matters**
-  - Preserves user preferences, goals, and feedback across sessions.
-  - Powers personalization and decision-making in downstream conversations.
-  - Keeps context consistent between managed Platform and OSS deployments.
-</Info>
 
-## Key terms
+# Mem0 如何添加内存
 
-- **Messages** – The ordered list of user/assistant turns you send to `add`.
-- **Infer** – Controls whether Mem0 extracts structured memories (`infer=True`, default) or stores raw messages.
-- **Metadata** – Optional filters (e.g., `{"category": "movie_recommendations"}`) that improve retrieval later.
-- **User / Session identifiers** – `user_id`, `agent_id`, or `run_id` that scope the memory for future searches.
+添加内存是 Mem0 从对话中捕获有用详细信息的方式，以便您的代理稍后可以重复使用它们。可以将其视为将聊天记录中的重要句子保存到代理可以搜索的结构化笔记本中。
 
-## How does it work?
+<信息>
+  **为什么重要**
+  - 跨会话保留用户偏好、目标和反馈。
+  - 支持下游对话中的个性化和决策。
+  - 保持托管平台和 OSS 部署之间的上下文一致。
+</信息>
 
-Mem0 offers two flows:
+## 关键术语
 
-- **Mem0 Platform** – Fully managed API with dashboard, scaling, and graph features.
-- **Mem0 Open Source** – Local SDK that you run in your own environment.
+- **消息** – 用户/助理的有序列表将您发送到“添加”。
+- **Infer** – 控制 Mem0 是否提取结构化内存（默认为“infer=True”）或存储原始消息。
+- **元数据** – 可选过滤器（例如，`{"category": "movie_recommendations"}`）可改善以后的检索。- **用户/会话标识符** – `user_id`、`agent_id` 或 `run_id` 确定内存范围以供将来搜索。
 
-Both flows take the same payload and pass it through the same pipeline.
+## 它是如何工作的？
 
-<Frame caption="Architecture diagram illustrating the process of adding memories.">
+Mem0 提供两种流程：
+
+- **Mem0 平台** – 具有仪表板、缩放和图形功能的完全托管 API。
+- **Mem0 开源** – 您在自己的环境中运行的本地 SDK。两个流采用相同的有效负载并通过相同的管道传递。
+
+<Frame title="说明添加内存过程的架构图。">
   <img src="../../images/add_architecture.png" />
-</Frame>
+</框架>
 
-<Steps>
-<Step title="Information extraction">
-Mem0 sends the messages through an LLM that pulls out key facts, decisions, or preferences to remember.
-</Step>
-<Step title="Conflict resolution">
-Existing memories are checked for duplicates or contradictions so the latest truth wins.
-</Step>
-<Step title="Storage">
-The resulting memories land in managed vector storage (and optional graph storage) so future searches return them quickly.
-</Step>
-</Steps>
+<步骤>
+<步骤title="信息提取">
+Mem0 通过 LLM 发送消息，提取需要记住的关键事实、决定或偏好。
+</步骤>
+<步骤标题=“冲突解决”>
+检查现有记忆是否有重复或矛盾，以便最新的事实获胜。
+</步骤>
+<步骤标题=“存储”>
+生成的内存存储在托管矢量存储（和可选的图形存储）中，因此将来的搜索可以快速返回它们。
+</步骤>
+</步骤>
 
-<Warning>
-Duplicate protection only runs during that conflict-resolution step when you let Mem0 infer memories (`infer=True`, the default). If you switch to `infer=False`, Mem0 stores your payload exactly as provided, so duplicates will land. Mixing both modes for the same fact will save it twice.
-</Warning>
+<警告>
+仅当您让 Mem0 推断内存（“infer=True”，默认值）时，重复保护才会在冲突解决步骤期间运行。如果您切换到“infer=False”，Mem0 会完全按照提供的方式存储您的有效负载，因此重复项将会出现。对于同一事实混合使用两种模式将节省两次。
+</警告>
 
-You trigger this pipeline with a single `add` call—no manual orchestration needed.
+您可以通过单个“add”调用触发此管道，无需手动编排。
 
-## Add with Mem0 Platform
+## 添加Mem0平台
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your-api-key")
@@ -87,16 +87,15 @@ await client.add(messages, {
   user_id: "alice",
 });
 ```
-</CodeGroup>
+</代码组>
 
-<Info icon="check">
-  Expect a `memory_id` (or list of IDs) in the response. Check the Mem0 dashboard to confirm the new entry under the correct user.
-</Info>
+<信息图标=“检查”>
+  响应中应包含“memory_id”（或 ID 列表）。检查 Mem0 仪表板以确认正确用户下的新条目。
+</信息>
 
-## Add with Mem0 Open Source
+## 使用 Mem0 开源添加
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -135,69 +134,63 @@ const result = memory.add(messages, {
   metadata: { category: "preferences" }
 });
 ```
-</CodeGroup>
+</代码组>
 
-<Tip>
-  Use `infer=False` only when you need to store raw transcripts. Most workflows benefit from Mem0 extracting structured memories automatically.
-</Tip>
+<提示>
+  仅当您需要存储原始成绩单时才使用“infer=False”。大多数工作流程都受益于 Mem0 自动提取结构化内存。
+</提示>
 
-<Warning>
-If you do choose `infer=False`, keep it consistent. Raw inserts skip conflict resolution, so a later `infer=True` call with the same content will create a second memory instead of updating the first.
-</Warning>
+<警告>
+如果您确实选择“infer=False”，请保持一致。原始插入会跳过冲突解决，因此稍后使用相同内容的“infer=True”调用将创建第二个内存，而不是更新第一个内存。
+</警告>
 
-## When Should You Add Memory?
+## 什么时候应该添加内存？
 
-Add memory whenever your agent learns something useful:
+每当你的代理学到一些有用的东西时就添加记忆：
 
-- A new user preference is shared
-- A decision or suggestion is made
-- A goal or task is completed
-- A new entity is introduced
-- A user gives feedback or clarification
+- 共享新的用户偏好
+- 做出决定或建议
+- 目标或任务已完成
+- 引入一个新实体
+- 用户提供反馈或澄清
 
 <Callout type="tip" icon="plug">
-  **MCP Alternative**: With <Link href="/platform/mem0-mcp">Mem0 MCP</Link>, AI agents can add memories automatically based on context.
-</Callout>
+  **MCP 替代方案**：通过 <Link href="/platform/mem0-mcp">Mem0 MCP</Link>，AI 代理可以根据上下文自动添加内存。</标注>
 
-Storing this context allows the agent to reason better in future interactions.
+存储此上下文可以让智能体在未来的交互中更好地进行推理。
 
 
-### More Details
+### 更多细节
 
-For full list of supported fields, required formats, and advanced options, see the
-[Add Memory API Reference](/api-reference/memory/add-memories).
+有关支持的字段、所需格式和高级选项的完整列表，请参阅
+[添加内存 API 参考](/api-reference/memory/add-memories)。
 
-## Managed vs OSS differences
+## 托管与 OSS 的差异|能力| Mem0平台|内存0 OSS |
+| ---| ---| ---|
+|冲突解决 |自动仪表板可见性 | SDK在本地处理合并；您控制存储|
+|速率限制 |每个工作区的托管配额 |受您的硬件和提供商 API 的限制 |
+|仪表板可视性 |是的——目视检查记忆 |通过 CLI、日志或自定义 UI 检查 |
 
-| Capability | Mem0 Platform | Mem0 OSS |
-| --- | --- | --- |
-| Conflict resolution | Automatic with dashboard visibility | SDK handles merges locally; you control storage |
-| Rate limits | Managed quotas per workspace | Limited by your hardware and provider APIs |
-| Dashboard visibility | Yes — inspect memories visually | Inspect via CLI, logs, or custom UI |
+## 付诸实践
 
-## Put it into practice
+- 查看<Link href="/platform/advanced-memory-operations">高级内存操作</Link>指南，了解图层元数据、重新排序器和图形切换。
+- 探索每个请求/响应字段的<Link href="/api-reference/memory/add-memories">添加内存 API 参考</Link>。
 
-- Review the <Link href="/platform/advanced-memory-operations">Advanced Memory Operations</Link> guide to layer metadata, rerankers, and graph toggles.
-- Explore the <Link href="/api-reference/memory/add-memories">Add Memories API reference</Link> for every request/response field.
+## 现场观看
 
-## See it live
+- <Link href="/cookbooks/operations/support-inbox">Support Inbox with Mem0</Link> 显示添加 + 搜索为支持流程提供支持。- <Link href="/cookbooks/companions/ai-tutor">AI Tutor with Mem0</Link> 使用 add 来个性化课程计划。
 
-- <Link href="/cookbooks/operations/support-inbox">Support Inbox with Mem0</Link> shows add + search powering a support flow.
-- <Link href="/cookbooks/companions/ai-tutor">AI Tutor with Mem0</Link> uses add to personalize lesson plans.
-
-{/* DEBUG: verify CTA targets */}
-
-<CardGroup cols={2}>
-  <Card
-    title="Explore Search Concepts"
-    description="See how stored memories feed retrieval in the Search guide."
-    icon="search"
-    href="/core-concepts/memory-operations/search"
+{/* DEBUG：验证 CTA 目标 */}<卡组列={2}>
+  <卡片
+    title="探索搜索概念"
+    描述 =“查看存储的记忆如何在搜索指南中提供检索。”
+    图标=“搜索”
+    href="/核心概念/内存操作/搜索"
   />
-  <Card
-    title="Build a Support Agent"
-    description="Follow the cookbook to apply add/search/update in production."
-    icon="rocket"
+  <卡片
+    title="建立支持代理"
+    description="按照说明书在生产中应用添加/搜索/更新。"
+    图标=“火箭”
     href="/cookbooks/operations/support-inbox"
   />
-</CardGroup>
+</卡组>

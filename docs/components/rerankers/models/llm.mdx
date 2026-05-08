@@ -3,26 +3,28 @@ title: LLM as Reranker
 description: "Use any LLM as a flexible reranker in Mem0 with custom prompts and domain-specific scoring logic."
 ---
 
-<Warning>
-**This page has been superseded.** Please see [LLM Reranker](/components/rerankers/models/llm_reranker) for the complete and up-to-date documentation on using LLMs for reranking.
-</Warning>
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-LLM-based reranker provides maximum flexibility by using any Large Language Model to score document relevance. This approach allows for custom prompts and domain-specific scoring logic.
 
-## Supported LLM Providers
 
-Any LLM provider supported by Mem0 can be used for reranking:
+<警告>
+**此页面已被取代。** 请参阅 [LLM Reranker](/components/rerankers/models/llm_reranker)，了解有关使用 LLM 进行重新排名的完整且最新的文档。
+</警告>
 
-- **OpenAI**: GPT-4, GPT-3.5-turbo, etc.
-- **Anthropic**: Claude models
-- **Together**: Open-source models
-- **Groq**: Fast inference
-- **Ollama**: Local models
-- And more...
+基于 LLM 的重新排名器通过使用任何大型语言模型对文档相关性进行评分，提供了最大的灵活性。这种方法允许自定义提示和特定于域的评分逻辑。
 
-## Configuration
+## 支持的法学硕士提供商
 
-```python Python
+Mem0 支持的任何 LLM 提供商都可以用于重新排名：
+
+- **OpenAI**：GPT-4、GPT-3.5-turbo 等。
+- **人择**：克劳德模型
+- **一起**：开源模型
+- **Groq**：快速推理
+- **Ollama**：本地模特
+- 还有更多...
+
+## 配置```python Python
 from mem0 import Memory
 
 config = {
@@ -53,12 +55,9 @@ config = {
 
 memory = Memory.from_config(config)
 ```
+## 自定义评分提示
 
-## Custom Scoring Prompt
-
-You can provide a custom prompt for relevance scoring:
-
-```python Python
+您可以提供相关性评分的自定义提示：```python Python
 custom_prompt = """You are a relevance scoring assistant. Rate how well this document answers the query.
 
 Query: "{query}"
@@ -75,10 +74,7 @@ Provide only a single numerical score between 0.0 and 1.0."""
 
 config["reranker"]["config"]["scoring_prompt"] = custom_prompt
 ```
-
-## Usage Example
-
-```python Python
+## 使用示例```python Python
 import os
 from mem0 import Memory
 
@@ -129,12 +125,9 @@ Memory: I find object-oriented programming challenging
 Vector Score: 0.782
 Rerank Score: 0.850
 ```
+## 特定领域的评分
 
-## Domain-Specific Scoring
-
-Create specialized scoring for your domain:
-
-```python Python
+为您的域创建专门的评分：```python Python
 medical_prompt = """You are a medical relevance expert. Score how relevant this medical record is to the clinical query.
 
 Clinical Query: "{query}"
@@ -160,12 +153,9 @@ config = {
     }
 }
 ```
+## 多个 LLM 提供者
 
-## Multiple LLM Providers
-
-Use different LLM providers for reranking:
-
-```python Python
+使用不同的 LLM 提供商进行重新排名：```python Python
 # Using Anthropic Claude
 anthropic_config = {
     "reranker": {
@@ -190,37 +180,34 @@ ollama_config = {
     }
 }
 ```
+## 配置参数
 
-## Configuration Parameters
+|参数|描述 |类型 |默认|
+|------------|-------------|------|---------|
+| `模型` |用于评分的LLM模型| `str` | `"gpt-4o-mini"` |
+| `提供者` | LLM 提供者名称 | `str` | `"openai"` |
+| `api_key` | LLM 提供商的 API 密钥 | `str` | `无` |
+| `top_k` |返回的最大文件数 | `int` | `无` |
+| `温度` | LLM 生成温度 | `浮动` | `0。0` |
+| `max_tokens` | LLM 响应的最大令牌数 | `int` | `100` |
+| `scoring_prompt` |自定义提示模板| `str` |默认提示|
 
-| Parameter | Description | Type | Default |
-|-----------|-------------|------|---------|
-| `model` | LLM model to use for scoring | `str` | `"gpt-4o-mini"` |
-| `provider` | LLM provider name | `str` | `"openai"` |
-| `api_key` | API key for the LLM provider | `str` | `None` |
-| `top_k` | Maximum documents to return | `int` | `None` |
-| `temperature` | Temperature for LLM generation | `float` | `0.0` |
-| `max_tokens` | Maximum tokens for LLM response | `int` | `100` |
-| `scoring_prompt` | Custom prompt template | `str` | Default prompt |
+## 优点
 
-## Advantages
+- **最大灵活性**：针对任何用例的自定义提示
+- **领域专业知识**：利用专业领域的法学硕士知识
+- **可解释性**：通过即时工程了解评分
+- **多标准**：基于多个相关因素的评分
 
-- **Maximum Flexibility**: Custom prompts for any use case
-- **Domain Expertise**: Leverage LLM knowledge for specialized domains
-- **Interpretability**: Understand scoring through prompt engineering
-- **Multi-criteria**: Score based on multiple relevance factors
+## 注意事项
 
-## Considerations
+- **延迟**：比专门的重新排名器更高的延迟
+- **成本**：每次重新排名操作的 LLM API 成本
+- **一致性**：评分可能略有不同
+- **提示工程**：需要仔细的提示设计
 
-- **Latency**: Higher latency than specialized rerankers
-- **Cost**: LLM API costs per reranking operation
-- **Consistency**: May have slight variations in scoring
-- **Prompt Engineering**: Requires careful prompt design
-
-## Best Practices
-
-1. **Temperature**: Use 0.0 for consistent scoring
-2. **Prompt Design**: Be specific about scoring criteria
-3. **Token Efficiency**: Keep prompts concise to reduce costs
-4. **Caching**: Cache results for repeated queries when possible
-5. **Fallback**: Handle API errors gracefully
+## 最佳实践1. **温度**：使用 0.0 以获得一致的评分
+2. **提示设计**：具体说明评分标准
+3. **代币效率**：保持提示简洁，降低成本
+4. **缓存**：尽可能缓存重复查询的结果
+5. **Fallback**：优雅地处理 API 错误

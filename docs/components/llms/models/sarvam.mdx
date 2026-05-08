@@ -3,13 +3,15 @@ title: Sarvam AI
 description: "Configure Sarvam AI as an LLM provider in Mem0, specializing in Indian language support with the Sarvam-M model."
 ---
 
-**Sarvam AI** is an Indian AI company developing language models with a focus on Indian languages and cultural context. Their latest model **Sarvam-M** is designed to understand and generate content in multiple Indian languages while maintaining high performance in English.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-To use Sarvam AI's models, please set the `SARVAM_API_KEY` which you can get from their [platform](https://dashboard.sarvam.ai/).
 
-## Usage
 
-```python
+**Sarvam AI** 是一家印度人工智能公司，开发语言模型，重点关注印度语言和文化背景。他们的最新模型 **Sarvam-M** 旨在理解和生成多种印度语言的内容，同时保持英语的高性能。
+
+要使用 Sarvam AI 的模型，请设置“SARVAM_API_KEY”，您可以从他们的[平台](https://dashboard.sarvam.ai/)获取该密钥。
+
+＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -35,10 +37,7 @@ messages = [
 ]
 m.add(messages, user_id="alex")
 ```
-
-## Advanced Usage with Sarvam-Specific Features
-
-```python
+## Sarvam 特定功能的高级用法```python
 import os
 from mem0 import Memory
 
@@ -68,7 +67,6 @@ messages = [
 ]
 m.add(messages, user_id="rajesh", metadata={"language": "hindi", "topic": "banking"})
 ```
+## 配置
 
-## Config
-
-All available parameters for the `sarvam` config are present in [Master List of All Params in Config](../config).
+`sarvam` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

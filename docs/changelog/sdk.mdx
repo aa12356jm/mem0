@@ -4,1453 +4,1300 @@ description: "Release notes for the Mem0 Python SDK, TypeScript SDK, Vercel AI S
 mode: "wide"
 ---
 
-<Tabs>
-<Tab title="Python">
-
-<Update label="2026-04-25" description="v2.0.1">
-
-**Bug Fixes:**
-- **Client:** Map `user_id`, `agent_id`, `run_id` entity params to filters in `GET /memories` ([#4960](https://github.com/mem0ai/mem0/pull/4960))
-- **Memory:** Honor `prompt` param in vector store extraction pipeline ([#4914](https://github.com/mem0ai/mem0/pull/4914))
-- **Memory:** Add missing `text_lemmatized` field in `AsyncMemory._create_memory` ([#4886](https://github.com/mem0ai/mem0/pull/4886))
-- **Memory:** Merge same-key operator dicts in AND metadata filters ([#4853](https://github.com/mem0ai/mem0/pull/4853))
-- **LLMs:** Narrow `_is_reasoning_model` check to not match `gpt-5.x` variants ([#4746](https://github.com/mem0ai/mem0/pull/4746))
-- **Vector Stores:** Add `ca_certs` config option for Elasticsearch vector store ([#3993](https://github.com/mem0ai/mem0/pull/3993))
-- **Vector Stores:** Add `agent_id` and `run_id` to Elasticsearch/OpenSearch default mappings ([#4906](https://github.com/mem0ai/mem0/pull/4906))
-- **Embeddings:** Set FastEmbed `embedding_dims` from model metadata at init ([#4711](https://github.com/mem0ai/mem0/pull/4711))
-
-**Security:**
-- Bump vulnerable dependencies to patched versions ([#4835](https://github.com/mem0ai/mem0/pull/4835))
-
-</Update>
-
-<Update label="2026-04-14" description="v2.0.0">
-
-**Major Release** — Python SDK with V3 memory pipeline, ADD-only extraction, and cleaned-up API surface.
-
-**New Features:**
-- **Single-Pass Extraction:** Replaced 2-LLM-call pipeline with additive extraction using `ADDITIVE_EXTRACTION_PROMPT`. Memories accumulate via `linked_memory_ids` — no more UPDATE/DELETE events ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **Hybrid Search:** Combined semantic + BM25 keyword matching + entity boost with additive scoring. Native `keyword_search()` added to 15 vector store adapters (Qdrant, Elasticsearch, OpenSearch, Azure AI Search, Weaviate, Redis, PGVector, Pinecone, Databricks, MongoDB, Milvus, Baidu, Upstash, Azure MySQL, Vertex AI) ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **Entity Extraction & Linking:** spaCy-based entity extraction with second vector collection (`{collection}_entities`) for cross-memory relationship retrieval. Optional dependency: `pip install mem0ai[nlp]` ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **Batch Operations:** Batch embedding, batch persist, and batch entity linking (8-phase pipeline) for both sync `Memory` and async `AsyncMemory` at full parity ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **Message Persistence:** SQLite-based rolling window (10 messages per session scope) for LLM context ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **Valkey Cluster Mode:** Added `cluster_mode` parameter for Valkey Cluster Mode Enabled (CME) deployments ([#4759](https://github.com/mem0ai/mem0/pull/4759))
-- **V3 API Endpoints:** `MemoryClient.add()` now posts to `/v3/memories/add/`; `MemoryClient.get_all()` posts to `/v3/memories/` and returns a paginated envelope `{"count": int, "next": str | None, "previous": str | None, "results": [...]}` ([#4856](https://github.com/mem0ai/mem0/pull/4856))
-- **Default model:** `gpt-5-mini` is now the default across `OpenAILLM`, `OpenAIStructuredLLM`, `AzureOpenAILLM`, `AzureOpenAIStructuredLLM`, and `LiteLLM` fallback ([#4829](https://github.com/mem0ai/mem0/pull/4829))
-
-**Breaking Changes:**
-- **`add()` returns ADD-only events** — No more `"UPDATE"` or `"DELETE"` events. Memories accumulate; nothing is overwritten ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **`search()` default `threshold` is now `0.1`** — Pass `threshold=0.0` for previous behavior ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **`search()` `score` is now a combined multi-signal score** — The top-level `score` fuses semantic similarity, BM25 keyword match, and entity boost into one value. Absolute numbers shift versus the old raw cosine score; retune any hard thresholds against representative queries. Per-signal scores are not exposed on the response ([#4805](https://github.com/mem0ai/mem0/pull/4805), [#4836](https://github.com/mem0ai/mem0/pull/4836))
-- **`search()` default `rerank` is now `False`** — Pass `rerank=True` for previous behavior ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **`top_k` default changed 100 → 20** in `Memory.get_all()` and `Memory.search()` (sync + async). Pass `top_k=100` explicitly to restore the old behavior ([#4843](https://github.com/mem0ai/mem0/pull/4843))
-- **Entity ID validation:** `user_id` / `agent_id` / `run_id` are trimmed; empty-string and whitespace-only values now raise `ValueError` ([#4843](https://github.com/mem0ai/mem0/pull/4843))
-- **Search params validation:** `threshold` must be a number in `[0, 1]`; `top_k` must be a non-negative integer — invalid inputs raise `ValueError` ([#4843](https://github.com/mem0ai/mem0/pull/4843))
-- **`messages` in `Memory.add()` rejects invalid types:** Passing `None` or non-`(str | dict | list)` values raises `Mem0ValidationError` (`error_code="VALIDATION_003"`) ([#4843](https://github.com/mem0ai/mem0/pull/4843))
-- **`qdrant-client>=1.12.0` required** — Upgrade from `>=1.9.1` ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **`org_id` and `project_id` removed** — Removed from `MemoryClient` constructor and all method signatures ([#4740](https://github.com/mem0ai/mem0/pull/4740))
-- **Graph Memory Removed (OSS):** `mem0/memory/graph_memory.py`, `memgraph_memory.py`, `kuzu_memory.py`, `apache_age_memory.py`, and `mem0/graphs/` (Neo4j / Memgraph / Kuzu / Apache AGE / Neptune drivers) deleted — ~4,000 lines. Graph memory is no longer supported in the OSS SDK; graph drivers (neo4j, memgraph, kuzu, etc.) can be uninstalled. Use the Platform API for graph features. Remove `enable_graph` and `graph_store` from your config ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **`enable_graph` removed from Client SDK** — Graph memory is now a project-level setting on the Platform. Remove `enable_graph` from `MemoryClient.add()` / `search()` / `get_all()` / `update_project()` calls ([#4776](https://github.com/mem0ai/mem0/pull/4776))
-- **`custom_fact_extraction_prompt` renamed to `custom_instructions`** — Update config and memory module references ([#4740](https://github.com/mem0ai/mem0/pull/4740))
-- **Typed option classes** — Added Pydantic v2 typed classes: `AddMemoryOptions`, `SearchMemoryOptions`, `GetAllMemoryOptions`, `DeleteAllMemoryOptions`, `UpdateMemoryOptions`, `ProjectUpdateOptions` ([#4740](https://github.com/mem0ai/mem0/pull/4740))
-
-**Security:**
-- **FAISS:** Prevent arbitrary code execution via pickle deserialization in `FAISS` vector store ([#4833](https://github.com/mem0ai/mem0/pull/4833))
-
-**Bug Fixes:**
-- **V3 migration crashes:** Fixed crashes in the v3 migration path; entity linking on OSS is now functional across Qdrant and Milvus backends ([#4836](https://github.com/mem0ai/mem0/pull/4836))
-- **Qdrant entity store:** Entity store now shares the existing Qdrant client when using embedded mode (`path=...`), eliminating RocksDB lock contention between the main and entity collections ([#4836](https://github.com/mem0ai/mem0/pull/4836))
-- **Reranker:** Fixed incorrect use of SentenceTransformer for cross-encoder reranker models — switched to CrossEncoder API for proper scoring ([#4806](https://github.com/mem0ai/mem0/pull/4806))
-- **S3 Vectors:** Handle `vector=None` in `update()` to prevent boto3 validation error when `event=NONE` ([#4594](https://github.com/mem0ai/mem0/pull/4594))
-- **LLMs:** Made OpenAI `store` parameter opt-in to prevent leaking to non-OpenAI backends like Google Gemini ([#4757](https://github.com/mem0ai/mem0/pull/4757))
-- **LLMs:** Forward `response_format` to Azure OpenAI API to prevent JSON parsing failures ([#4689](https://github.com/mem0ai/mem0/pull/4689))
-- **Core:** Guard `temp_uuid_mapping` lookups against LLM-hallucinated IDs with safe `.get()` and warnings ([#4674](https://github.com/mem0ai/mem0/pull/4674))
-- **Client:** Prevent `MemoryClient.feedback()` telemetry TypeError by merging feedback data into single payload ([#4795](https://github.com/mem0ai/mem0/pull/4795))
-
-**Improvements:**
-- **Telemetry:** Sample OSS hot-path events at 10% via PostHog `before_send` hook to reduce event volume ([#4771](https://github.com/mem0ai/mem0/pull/4771))
-
-See the [OSS v1 to v2 migration guide](https://docs.mem0.ai/migration/oss-v1-to-v2) and [Platform migration guide](https://docs.mem0.ai/migration/platform-v2-to-v3) for upgrade instructions.
-
-</Update>
-
-<Update label="2026-04-06" description="v1.0.11">
-
-**New Features & Updates:**
-- **SDK:** Added `multilingual` parameter to project update ([#4314](https://github.com/mem0ai/mem0/pull/4314))
-
-**Bug Fixes:**
-- **LLMs:** Fixed Groq model configuration ([#4700](https://github.com/mem0ai/mem0/pull/4700))
-- **Core:** Prevented thread and memory leaks from PostHog telemetry ([#4535](https://github.com/mem0ai/mem0/pull/4535))
-- **Vector Stores:** Used `DatetimeRange` for datetime string values in Qdrant range filters ([#4659](https://github.com/mem0ai/mem0/pull/4659))
-- **Configs:** Added missing `ConfigDict` to vector store configs (Elasticsearch, MongoDB, Neptune, OpenSearch, PGVector, Supabase, Valkey) ([#4656](https://github.com/mem0ai/mem0/pull/4656))
-
-</Update>
-
-<Update label="2026-04-01" description="v1.0.10">
-
-**New Features & Updates:**
-- **LLMs:** Added MiniMax provider support for AWS Bedrock ([#4609](https://github.com/mem0ai/mem0/pull/4609))
-
-**Bug Fixes:**
-- **Configs:** Migrated CassandraConfig and AzureMySQLConfig to pydantic v2 ConfigDict ([#4646](https://github.com/mem0ai/mem0/pull/4646))
-- **LLMs:** Forward `response_format` to OpenAI-compatible API for DeepSeek ([#4635](https://github.com/mem0ai/mem0/pull/4635))
-- **LLMs:** Forward `response_format` to OpenAI-compatible API for vLLM ([#4608](https://github.com/mem0ai/mem0/pull/4608))
-- **Vector Stores:** Only list authorized collections when listing MongoDB collections ([#3888](https://github.com/mem0ai/mem0/pull/3888))
-- **Core:** Reset graph database in `Memory.reset()` ([#4185](https://github.com/mem0ai/mem0/pull/4185))
-- **Core:** Make `AsyncMemory.from_config` a regular classmethod ([#4183](https://github.com/mem0ai/mem0/pull/4183))
-
-</Update>
-
-<Update label="2026-03-28" description="v1.0.9">
-
-**New Features & Updates:**
-- **LLMs:** Added `reasoning_effort` parameter support for reasoning models ([#4461](https://github.com/mem0ai/mem0/pull/4461))
-
-**Bug Fixes:**
-- **Core:** Preserved original `actor_id` during memory update ([#4570](https://github.com/mem0ai/mem0/pull/4570))
-- **Core:** Set `updated_at` on creation and preserve pre-existing `created_at` ([#4499](https://github.com/mem0ai/mem0/pull/4499))
-- **Core:** Centralized entity cleanup and skip malformed LLM relation dicts ([#4515](https://github.com/mem0ai/mem0/pull/4515))
-- **Core:** Removed `README.md` from wheel shared-data ([#4052](https://github.com/mem0ai/mem0/pull/4052))
-- **Vector Stores:** Handled `vector=None` in Milvus and Qdrant update methods ([#4568](https://github.com/mem0ai/mem0/pull/4568))
-- **Vector Stores:** Rebuilt FAISS index on vector deletion ([#4178](https://github.com/mem0ai/mem0/pull/4178))
-
-**Improvements:**
-- **Embeddings:** Updated default Gemini and Vertex AI embedder model to `gemini-embedding-001` ([#4571](https://github.com/mem0ai/mem0/pull/4571))
-
-</Update>
-
-<Update label="2026-03-26" description="v1.0.8">
-
-**New Features & Updates:**
-- **Vector Stores:** Integrated Turbopuffer as a vector database provider ([#4428](https://github.com/mem0ai/mem0/pull/4428))
-- **LLMs:** Added MiniMax LLM provider ([#4431](https://github.com/mem0ai/mem0/pull/4431))
-
-**Bug Fixes:**
-- **Core:** Fixed merging of multiple filter operators for the same key ([#4559](https://github.com/mem0ai/mem0/pull/4559))
-- **Core:** Prevented in-place mutation of metadata in `_create_memory` ([#4529](https://github.com/mem0ai/mem0/pull/4529))
-- **Core:** Preserved custom metadata when updating memory ([#4495](https://github.com/mem0ai/mem0/pull/4495))
-- **Core:** Handled chatty LLM responses in JSON parsing ([#4525](https://github.com/mem0ai/mem0/pull/4525))
-- **Core:** Prevented double embedding in `mem0.add` ([#3996](https://github.com/mem0ai/mem0/pull/3996))
-- **Core:** Raised `ValueError` when deleting nonexistent memory ([#4455](https://github.com/mem0ai/mem0/pull/4455))
-- **Core:** Cleaned up graph store data on `Memory.delete()` ([#4505](https://github.com/mem0ai/mem0/pull/4505))
-- **Vector Stores:** Prevented SQL injection in Databricks vector store ([#4558](https://github.com/mem0ai/mem0/pull/4558))
-- **Vector Stores:** Upgraded MongoDB vector store from deprecated `knnVector` to GA `vectorSearch` ([#3995](https://github.com/mem0ai/mem0/pull/3995))
-- **Vector Stores:** Prevented embedding corruption in Valkey and Redis when vector is `None` ([#4362](https://github.com/mem0ai/mem0/pull/4362))
-- **Vector Stores:** Accepted default `/tmp/chroma` path in `ChromaDbConfig` validator ([#4179](https://github.com/mem0ai/mem0/pull/4179))
-- **Vector Stores:** Wrapped vector and payload in lists for `Langchain.update` ([#4446](https://github.com/mem0ai/mem0/pull/4446))
-- **Graph:** Soft-delete graph relationships instead of hard `DELETE` ([#4188](https://github.com/mem0ai/mem0/pull/4188))
-- **Graph:** Sanitized hyphens in Neo4j Cypher relationship names ([#4154](https://github.com/mem0ai/mem0/pull/4154))
-- **Graph:** Used root LLM config as fallback for graph store instead of hardcoded OpenAI default ([#4466](https://github.com/mem0ai/mem0/pull/4466))
-- **Qdrant:** Fixed `do not remove local path on init` ([#4475](https://github.com/mem0ai/mem0/pull/4475))
-- **Qdrant:** Implemented enhanced metadata filtering operators ([#4127](https://github.com/mem0ai/mem0/pull/4127))
-- **Embeddings:** Fixed OpenAI embedding dimensions ([#4481](https://github.com/mem0ai/mem0/pull/4481))
-- **LLMs:** Omitted `topP` for Anthropic Converse in Bedrock; used `AWSBedrockConfig` in `LlmFactory` ([#4469](https://github.com/mem0ai/mem0/pull/4469))
-- **LLMs:** Avoided sending both `temperature` and `top_p` to Anthropic API ([#4471](https://github.com/mem0ai/mem0/pull/4471))
-- **LLMs:** Handled `None` content and empty candidates in `GeminiLLM` parsing ([#4462](https://github.com/mem0ai/mem0/pull/4462))
-- **LLMs:** Added missing `_parse_response` to `AzureOpenAIStructuredLLM` ([#4434](https://github.com/mem0ai/mem0/pull/4434))
-- **History:** Added timestamps for `DELETE` operations in history ([#4492](https://github.com/mem0ai/mem0/pull/4492))
-
-**Improvements:**
-- **Vector Stores:** Added vector validation to OpenSearchDB to ensure non-null, non-empty, and correct-dimension vectors ([#4472](https://github.com/mem0ai/mem0/pull/4472))
-
-</Update>
-
-<Update label="2026-03-19" description="v1.0.7">
-
-**Bug Fixes:**
-- **Core:** Fixed control characters in LLM JSON responses causing parse failures ([#4420](https://github.com/mem0ai/mem0/pull/4420))
-- **Core:** Replaced hardcoded US/Pacific timezone references with `timezone.utc` ([#4404](https://github.com/mem0ai/mem0/pull/4404))
-- **Core:** Preserved `http_auth` in `_safe_deepcopy_config` for OpenSearch ([#4418](https://github.com/mem0ai/mem0/pull/4418))
-- **Core:** Normalized malformed LLM fact output before embedding ([#4224](https://github.com/mem0ai/mem0/pull/4224))
-- **Embeddings:** Pass `encoding_format='float'` in OpenAI embeddings for proxy compatibility ([#4058](https://github.com/mem0ai/mem0/pull/4058))
-- **LLMs:** Fixed Ollama to pass tools to `client.chat` and parse `tool_calls` from response ([#4176](https://github.com/mem0ai/mem0/pull/4176))
-- **Reranker:** Support nested LLM config in `LLMReranker` for non-OpenAI providers ([#4405](https://github.com/mem0ai/mem0/pull/4405))
-- **Vector Stores:** Cast `vector_distance` to float in Redis search ([#4377](https://github.com/mem0ai/mem0/pull/4377))
-
-**Improvements:**
-- **Embeddings:** Improved Ollama embedder with model name normalization and error handling ([#4403](https://github.com/mem0ai/mem0/pull/4403))
-
-</Update>
-
-<Update label="2026-03-16" description="v1.0.6">
-
-**Bug Fixes:**
-- **Telemetry:** Fixed telemetry vector store initialization still running when `MEM0_TELEMETRY` is disabled (#4351)
-- **Core:** Removed destructive `vector_store.reset()` call from `delete_all()` that was wiping the entire vector store instead of deleting only the target memories (#4349)
-- **OSS:** `OllamaLLM` now respects the configured URL instead of always falling back to localhost (#4320)
-- **Core:** Fixed `KeyError` when LLM omits the `entities` key in tool call response (#4313)
-- **Prompts:** Ensured JSON instruction is included in prompts when using `json_object` response format (#4271)
-- **Core:** Fixed incorrect database parameter handling (#3913)
-
-**Dependencies:**
-- Updated LangChain dependencies to v1.0.0 (#4353)
-- Bumped protobuf dependency to 5.29.6 and extended upper bound to `<7.0.0` (#4326)
-
-</Update>
-
-<Update label="2026-03-03" description="v1.0.5">
-- **Telemetry Fix**
-  - Fixed an issue where the PostHog client was initialized even after telemetry was disabled. Although events were not captured, the client was unnecessarily initialized.
-</Update>
-
-<Update label="2026-02-17" description="v1.0.4">
-
-**New Features & Updates:**
-- **Memory Update:**
-  - Added `timestamp` parameter to `update()` — accepts Unix epoch (int/float) or ISO 8601 string
-
-</Update>
-
-<Update label="2026-01-29" description="v1.0.3">
-
-**New Features & Updates:**
-- **Project Settings:**
-  - Added inclusion prompt, exclusion prompt, memory depth, and usecase setting
-
-</Update>
-
-<Update label="2026-01-13" description="v1.0.2">
-
-**New Features & Updates:**
-- **Vector Stores:**
-  - Added DriverInfo metadata to MongoDB vector store
-
-</Update>
-
-<Update label="2025-11-14" description="v1.0.1">
-
-**New Features & Updates:**
-- **Vector Stores:**
-  - Added Apache Cassandra vector store support
-- **Embeddings:**
-  - Added FastEmbed embedding support for local embeddings
-- **Graph Store:**
-  - Added configurable embedding similarity threshold for graph store node matching
-
-**Bug Fixes:**
-- **Core:**
-  - Fixed condition check for memories_result type in Memory class
-  - Fixed list_memories endpoint Pydantic validation error
-  - Fixed memory deletion not removing from vector store
-
-</Update>
-
-<Update label="2025-10-16" description="v1.0.0">
-
-**New Features & Updates:**
-- **Vector Stores:**
-  - Added Azure MySQL support
-  - Added Azure AI Search Vector Store support
-- **LLMs:**
-  - Added Tool Call support for LangchainLLM
-  - Enabled custom model and parameters for Hugging Face with huggingface_base_url
-  - Updated default LLM configuration
-- **Rerankers:**
-  - Added reranker support: Cohere, ZeroEntropy, Hugging Face, Sentence Transformers, and LLMs
-- **Core:**
-  - Added metadata filtering for OSS
-  - Added Assistant memory retrieval
-  - Enabled async mode as default
-
-**Improvements:**
-- **Prompts:**
-  - Improved prompt for better memory retrieval
-- **Dependencies:**
-  - Updated dependency compatibility with OpenAI 2.x
-- **Validation:**
-  - Validated embedding_dims for Kuzu integration
-
-**Bug Fixes:**
-- **Vector Stores:**
-  - Fixed Databricks Vector Store integration
-  - Fixed Milvus DB bug and added test coverage
-  - Fixed Weaviate search method
-- **LLMs:**
-  - Fixed bug with thinking LLM in vLLM
-
-</Update>
-
-<Update label="2025-09-25" description="v0.1.118">
-
-**New Features & Updates:**
-- **Vector Stores:**
-  - Added Valkey vector store support
-  - Added support for ChromaDB Cloud
-  - Added Mem0 vector store backend integration for Neptune Analytics
-- **Graph Store:**
-  - Added Neptune-DB graph store with vector store
-- **Core:**
-  - Implemented structured exception classes with error codes and suggested actions
-
-**Improvements:**
-- **Dependencies:**
-  - Updated OpenAI dependency and improved Ollama compatibility
-- **Testing:**
-  - Added Weaviate DB test
-  - Added comprehensive test suite for SQLiteManager
-- **Documentation:**
-  - Updated category docs
-  - Updated Search V2 / Get All V2 filters documentation
-  - Refactored AWS example title
-  - Fixed Quickstart cURL example
-
-**Bug Fixes:**
-- **Vector Stores:**
-  - Databricks bug fixes
-  - Fixed S3 Vectors memory initialization issue from configuration
-- **Core:**
-  - Fixed JSON parsing with new memories
-  - Replaced hardcoded LLM provider with provider from configuration
-- **LLMs:**
-  - Fixed Bedrock Anthropic models to use system field
-
-</Update>
-
-<Update label="2025-09-03" description="v0.1.117">
-
-**New Features & Updates:**
-- **OpenMemory:**
-  - Added memory export / import feature
-  - Added vector store integrations: Weaviate, FAISS, PGVector, Chroma, Redis, Elasticsearch, Milvus
-  - Added `export_openmemory.sh` migration script
-- **Vector Stores:**
-  - Added Amazon S3 Vectors support
-  - Added Databricks Mosaic AI vector store support
-  - Added support for OpenAI Store
-- **Graph Memory:** Added support for graph memory using Kuzu
-- **Azure:** Added Azure Identity for Azure OpenAI and Azure AI Search authentication
-- **Elasticsearch:** Added headers configuration support
-
-**Improvements:**
-  - Added custom connection client to enable connecting to local containers for Weaviate
-  - Updated configuration AWS Bedrock
-  - Fixed dependency issues and tests; updated docstrings
-- **Documentation:**
-  - Fixed Graph Docs page missing in sidebar
-  - Updated integration documentation
-  - Added version param in Search V2 API documentation
-  - Updated Databricks documentation and refactored docs
-  - Updated favicon logo
-  - Fixed typos and Typescript docs
-
-**Bug Fixes:**
-- Baidu: Added missing provider for Baidu vector DB
-- MongoDB: Replaced `query_vector` args in search method
-- Fixed new memory mistaken for current
-- AsyncMemory._add_to_vector_store: handled edge case when no facts found
-- Fixed missing commas in Kuzu graph INSERT queries
-- Fixed inconsistent created and updated properties for Graph
-- Fixed missing `app_id` on client for Neptune Analytics
-- Correctly pick AWS region from environment variable
-- Fixed Ollama model existence check
-
-**Refactoring:**
-- **PGVector:** Use internal connection pools and context managers
-
-</Update>
-
-<Update label="2025-08-14" description="v0.1.116">
-
-**New Features & Updates:**
-- **Pinecone:** Added namespace support and improved type safety
-- **Milvus:** Added db_name field to MilvusDBConfig
-- **Vector Stores:** Added multi-id filters support
-- **Vercel AI SDK:** Migration to AI SDK V5.0
-- **Python Support:** Added Python 3.12 support
-- **Graph Memory:** Added sanitizer methods for nodes and relationships
-- **LLM Monitoring:** Added monitoring callback support
-
-**Improvements:**
-- **Performance:**
-  - Improved async handling in AsyncMemory class
-- **Documentation:**
-  - Added async add announcement
-  - Added personalized search docs
-  - Added Neptune examples
-  - Added V5 migration docs
-- **Configuration:**
-  - Refactored base class config for LLMs
-  - Added sslmode for pgvector
-- **Dependencies:**
-  - Updated psycopg to version 3
-  - Updated Docker compose
-
-**Bug Fixes:**
-- **Tests:**
-  - Fixed failing tests
-  - Restricted package versions
-- **Memgraph:**
-  - Fixed async attribute errors
-  - Fixed n_embeddings usage
-  - Fixed indexing issues
-- **Vector Stores:**
-  - Fixed Qdrant cloud indexing
-  - Fixed Neo4j Cypher syntax
-  - Fixed LLM parameters
-- **Graph Store:**
-  - Fixed LM config prioritization
-- **Dependencies:**
-  - Fixed JSON import for psycopg
-
-**Refactoring:**
-- **Google AI:** Refactored from Gemini to Google AI
-- **Base Classes:** Refactored LLM base class configuration
-
-</Update>
-
-<Update label="2025-07-24" description="v0.1.115">
-
-**New Features & Updates:**
-- Enhanced project management via `client.project` and `AsyncMemoryClient.project` interfaces
-- Full support for project CRUD operations (create, read, update, delete)
-- Project member management: add, update, remove, and list members
-- Manage project settings including custom instructions, categories, retrieval criteria, and graph enablement
-- Both sync and async support for all project management operations
-
-**Improvements:**
-- **Documentation:**
-  - Added detailed API reference and usage examples for new project management methods.
-  - Updated all docs to use `client.project.get()` and `client.project.update()` instead of deprecated methods.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
+
+
+
+
+<标签>
+<标签标题=“Python”>
+
+<更新标签=“2026-04-25”描述=“v2.0.1”>
+
+**错误修复：**
+- **客户端：** 将 `user_id`、`agent_id`、`run_id` 实体参数映射到 `GET /memories` 中的过滤器 ([#4960](https://github.com/mem0ai/mem0/pull/4960))
+- **内存：** 在向量存储提取管道中尊重 `prompt` 参数 ([#4914](https://github.com/mem0ai/mem0/pull/4914))
+- **内存：** 在 `AsyncMemory._create_memory` 中添加缺少的 `text_lemmatized` 字段 ([#4886](https://github.com/mem0ai/mem0/pull/4886))
+- **内存：** 在 AND 元数据过滤器中合并相同键运算符字典 ([#4853](https://github.com/mem0ai/mem0/pull/4853))
+- **LLM：** 缩小 `_is_reasoning_model` 检查以不匹配 `gpt-5.x` 变体 ([#4746](https://github.com/mem0ai/mem0/pull/4746))
+- **矢量存储：** 为 Elasticsearch 矢量存储添加 `ca_certs` 配置选项 ([#3993](https://github.com/elasticsearch/#3993)com/mem0ai/mem0/pull/3993))
+- **矢量存储：** 将 `agent_id` 和 `run_id` 添加到 Elasticsearch/OpenSearch 默认映射 ([#4906](https://github.com/mem0ai/mem0/pull/4906))
+- **嵌入：** 在初始化时从模型元数据设置 FastEmbed `embedding_dims` ([#4711](https://github.com/mem0ai/mem0/pull/4711))**安全：**
+- 将易受攻击的依赖项添加到修补版本（[#4835](https://github.com/mem0ai/mem0/pull/4835)）
+
+</更新>
+
+<更新标签=“2026-04-14”描述=“v2.0.0”>**主要版本** — 具有 V3 内存管道、仅 ADD 提取和清理的 API 表面的 Python SDK。**新功能：**
+- **单通道提取：** 使用“ADDITIVE_EXTRACTION_PROMPT”将 2-LLM 调用管道替换为附加提取。内存通过“linked_memory_ids”累积 - 不再有更新/删除事件（[#4805](https://github.com/mem0ai/mem0/pull/4805)）
+- **混合搜索：** 组合语义 + BM25 关键字匹配 + 具有附加评分的实体增强。原生 `keyword_search()` 添加到 15 个矢量存储适配器（Qdrant、Elasticsearch、OpenSearch、Azure AI Search、Weaviate、Redis、PGVector、Pinecone、Databricks、MongoDB、Milvus、百度、Upstash、Azure MySQL、Vertex AI）（[#4805](https://github.com/mem0ai/mem0/pull/4805)）
+- **实体提取和链接：** 基于 spaCy 的实体提取，使用第二个向量集合（`{collection}_entities`）进行跨内存关系检索。可选依赖项：`pip install mem0ai[nlp]` ([#4805](https://github.com/pipinstallmem0ai[nlp])com/mem0ai/mem0/pull/4805))
+- **批量操作：** 同步“Memory”和异步“AsyncMemory”的批量嵌入、批量持久和批量实体链接（8 阶段管道）（[#4805](https://github.com/mem0ai/mem0/pull/4805)）
+- **消息持久化：** LLM 上下文的基于 SQLite 的滚动窗口（每个会话范围 10 条消息）（[#4805](https://github.com/mem0ai/mem0/pull/4805)）
+- **Valkey 集群模式：** 为启用 Valkey 集群模式 (CME) 的部署添加了 `cluster_mode` 参数 ([#4759](https://github.com/mem0ai/mem0/pull/4759))
+- **V3 API 端点：** `MemoryClient.add()` 现在发布到 `/v3/memories/add/`； `MemoryClient.get_all()` 发送到 `/v3/memories/` 并返回一个分页信封 `{"count": int, "next": str |无，“上一个”：str |无，“结果”：[...]}` ([#4856](https://github.com)com/mem0ai/mem0/pull/4856))
+- **默认模型：** `gpt-5-mini` 现在是 `OpenAILLM`、`OpenAIStructuredLLM`、`AzureOpenAILLM`、`AzureOpenAIStructuredLLM` 和 `LiteLLM` 后备的默认模型 ([#4829](https://github.com/mem0ai/mem0/pull/4829))**重大变更：**
+- **`add()` 返回仅添加事件** — 不再有“UPDATE”或“DELETE”事件。记忆不断积累；没有任何内容被覆盖（[#4805](https://github.com/mem0ai/mem0/pull/4805)）
+- **`search()` 默认 `threshold` 现在为 `0.1`** — 为之前的行为传递 `threshold=0.0` ([#4805](https://github.com/mem0ai/mem0/pull/4805))
+- **`search()` `score` 现在是一种组合的多信号分数** — 顶级 `score` 将语义相似性、BM25 关键字匹配和实体增强融合为一个值。绝对数字相对于旧的原始余弦分数发生变化；针对代表性查询重新调整任何硬阈值。每个信号的分数不会在响应中公开（[#4805](https://github.com/mem0ai/mem0/pull/4805)、[#4836](https://github.com/mem0ai/mem0/pull/4836))
+- **`search()` 默认 `rerank` 现在为 `False`** — 为之前的行为传递 `rerank=True` ([#4805](https://github.com/rerank)com/mem0ai/mem0/pull/4805))
+- **`Memory.get_all()` 和 `Memory.search()` 中`top_k` 默认值更改为 100 → 20**（同步 + 异步）。显式传递 `top_k=100` 以恢复旧行为 ([#4843](https://github.com/mem0ai/mem0/pull/4843))
+- **实体 ID 验证：** `user_id` / `agent_id` / `run_id` 被修剪；空字符串和仅空白值现在引发 `ValueError` ([#4843](https://github.com/mem0ai/mem0/pull/4843))
+- **搜索参数验证：** `threshold` 必须是 `[0, 1]` 中的数字； `top_k` 必须是非负整数 - 无效输入引发 `ValueError` ([#4843](https://github.com/mem0ai/mem0/pull/4843))
+- **Memory.add()`中的`messages`拒绝无效类型：**传递`None`或非`(str | dict | list)`值会引发`Mem0ValidationError` (`error_code="VALIDATION_003"`) ([#4843](https://github.com/mem0ai/mem0/pull/4843))
+- **`qdrant-client>=1.12。需要 0`** — 从 `>=1.9.1` 升级 ([#4805](https://github.com/mem0ai/mem0/pull/4805))
+- **`org_id` 和 `project_id` 已删除** — 从 `MemoryClient` 构造函数和所有方法签名中删除 ([#4740](https://github.com/mem0ai/mem0/pull/4740))
+- **删除图形内存 (OSS)：** `mem0/memory/graph_memory.py`、`memgraph_memory.py`、`kuzu_memory.py`、`apache_age_memory.py` 和 `mem0/graphs/`（Neo4j / Memgraph / Kuzu / Apache AGE / Neptune 驱动程序）已删除 — 约 4,000 行。 OSS SDK不再支持图内存；可以卸载图形驱动程序（neo4j、memgraph、kuzu 等）。使用平台 API 来实现图形功能。从配置中删除 `enable_graph` 和 `graph_store` ([#4805](https://github.com/mem0ai/mem0/pull/4805))
+- **`enable_graph` 从客户端 SDK 中删除** — 图内存现在是平台上的项目级设置。从“MemoryClient”中删除“enable_graph”。add()` / `search()` / `get_all()` / `update_project()` 调用 ([#4776](https://github.com/mem0ai/mem0/pull/4776))
+- **`custom_fact_extraction_prompt` 重命名为 `custom_instructions`** — 更新配置和内存模块引用 ([#4740](https://github.com/mem0ai/mem0/pull/4740))
+- **类型化选项类** - 添加了 Pydantic v2 类型化类：`AddMemoryOptions`、`SearchMemoryOptions`、`GetAllMemoryOptions`、`DeleteAllMemoryOptions`、`UpdateMemoryOptions`、`ProjectUpdateOptions` ([#4740](https://github.com/mem0ai/mem0/pull/4740))**安全：**
+- **FAISS：** 通过 `FAISS` 矢量存储中的 pickle 反序列化防止任意代码执行 ([#4833](https://github.com/mem0ai/mem0/pull/4833))**错误修复：**
+- **V3迁移崩溃：**修复了v3迁移路径中的崩溃问题； OSS 上的实体链接现在可以跨 Qdrant 和 Milvus 后端运行 ([#4836](https://github.com/mem0ai/mem0/pull/4836))
+- **Qdrant 实体存储：** 实体存储现在在使用嵌入模式（`path=...`）时共享现有的 Qdrant 客户端，消除了主集合和实体集合之间的 RocksDB 锁争用 ([#4836](https://github.com/mem0ai/mem0/pull/4836))
+- **Reranker：** 修复了跨编码器重新排序模型中 SentenceTransformer 的错误使用 - 切换到 CrossEncoder API 以进行正确评分（[#4806](https://github.com/mem0ai/mem0/pull/4806)）
+- **S3 Vectors：** 在 `update()` 中处理 `vector=None` 以防止 `event=NONE` 时出现 boto3 验证错误 ([#4594](https://github.com)com/mem0ai/mem0/pull/4594))
+- **法学硕士：** 选择加入 OpenAI `store` 参数，以防止泄漏到 Google Gemini 等非 OpenAI 后端 ([#4757](https://github.com/mem0ai/mem0/pull/4757))
+- **LLM：** 将 `response_format` 转发到 Azure OpenAI API 以防止 JSON 解析失败 ([#4689](https://github.com/mem0ai/mem0/pull/4689))
+- **核心：** 使用安全的“.get()”和警告来保护“temp_uuid_mapping”查找 LLM 幻觉 ID ([#4674](https://github.com/mem0ai/mem0/pull/4674))
+- **客户端：** 通过将反馈数据合并到单个有效负载中来防止 `MemoryClient.feedback()` 遥测类型错误 ([#4795](https://github.com/mem0ai/mem0/pull/4795))**改进：**
+- **遥测：** 通过 PostHog `before_send` 挂钩以 10% 采样 OSS 热路径事件，以减少事件量 ([#4771](https://github.com/mem0ai/mem0/pull/4771))请参阅 [OSS v1 到 v2 迁移指南](https://docs.mem0.ai/migration/oss-v1-to-v2) 和 [平台迁移指南](https://docs.mem0.ai/migration/platform-v2-to-v3) 了解升级说明。
+
+</更新>
+
+<更新标签=“2026-04-06”描述=“v1.0.11”>
+
+**新功能和更新：**
+- **SDK：** 在项目更新中添加了 `multilingual` 参数 ([#4314](https://github.com/mem0ai/mem0/pull/4314))
+
+**错误修复：**
+- **LLM：**修复了 Groq 模型配置（[#4700](https://github.com/mem0ai/mem0/pull/4700)）
+- **核心：** 防止 PostHog 遥测造成的线程和内存泄漏（[#4535]（https://github.com/github.com/posts/4535）com/mem0ai/mem0/pull/4535))
+- **矢量存储：** 在 Qdrant 范围过滤器中使用 `DatetimeRange` 作为日期时间字符串值 ([#4659](https://github.com/mem0ai/mem0/pull/4659))
+- **配置：**向矢量存储配置添加了缺失的“ConfigDict”（Elasticsearch、MongoDB、Neptune、OpenSearch、PGVector、Supabase、Valkey）（[#4656](https://github.com/mem0ai/mem0/pull/4656)）
+
+</更新>
+
+<更新标签=“2026-04-01”描述=“v1.0.10”>**新功能和更新：**
+- **法学硕士：** 添加了对 AWS Bedrock 的 MiniMax 提供商支持 ([#4609](https://github.com/mem0ai/mem0/pull/4609))**错误修复：**
+- **配置：** 将 CassandraConfig 和 AzureMySQLConfig 迁移到 pydantic v2 ConfigDict ([#4646](https://github.com/mem0ai/mem0/pull/4646))
+- **LLM：** 将 `response_format` 转发到 DeepSeek 的 OpenAI 兼容 API ([#4635](https://github.com/mem0ai/mem0/pull/4635))
+- **LLM：** 将 `response_format` 转发到 vLLM 的 OpenAI 兼容 API ([#4608](https://github.com/mem0ai/mem0/pull/4608))
+- **矢量存储：** 在列出 MongoDB 集合时仅列出授权集合 ([#3888](https://github.com/mem0ai/mem0/pull/3888))
+- **核心：** 在 `Memory.reset()` 中重置图形数据库 ([#4185](https://github.com/mem0ai/mem0/pull/4185))
+- **核心：** 使 `AsyncMemory.from_config` 成为常规类方法 ([#4183](https://github.com/asyncMemory.from_config)com/mem0ai/mem0/pull/4183))
+
+</更新>
+
+<更新标签=“2026-03-28”描述=“v1.0.9”>**新功能和更新：**
+- **LLM：** 添加了对推理模型的 `reasoning_effort` 参数支持 ([#4461](https://github.com/mem0ai/mem0/pull/4461))**错误修复：**
+- **核心：** 在内存更新期间保留原始 `actor_id` ([#4570](https://github.com/mem0ai/mem0/pull/4570))
+- **核心：** 在创建时设置 `updated_at` 并保留预先存在的 `created_at` ([#4499](https://github.com/mem0ai/mem0/pull/4499))
+- **核心：** 集中实体清理并跳过格式错误的 LLM 关系字典 ([#4515](https://github.com/mem0ai/mem0/pull/4515))
+- **核心：** 从轮子共享数据中删除了 `README.md` ([#4052](https://github.com/mem0ai/mem0/pull/4052))
+- **矢量存储：** 在 Milvus 和 Qdrant 更新方法中处理 `vector=None` ([#4568](https://github.com/mem0ai/mem0/pull/4568))
+- **向量存储：** 在向量删除上重建 FAISS 索引 ([#4178](https://github.com/mem0ai/mem0/pull/4178))
+
+**改进：**
+- **嵌入：** 将默认 Gemini 和 Vertex AI 嵌入器模型更新为 `gemini-embedding-001` ([#4571](https://github.com/gemini-embedding-001)com/mem0ai/mem0/pull/4571))
+
+</更新><更新标签=“2026-03-26”描述=“v1.0.8”>**新功能和更新：**
+- **矢量存储：** 集成 Turbopuffer 作为矢量数据库提供程序 ([#4428](https://github.com/mem0ai/mem0/pull/4428))
+- **LLM：**添加了 MiniMax LLM 提供商（[#4431](https://github.com/mem0ai/mem0/pull/4431)）**错误修复：**
+- **核心：**修复了同一键的多个过滤器运算符的合并（[#4559](https://github.com/mem0ai/mem0/pull/4559)）
+- **核心：**防止 `_create_memory` 中元数据的就地突变（[#4529](https://github.com/mem0ai/mem0/pull/4529)）
+- **核心：** 更新内存时保留自定义元数据 ([#4495](https://github.com/mem0ai/mem0/pull/4495))
+- **核心：** 在 JSON 解析中处理繁琐的 LLM 响应（[#4525](https://github.com/mem0ai/mem0/pull/4525)）
+- **核心：**防止`mem0.add`中的双重嵌入（[#3996](https://github.com/mem0ai/mem0/pull/3996)）
+- **核心：** 删除不存在的内存时引发 `ValueError` ([#4455](https://github.com/mem0ai/mem0/pull/4455))
+- **核心：** 清理了 `Memory.delete()` 上的图形存储数据 ([#4505](https://github.com)。com/mem0ai/mem0/pull/4505))
+- **矢量存储：**防止 Databricks 矢量存储中的 SQL 注入 ([#4558](https://github.com/mem0ai/mem0/pull/4558))
+- **矢量存储：** 将 MongoDB 矢量存储从已弃用的 `knnVector` 升级到 GA `vectorSearch` ([#3995](https://github.com/mem0ai/mem0/pull/3995))
+- **矢量存储：** 当矢量为“无”时，防止在 Valkey 和 Redis 中嵌入损坏（[#4362](https://github.com/mem0ai/mem0/pull/4362)）
+- **矢量存储：** 在 `ChromaDbConfig` 验证器中接受默认的 `/tmp/chroma` 路径 ([#4179](https://github.com/mem0ai/mem0/pull/4179))
+- **矢量存储：** 将矢量和有效负载包装在“Langchain.update”列表中（[#4446](https://github.com/mem0ai/mem0/pull/4446)）
+- **图：** 软删除图关系而不是硬“DELETE”（[#4188]（https://github.com/mem0ai/mem0/pull/4188))
+- **图：** Neo4j Cypher 关系名称中的连字符已清理（[#4154](https://github.com/mem0ai/mem0/pull/4154)）
+- **图：** 使用根 LLM 配置作为图存储的后备，而不是硬编码 OpenAI 默认值 ([#4466](https://github.com/mem0ai/mem0/pull/4466))
+- **Qdrant：**修复了“不要删除 init 上的本地路径”（[#4475](https://github.com/mem0ai/mem0/pull/4475)）
+- **Qdrant：** 实现了增强的元数据过滤运算符（[#4127](https://github.com/mem0ai/mem0/pull/4127)）
+- **嵌入：**修复了 OpenAI 嵌入尺寸（[#4481](https://github.com/mem0ai/mem0/pull/4481)）
+- **法学硕士：** 在基岩中省略了 Anthropic Converse 的“topP”；在 `LlmFactory` 中使用了 `AWSBedrockConfig` ([#4469](https://github.com/mem0ai/mem0/pull/4469))
+- **法学硕士：**避免将“温度”和“top_p”发送到 Anthropic API（[#4471]（https://github.com/anthropic）。com/mem0ai/mem0/pull/4471))
+- **LLM：** 在“GeminiLLM”解析中处理“None”内容和空候选者（[#4462](https://github.com/mem0ai/mem0/pull/4462)）
+- **LLM：** 将缺失的“_parse_response”添加到“AzureOpenAIStructuredLLM”（[#4434](https://github.com/mem0ai/mem0/pull/4434)）
+- **历史记录：**为历史记录中的“DELETE”操作添加了时间戳（[#4492](https://github.com/mem0ai/mem0/pull/4492)）**改进：**
+- **向量存储：** 向 OpenSearchDB 添加了向量验证，以确保向量非空、非空且维度正确 ([#4472](https://github.com/mem0ai/mem0/pull/4472))</更新>
+
+<更新标签=“2026-03-19”描述=“v1.0.7”>**错误修复：**
+- **核心：**修复了LLM JSON响应中导致解析失败的控制字符（[#4420](https://github.com/mem0ai/mem0/pull/4420)）
+- **核心：** 将硬编码的美国/太平洋时区引用替换为“timezone.utc”（[#4404](https://github.com/mem0ai/mem0/pull/4404)）
+- **核心：** 在 OpenSearch 的 `_safe_deepcopy_config` 中保留 `http_auth` ([#4418](https://github.com/mem0ai/mem0/pull/4418))
+- **核心：** 嵌入之前规范化的格式错误的 LLM 事实输出（[#4224](https://github.com/mem0ai/mem0/pull/4224)）
+- **嵌入：** 在 OpenAI 嵌入中传递 `encoding_format='float'` 以实现代理兼容性（[#4058](https://github.com/mem0ai/mem0/pull/4058)）
+- **法学硕士：** 修复了 Ollama，将工具传递给 `client.chat` 并从响应中解析 `tool_calls` ([#4176](https://github.com)com/mem0ai/mem0/pull/4176))
+- **Reranker：** 支持非 OpenAI 提供商的“LLMReranker”中的嵌套 LLM 配置（[#4405](https://github.com/mem0ai/mem0/pull/4405)）
+- **矢量存储：** 将 `vector_distance` 投射到 Redis 搜索中浮动 ([#4377](https://github.com/mem0ai/mem0/pull/4377))**改进：**
+- **嵌入：** 改进了 Ollama 嵌入器，具有模型名称规范化和错误处理功能（[#4403](https://github.com/mem0ai/mem0/pull/4403)）
+
+</更新>
+
+<更新标签=“2026-03-16”描述=“v1.0.6”>**错误修复：**
+- **遥测：**修复了禁用“MEM0_TELEMETRY”时遥测向量存储初始化仍在运行的问题 (#4351)
+- **核心：**删除了破坏性的`vector_store。来自 `delete_all()` 的 Reset()` 调用会擦除整个向量存储，而不是仅删除目标内存 (#4349)
+- **OSS:** `OllamaLLM` 现在尊重配置的 URL，而不是总是回退到 localhost (#4320)
+- **核心：**当LLM在工具调用响应中省略“entities”键时修复了“KeyError”(#4313)
+- **提示：** 使用 `json_object` 响应格式时确保提示中包含 JSON 指令 (#4271)
+- **核心：**修复了不正确的数据库参数处理（#3913）
+
+**依赖关系：**
+- 将 LangChain 依赖项更新至 v1.0.0 (#4353)
+- 将 protobuf 依赖项提高到 5.29.6 并将上限扩展为“<7.0.0” (#4326)
+
+</更新><更新标签=“2026-03-03”描述=“v1.0.5”>
+- **遥测修复**
+  - 修复了即使禁用遥测后仍初始化 PostHog 客户端的问题。尽管未捕获事件，但客户端已被不必要地初始化。
+</更新>
+
+<更新标签=“2026-02-17”描述=“v1.0.4”>
+
+**新功能和更新：**
+- **内存更新：**
+  - 将“timestamp”参数添加到“update()”——接受 Unix 纪元（int/float）或 ISO 8601 字符串
+
+</更新>
+
+<更新标签=“2026-01-29”描述=“v1.0.3”>
+
+**新功能和更新：**
+- **项目设置：**
+  - 新增包含提示、排除提示、内存深度、用例设置
+
+</更新>
+
+<更新标签=“2026-01-13”描述=“v1.0.2”>
+
+**新功能和更新：**
+- **矢量商店：**
+  - 将 DriverInfo 元数据添加到 MongoDB 矢量存储
+
+</更新>
+
+<更新标签=“2025-11-14”描述=“v1.0。1">
+
+**新功能和更新：**
+- **矢量商店：**
+  - 添加了 Apache Cassandra 矢量存储支持
+- **嵌入：**
+  - 添加了对本地嵌入的 FastEmbed 嵌入支持
+- **图谱商店：**
+  - 添加了用于图存储节点匹配的可配置嵌入相似度阈值**错误修复：**
+- **核心：**
+  - 修复了 Memory 类中 Memory_result 类型的条件检查
+  - 修复了 list_memories 端点 Pydantic 验证错误
+  - 修复了内存删除未从向量存储中删除的问题
+
+</更新><更新标签=“2025-10-16”描述=“v1.0。0">
+
+**新功能和更新：**
+- **矢量商店：**
+  - 添加了 Azure MySQL 支持
+  - 添加了 Azure AI 搜索矢量存储支持
+- **法学硕士：**
+  - 添加了对 LangchainLLM 的工具调用支持
+  - 使用 Huggingface_base_url 启用 Hugging Face 的自定义模型和参数
+  - 更新了默认的 LLM 配置
+- **重新排序：**
+  - 添加了重新排名器支持：Cohere、ZeroEntropy、Hugging Face、Sentence Transformers 和 LLM
+- **核心：**
+  - 添加了OSS元数据过滤
+  - 新增记忆检索助手
+  - 默认启用异步模式
+
+**改进：**
+- **提示：**
+  - 改进提示以更好地检索记忆
+- **依赖关系：**
+  - 更新了与 OpenAI 2.x 的依赖兼容性
+- **验证：**
+  - 验证 Kuzu 集成的 embedding_dims**错误修复：**
+- **矢量商店：**
+  - 修复了 Databricks Vector Store 集成
+  - 修复了 Milvus DB 错误并增加了测试覆盖率
+  - 修正Weaviate搜索方法
+- **法学硕士：**
+  - 修复了在 vLLM 中思考 LLM 的错误
+
+</更新>
+
+<更新标签=“2025-09-25”描述=“v0.1。118">
+
+**新功能和更新：**
+- **矢量商店：**
+  - 添加了 Valkey 矢量存储支持
+  - 添加了对 ChromaDB 云的支持
+  - 为 Neptune Analytics 添加了 Mem0 矢量存储后端集成
+- **图谱商店：**
+  - 添加了带有矢量存储的 Neptune-DB 图形存储
+- **核心：**
+  - 实现了带有错误代码和建议操作的结构化异常类**改进：**
+- **依赖关系：**
+  - 更新了 OpenAI 依赖项并改进了 Ollama 兼容性
+- **测试：**
+  - 添加了 Weaviate DB 测试
+  - 为 SQLiteManager 添加了全面的测试套件
+- **文档：**
+  - 更新了类别文档
+  - 更新了搜索 V2/获取所有 V2 过滤器文档
+  - 重构AWS示例标题
+  - 修复了快速入门 cURL 示例**错误修复：**
+- **矢量商店：**
+  - 数据块错误修复
+  - 修复了配置中的 S3 Vectors 内存初始化问题
+- **核心：**
+  - 修复了新记忆的 JSON 解析
+  - 用配置中的提供程序替换了硬编码的 LLM 提供程序
+- **法学硕士：**
+  - 修复了基岩人类模型以使用系统场
+
+</更新>
+
+<更新标签=“2025-09-03”描述=“v0.1.117”>
+
+**新功能和更新：**
+- **打开内存：**
+  - 添加内存导出/导入功能
+  - 添加了矢量存储集成：Weaviate、FAISS、PGVector、Chroma、Redis、Elasticsearch、Milvus
+  - 添加了“export_openmemory”。sh`迁移脚本
+- **矢量商店：**
+  - 添加了 Amazon S3 矢量支持
+  - 添加了 Databricks Mosaic AI 矢量存储支持
+  - 添加了对 OpenAI 商店的支持
+- **图形内存：** 添加了对使用 Kuzu 的图形内存的支持
+- **Azure：** 添加了用于 Azure OpenAI 和 Azure AI 搜索身份验证的 Azure 身份
+- **Elasticsearch：** 添加了标头配置支持**改进：**
+  - 添加了自定义连接客户端以支持连接到 Weaviate 的本地容器
+  - 更新配置 AWS Bedrock
+  - 修复了依赖问题和测试；更新的文档字符串
+- **文档：**
+  - 修复了侧边栏中缺少的图形文档页面
+  - 更新了集成文档
+  - 在 Search V2 API 文档中添加了版本参数
+  - 更新了 Databricks 文档并重构了文档
+  - 更新了网站图标徽标
+  - 修复了打字错误和 Typescript 文档**错误修复：**
+- 百度：添加了缺失的百度矢量数据库提供程序
+- MongoDB：替换了搜索方法中的“query_vector”参数
+- 修复了新内存被误认为当前内存的问题
+- 异步内存。_add_to_vector_store：处理未找到事实时的边缘情况
+- 修复了 Kuzu 图 INSERT 查询中缺少逗号的问题
+- 修复了图形创建和更新属性不一致的问题
+- 修复了 Neptune Analytics 客户端上缺失的“app_id”
+- 从环境变量中正确选择AWS区域
+- 修正了 Ollama 模型存在检查
+
+**重构：**
+- **PGVector：** 使用内部连接池和上下文管理器
+
+</更新>
+
+<更新标签=“2025-08-14”描述=“v0.1.116”>**新功能和更新：**
+- **Pinecone：** 添加了命名空间支持并改进了类型安全性
+- **Milvus:** 在 MilvusDBConfig 中添加了 db_name 字段
+- **矢量存储：** 添加了多 ID 过滤器支持
+- **Vercel AI SDK：** 迁移到 AI SDK V5.0
+- **Python 支持：** 添加了 Python 3.12 支持
+- **图形内存：**添加了节点和关系的清理方法
+- **LLM监控：**添加监控回调支持
+
+**改进：**
+- **性能：**
+  - 改进了 AsyncMemory 类中的异步处理
+- **文档：**
+  - 添加了异步添加公告
+  - 新增个性化搜索文档
+  - 添加了海王星示例
+  - 添加了 V5 迁移文档
+- **配置：**
+  - 重构 LLM 的基类配置
+  - 为 pgvector 添加了 sslmode
+- **依赖关系：**
+  - 将 psycopg 更新至版本 3
+  - 更新了 Docker 撰写**错误修复：**
+- **测试：**
+  - 修复了失败的测试
+  - 受限制的软件包版本
+- **内存图：**
+  - 修复了异步属性错误
+  - 修复了 n_embeddings 的使用
+  - 修复了索引问题
+- **矢量商店：**
+  - 修复了 Qdrant 云索引
+  - 修复了 Neo4j Cypher 语法
+  - 修正了LLM参数
+- **图谱商店：**
+  - 修复了 LM 配置优先级
+- **依赖关系：**
+  - 修复了 psycopg 的 JSON 导入
+
+**重构：**
+- **Google AI：** 从 Gemini 重构为 Google AI
+- **基类：**重构LLM基类配置
+
+</更新>
+
+<更新标签=“2025-07-24”描述=“v0.1.115”>**新功能和更新：**
+- 通过“client.project”和“AsyncMemoryClient”增强了项目管理。项目接口
+- 全面支持项目CRUD操作（创建、读取、更新、删除）
+- 项目成员管理：添加、更新、删除和列出成员
+- 管理项目设置，包括自定义说明、类别、检索标准和图形启用
+- 对所有项目管理操作的同步和异步支持**改进：**
+- **文档：**
+  - 为新的项目管理方法添加了详细的API参考和使用示例。
+  - 更新了所有文档以使用“client.project.get()”和“client.project.update()”而不是已弃用的方法。
   
-- **Deprecation:**
-  - Marked `get_project()` and `update_project()` as deprecated (these methods were already present); added warnings to guide users to the new API.
+- **弃用：**
+  - 将 `get_project()` 和 `update_project()` 标记为已弃用（这些方法已经存在）；添加了警告以引导用户使用新 API。
+
+**错误修复：**
+- **测试：**
+  - 修复了 Gemini 嵌入器和 LLM 测试模拟，以实现正确的错误处理和参数结构。
+- **法学硕士：**
+  - 修复了 vLLM 模块中的重复导入。
 
-**Bug Fixes:**
-- **Tests:**
-  - Fixed Gemini embedder and LLM test mocks for correct error handling and argument structure.
-- **vLLM:**
-  - Fixed duplicate import in vLLM module.
+</更新>
 
-</Update>
+<更新标签=“2025-07-05”描述=“v0.1。114">
 
-<Update label="2025-07-05" description="v0.1.114">
+**新功能：**
+- **OpenAI 代理：** 添加了 OpenAI 代理 SDK 支持
+- **Amazon Neptune：** 添加了 Amazon Neptune Analytics graph_store 配置和集成
+- **vLLM：** 添加了 vLLM 支持
+
+**改进：**
+- **文档：** 
+  - 添加了 SOC2 和 HIPAA 合规性文档
+  - 增强平台群聊功能文档
+  - 添加了 Google AI ADK 集成文档
+  - 修复了文档图像和链接
+- **设置：**修复了 Mem0 设置、日志记录和文档问题**错误修复：**
+- **MongoDB：** 修复了 MongoDB Vector Store 未对齐的字符串和类
+- **vLLM：**修复了 vLLM 模块中缺少 OpenAI 导入和调用错误
+- **依赖项：**修复了与缺少依赖项相关的 CI 问题
+- **安装：** 恢复 pip 安装更改
 
-**New Features:**
-- **OpenAI Agents:** Added OpenAI agents SDK support
-- **Amazon Neptune:** Added Amazon Neptune Analytics graph_store configuration and integration
-- **vLLM:** Added vLLM support
+</更新>
 
-**Improvements:**
-- **Documentation:** 
-  - Added SOC2 and HIPAA compliance documentation
-  - Enhanced group chat feature documentation for platform
-  - Added Google AI ADK Integration documentation
-  - Fixed documentation images and links
-- **Setup:** Fixed Mem0 setup, logging, and documentation issues
+<更新标签=“2025-06-30”描述=“v0.1.113”>
 
-**Bug Fixes:**
-- **MongoDB:** Fixed MongoDB Vector Store misaligned strings and classes
-- **vLLM:** Fixed missing OpenAI import in vLLM module and call errors
-- **Dependencies:** Fixed CI issues related to missing dependencies
-- **Installation:** Reverted pip install changes
+**错误修复：**
+- **Gemini：** 修复了 Gemini 嵌入器配置
 
-</Update>
+</更新>
 
-<Update label="2025-06-30" description="v0.1.113">
+<更新标签=“2025-06-27”描述=“v0.1。112">
 
-**Bug Fixes:**
-- **Gemini:** Fixed Gemini embedder configuration
+**新功能：**
+- **内存：** 添加不可变参数以添加方法
+- **OpenMemory：** 添加了 async_mode 参数支持**改进：**
+- **文档：** 
+  - 增强的平台功能文档
+  - 修复了文档链接
+  - 添加了 async_mode 文档
+- **MongoDB：** 修复了 MongoDB 配置名称
 
-</Update>
+**错误修复：**
+- **Bedrock：** 修复了 Bedrock LLM、嵌入、工具和临时凭证
+- **内存：** 通过更新依赖项和更正 API 使用来修复内存分类
+- **Gemini：**修复了 Gemini 嵌入和 LLM 问题
 
-<Update label="2025-06-27" description="v0.1.112">
+</更新>
 
-**New Features:**
-- **Memory:** Added immutable parameter to add method
-- **OpenMemory:** Added async_mode parameter support
+<更新标签=“2025-06-23”描述=“v0.1.111”>**新功能：**
+- **打开内存：** 
+  - 添加了 OpenMemory 增强支持
+  - 使用新库添加了 OpenMemory 本地支持
+- **vLLM：** 添加了 vLLM 支持集成
 
-**Improvements:**
-- **Documentation:** 
-  - Enhanced platform feature documentation
-  - Fixed documentation links
-  - Added async_mode documentation
-- **MongoDB:** Fixed MongoDB configuration name
+**改进：**
+- **文档：** 
+  - 添加了 MCP 客户端集成指南并更新了安装命令
+  - 改进了 Mem0 OSS 图形内存的代理 ID 文档
+- **核心：**添加JSON解析以解决幻觉错误
 
-**Bug Fixes:**
-- **Bedrock:** Fixed Bedrock LLM, embeddings, tools, and temporary credentials
-- **Memory:** Fixed memory categorization by updating dependencies and correcting API usage
-- **Gemini:** Fixed Gemini Embeddings and LLM issues
+**错误修复：**
+- **Gemini：** 修复了 Gemini Embeddings 迁移
 
-</Update>
+</更新>
 
-<Update label="2025-06-23" description="v0.1.111">
+<更新标签=“2025-06-20”描述=“v0.1.110”>
 
-**New Features:**
-- **OpenMemory:** 
-  - Added OpenMemory augment support
-  - Added OpenMemory Local Support using new library
-- **vLLM:** Added vLLM support integration
+**新功能：**
+- **百度：**添加了百度矢量数据库集成
 
-**Improvements:**
-- **Documentation:** 
-  - Added MCP Client Integration Guide and updated installation commands
-  - Improved Agent Id documentation for Mem0 OSS Graph Memory
-- **Core:** Added JSON parsing to solve hallucination errors
+**改进：**
+- **文档：** 
+  - 更新了变更日志
+  - 修复了快速启动页面中的示例
+  - 更新了客户端。OpenAPI 规范中的 update() 方法文档
+- **OpenSearch：**更新了记录器警告
+
+**错误修复：**
+- **CI：** 修复了失败的 CI 管道
 
-**Bug Fixes:**
-- **Gemini:** Fixed Gemini Embeddings migration
+</更新>
 
-</Update>
+<更新标签=“2025-06-19”描述=“v0.1.109”>
 
-<Update label="2025-06-20" description="v0.1.110">
+**新功能：**
+- **AgentOps：** 添加了 AgentOps 集成
+- **LM Studio：** 为 LM Studio 配置添加了 response_format 参数
+- **示例：** 添加了由语音驱动的内存代理（Cartesia + Agno）**改进：**
+- **AI SDK：**添加了output_format参数
+- **客户端：** 增强的更新方法以支持元数据
+- **Google：** 添加了 Google Genai 库支持
 
-**New Features:**
-- **Baidu:** Added Baidu vector database integration
+**错误修复：**
+- **构建：**修复了构建 CI 失败
+- **松果：**修复了异步内存的松果
 
-**Improvements:**
-- **Documentation:** 
-  - Updated changelog
-  - Fixed example in quickstart page
-  - Updated client.update() method documentation in OpenAPI specification
-- **OpenSearch:** Updated logger warning
+</更新>
 
-**Bug Fixes:**
-- **CI:** Fixed failing CI pipeline
+<更新标签=“2025-06-14”描述=“v0.1.108”>
 
-</Update>
+**新功能：**
+- **MongoDB：** 添加了 MongoDB 矢量存储支持
+- **客户端：**添加了对摘要功能的客户端支持**改进：**
+- **松果：**修复了松果版本问题
+- **OpenSearch：** 添加了记录器支持
+- **测试：**添加了python版本测试环境
 
-<Update label="2025-06-19" description="v0.1.109">
+</更新>
 
-**New Features:**
-- **AgentOps:** Added AgentOps integration
-- **LM Studio:** Added response_format parameter for LM Studio configuration
-- **Examples:** Added Memory agent powered by voice (Cartesia + Agno)
+<更新标签=“2025-06-11”描述=“v0.1。107">
 
-**Improvements:**
-- **AI SDK:** Added output_format parameter
-- **Client:** Enhanced update method to support metadata
-- **Google:** Added Google Genai library support
+**改进：**
+- **文档：**
+  - 更新了 Livekit 文档迁移
+  - 更新了 OpenMemory 托管版本文档
+- **核心：**更新的分类流程
+- **存储：**修复了迁移问题
 
-**Bug Fixes:**
-- **Build:** Fixed Build CI failure
-- **Pinecone:** Fixed pinecone for async memory
+</更新>
 
-</Update>
+<更新标签=“2025-06-09”描述=“v0.1.106”>
 
-<Update label="2025-06-14" description="v0.1.108">
+**新功能：**
+- **Cloudflare：** 添加了 Cloudflare 矢量存储支持
+- **搜索：**为搜索功能添加了阈值参数
+- **API：** 添加了对 v2 内存 API 的通配符支持**改进：**
+- **文档：**更新了 OpenMemory 环境设置的自述文档
+- **核心：** 添加了对唯一用户 ID 的支持
 
-**New Features:**
-- **MongoDB:** Added MongoDB Vector Store support
-- **Client:** Added client support for summary functionality
+**错误修复：**
+- **核心：**修复错误处理异常
 
-**Improvements:**
-- **Pinecone:** Fixed pinecone version issues
-- **OpenSearch:** Added logger support
-- **Testing:** Added python version test environments
+</更新>
 
-</Update>
+<更新标签=“2025-06-03”描述=“v0.1.104”>
 
-<Update label="2025-06-11" description="v0.1.107">
+**错误修复：**
+- **矢量存储：** 修复了 FAISS 和 OpenSearch 的 GET_ALL 功能
 
-**Improvements:**
-- **Documentation:**
-  - Updated Livekit documentation migration
-  - Updated OpenMemory hosted version documentation
-- **Core:** Updated categorization flow
-- **Storage:** Fixed migration issues
+</更新>
 
-</Update>
+<更新标签=“2025-06-02”描述=“v0.1.103”>
 
-<Update label="2025-06-09" description="v0.1.106">
+**新功能：**
+- **LLM：** 添加了对具有 baseUrl 配置的 OpenAI 兼容 LLM 提供商的支持
 
-**New Features:**
-- **Cloudflare:** Added Cloudflare vector store support
-- **Search:** Added threshold parameter to search functionality
-- **API:** Added wildcard character support for v2 Memory APIs
+**改进：**
+- **文档：**
+  - 修复了损坏的链接
+  - 改进的图形内存功能文档清晰度
+  - 更新了enable_graph文档
+- **TypeScript SDK：**更新了 Google SDK 对等依赖版本
+- **客户端：**添加了异步模式参数
 
-**Improvements:**
-- **Documentation:** Updated README docs for OpenMemory environment setup
-- **Core:** Added support for unique user IDs
+</更新>
 
-**Bug Fixes:**
-- **Core:** Fixed error handling exceptions
+<更新标签=“2025-05-26”描述=“v0.1。102">
 
-</Update>
+**新功能：**
+- **示例：**添加了 Neo4j 示例
+- **AI SDK：** 添加了 Google 提供商支持
+- **OpenMemory：** 添加了 LLM 和嵌入提供商支持**改进：**
+- **文档：**
+  - 更新了内存导出文档
+  - 增强的基于角色的内存归因规则文档
+  - 更新了 API 参考和消息文档
+  - 添加了 Mastra 和 Raycast 文档
+  - 为 Search 和 GetAll V2 添加了 NOT 过滤器文档
+  - 宣布支持克劳德 4
+- **核心：**
+  - 删除了对在 client.add() 中传递字符串作为输入的支持
+  - 添加了对 sarvam-m 模型的支持
+- **TypeScript SDK：** 消息接口中的固定类型**错误修复：**
+- **内存：**当不存在新事实时，防止将提示工件保存为内存
+- **OpenMemory：**修复了 MCP 工具描述中的拼写错误
 
-<Update label="2025-06-03" description="v0.1.104">
+</更新>
 
-**Bug Fixes:**
-- **Vector Stores:** Fixed GET_ALL functionality for FAISS and OpenSearch
+<更新标签=“2025-05-15”描述=“v0.1。101">
 
-</Update>
+**新功能：**
+- **Neo4j：** 添加了基本标签配置支持
 
-<Update label="2025-06-02" description="v0.1.103">
+**改进：**
+- **文档：**
+  - 更新了医疗保健示例索引
+  - 增强协作任务代理文档的清晰度
+  - 添加了基于条件的过滤文档
+- **OpenMemory：** 添加了 cURL 命令以方便安装
+- **构建：** 迁移到 Hatch 构建系统
 
-**New Features:**
-- **LLM:** Added support for OpenAI compatible LLM providers with baseUrl configuration
+</更新>
 
-**Improvements:**
-- **Documentation:**
-  - Fixed broken links
-  - Improved Graph Memory features documentation clarity
-  - Updated enable_graph documentation
-- **TypeScript SDK:** Updated Google SDK peer dependency version
-- **Client:** Added async mode parameter
+<更新标签=“2025-05-10”描述=“v0.1.100”>**新功能：**
+- **内存：**添加了群聊内存功能支持
+- **示例：** 使用 Mem0 和 Google ADK 添加医疗保健助手
 
-</Update>
+**错误修复：**
+- **SSE：**修复了SSE连接问题
+- **MCP：** 修复了从仪表板添加的 MCP 客户端中未出现的记忆
 
-<Update label="2025-05-26" description="v0.1.102">
+</更新>
 
-**New Features:**
-- **Examples:** Added Neo4j example
-- **AI SDK:** Added Google provider support
-- **OpenMemory:** Added LLM and Embedding Providers support
+<更新标签=“2025-05-07”描述=“v0.1.99”>
 
-**Improvements:**
-- **Documentation:**
-  - Updated memory export documentation
-  - Enhanced role-based memory attribution rules documentation
-  - Updated API reference and messages documentation
-  - Added Mastra and Raycast documentation
-  - Added NOT filter documentation for Search and GetAll V2
-  - Announced Claude 4 support
-- **Core:**
-  - Removed support for passing string as input in client.add()
-  - Added support for sarvam-m model
-- **TypeScript SDK:** Fixed types from message interface
+**新功能：**
+- **OpenMemory：** 添加了 OpenMemory 支持
+- **Neo4j：** 为 Neo4j 模型添加了权重
+- **AWS：** 添加了对 Opsearch Serverless 的支持
+- **示例：** 添加了 ElizaOS 示例
 
-**Bug Fixes:**
-- **Memory:** Prevented saving prompt artifacts as memory when no new facts are present
-- **OpenMemory:** Fixed typos in MCP tool description
+**改进：**
+- **文档：**更新了 Azure AI 文档
+- **AI SDK：**添加了缺少的参数并更新了演示应用程序
+- **OSS：** 修复了 AOSS 和 AWS BedRock LLM
 
-</Update>
+</更新>
 
-<Update label="2025-05-15" description="v0.1.101">
+<更新标签=“2025-04-30”描述=“v0.1。98">
 
-**New Features:**
-- **Neo4j:** Added base label configuration support
+**新功能：**
+- **Neo4j：** 添加了对 Neo4j 数据库的支持
+- **AWS：** 添加了对 AWS Bedrock 嵌入的支持
 
-**Improvements:**
-- **Documentation:**
-  - Updated Healthcare example index
-  - Enhanced collaborative task agent documentation clarity
-  - Added criteria-based filtering documentation
-- **OpenMemory:** Added cURL command for easy installation
-- **Build:** Migrated to Hatch build system
+**改进：**
+- **客户端：**更新了delete_users()以使用V2 API端点
+- **文档：**更新了时间戳和双身份内存管理文档
+- **Neo4j：** 改进了 Neo4j 查询并删除了警告
+- **AI SDK：** 添加了对服务关闭时优雅失败的支持**错误修复：**
+- 修复了AI SDK过滤器
+- 修正了新记忆的错误类型
+- 修复了添加/更新内存时重复元数据的问题
 
-</Update>
+</更新>
 
-<Update label="2025-05-10" description="v0.1.100">
+<更新标签=“2025-04-23”描述=“v0.1.97”>
 
-**New Features:**
-- **Memory:** Added Group Chat Memory Feature support
-- **Examples:** Added Healthcare assistant using Mem0 and Google ADK
+**新功能：**
+- **HuggingFace：** 添加了对 HF 推理的支持
 
-**Bug Fixes:**
-- **SSE:** Fixed SSE connection issues
-- **MCP:** Fixed memories not appearing in MCP clients added from Dashboard
+**错误修复：**
+- 修复了 Mem0 的代理
 
-</Update>
+</更新><更新标签=“2025-04-16”描述=“v0.1.96”>
 
-<Update label="2025-05-07" description="v0.1.99">
+**新功能：**
+- **Vercel AI SDK：** 添加了图形内存支持
 
-**New Features:**
-- **OpenMemory:** Added OpenMemory support
-- **Neo4j:** Added weights to Neo4j model
-- **AWS:** Added support for Opsearch Serverless
-- **Examples:** Added ElizaOS Example
+**改进：**
+- **文档：**固定时间戳和自述文件链接
+- **客户端：**更新了 TS 客户端以使用正确的类型来删除用户
+- **依赖项：**从基础包中删除了不必要的依赖项
 
-**Improvements:**
-- **Documentation:** Updated Azure AI documentation
-- **AI SDK:** Added missing parameters and updated demo application
-- **OSS:** Fixed AOSS and AWS BedRock LLM
+</更新>
 
-</Update>
+<更新标签=“2025-04-09”描述=“v0.1。95">
 
-<Update label="2025-04-30" description="v0.1.98">
+**改进：**
+- **客户端：**修复了使用默认 org_id 和 project_id 的 Ping 方法
+- **文档：**更新文档
 
-**New Features:**
-- **Neo4j:** Added support for Neo4j database
-- **AWS:** Added support for AWS Bedrock Embeddings
+**错误修复：**
+- 修复了 mem0 迁移问题
 
-**Improvements:**
-- **Client:** Updated delete_users() to use V2 API endpoints
-- **Documentation:** Updated timestamp and dual-identity memory management docs
-- **Neo4j:** Improved Neo4j queries and removed warnings
-- **AI SDK:** Added support for graceful failure when services are down
+</更新>
 
-**Bug Fixes:**
-- Fixed AI SDK filters
-- Fixed new memories wrong type
-- Fixed duplicated metadata issue while adding/updating memories
+<更新标签=“2025-04-26”描述=“v0.1.94”>
 
-</Update>
+**新功能：**
+- **集成：** 添加了 Memgraph 集成
+- **内存：**添加了时间戳支持
+- **Vector Stores：** 添加了 VectorDB 的重置功能**改进：**
+- **文档：**
+  - 更新了时间戳和过期日期文档
+  - 修复了 v2 搜索文档
+  - 在 EC“自定义配置”部分添加了“内存”
+  - 修复了 json 配置示例中的拼写错误
 
-<Update label="2025-04-23" description="v0.1.97">
+</更新>
 
-**New Features:**
-- **HuggingFace:** Added support for HF Inference
+<更新标签=“2025-04-21”描述=“v0.1.93”>
 
-**Bug Fixes:**
-- Fixed proxy for Mem0
+**改进：**
+- **向量存储：** 在所有向量数据库中初始化 embedding_model_dims
 
-</Update>
+**错误修复：**
+- **文档：**修复了 agno 链接
 
-<Update label="2025-04-16" description="v0.1.96">
+</更新>
 
-**New Features:**
-- **Vercel AI SDK:** Added Graph Memory support
+<更新标签=“2025-04-18”描述=“v0.1。92">
 
-**Improvements:**
-- **Documentation:** Fixed timestamp and README links
-- **Client:** Updated TS client to use proper types for deleteUsers
-- **Dependencies:** Removed unnecessary dependencies from base package
+**新功能：**
+- **内存：**添加了内存重置功能
+- **客户端：** 添加了对自定义指令的支持
+- **示例：** 添加了由内存驱动的健身检查器
 
-</Update>
+**改进：**
+- **核心：**更新了 capture_event
+- **文档：** 修复了 v2 get_all 的卷曲
 
-<Update label="2025-04-09" description="v0.1.95">
+**错误修复：**
+- **矢量存储：** 修复了 user_id 功能
+- **客户端：** 各种客户端改进
 
-**Improvements:**
-- **Client:** Fixed Ping Method for using default org_id and project_id
-- **Documentation:** Updated documentation
+</更新>
 
-**Bug Fixes:**
-- Fixed mem0-migrations issue
+<更新标签=“2025-04-16”描述=“v0.1.91”>
 
-</Update>
+**新功能：**
+- **LLM 集成：** 添加了 Azure OpenAI 嵌入模型
+- **示例：**
+  - 添加了使用 grok3 的电影推荐
+  - 使用 Elevenlabs 添加了语音助手**改进：**
+- **文档：**
+  - 添加关键词AI
+  - 重新格式化导航栏页面 URL
+  - 更新了变更日志
+  - 更新了 openai.mdx
+- **FAISS：** 沉默的 FAISS 信息日志
 
-<Update label="2025-04-26" description="v0.1.94">
+</更新>
 
-**New Features:**
-- **Integrations:** Added Memgraph integration
-- **Memory:** Added timestamp support
-- **Vector Stores:** Added reset function for VectorDBs
+<更新标签=“2025-04-11”描述=“v0.1.90”>**新功能：**
+- **LLM 集成：** 添加 Mistral AI 作为 LLM 提供商
 
-**Improvements:**
-- **Documentation:**
-  - Updated timestamp and expiration_date documentation
-  - Fixed v2 search documentation
-  - Added "memory" in EC "Custom config" section
-  - Fixed typos in the json config sample
+**改进：**
+- **文档：**
+  - 更新了变更日志
+  - 修复了内存排除示例
+  - 更新了 xAI 文档
+  - 更新了 YouTube Chrome 扩展程序示例文档
 
-</Update>
+**错误修复：**
+- **核心：**修复了 GraphMemory 中的 EmbedderFactory.create()
+- **Azure OpenAI：** 添加了补丁来修复 Azure OpenAI
+- **遥测：**修复了遥测问题
 
-<Update label="2025-04-21" description="v0.1.93">
+</更新>
 
-**Improvements:**
-- **Vector Stores:** Initialized embedding_model_dims in all vectordbs
+<更新标签=“2025-04-11”描述=“v0.1。89">
 
-**Bug Fixes:**
-- **Documentation:** Fixed agno link
+**新功能：**
+- **Langchain 集成：** 添加了对 Langchain VectorStores 的支持
+- **示例：**
+  - 添加了个人助理示例
+  - 添加了个人学习伙伴示例
+  - 添加了 YouTube 助手 Chrome 扩展示例
+  - 添加了 agno 示例
+  - 更新了 OpenAI Responses API 示例
+- **矢量存储：** 添加了在矢量数据库中存储 user_id 的功能
+- **异步内存：**添加了对 OSS 的异步支持**改进：**
+- **文档：**更新了格式和示例
 
-</Update>
+</更新>
 
-<Update label="2025-04-18" description="v0.1.92">
+<更新标签=“2025-04-09”描述=“v0.1.87”>
 
-**New Features:**
-- **Memory:** Added Memory Reset functionality
-- **Client:** Added support for Custom Instructions
-- **Examples:** Added Fitness Checker powered by memory
+**新功能：**
+- **Upstash Vector：** 添加了对 Upstash Vector 商店的支持
 
-**Improvements:**
-- **Core:** Updated capture_event
-- **Documentation:** Fixed curl for v2 get_all
+**改进：**
+- **代码质量：**删除了多余的代码行
+- **构建：**更新了MAKEFILE
+- **文档：**更新了内存导出文档
 
-**Bug Fixes:**
-- **Vector Store:** Fixed user_id functionality
-- **Client:** Various client improvements
+</更新>
 
-</Update>
+<更新标签=“2025-04-07”描述=“v0.1.86”>
 
-<Update label="2025-04-16" description="v0.1.91">
+**改进：**
+- **FAISS：** 向 FAISS 矢量存储添加了 embedding_dims 参数
 
-**New Features:**
-- **LLM Integrations:** Added Azure OpenAI Embedding Model
-- **Examples:**
-  - Added movie recommendation using grok3
-  - Added Voice Assistant using Elevenlabs
+</更新>
 
-**Improvements:**
-- **Documentation:**
-  - Added keywords AI
-  - Reformatted navbar page URLs
-  - Updated changelog
-  - Updated openai.mdx
-- **FAISS:** Silenced FAISS info logs
+<更新标签=“2025-04-07”描述=“v0.1.84”>
 
-</Update>
+**新功能：**
+- **Langchain 嵌入器：** 添加了 Langchain 嵌入器集成
 
-<Update label="2025-04-11" description="v0.1.90">
+**改进：**
+- **Langchain LLM：**更新了Langchain LLM集成以直接传递Langchain对象LLM
+</更新>
 
-**New Features:**
-- **LLM Integrations:** Added Mistral AI as LLM provider
+<更新标签=“2025-04-07”描述=“v0.1。83">
 
-**Improvements:**
-- **Documentation:**
-  - Updated changelog
-  - Fixed memory exclusion example
-  - Updated xAI documentation
-  - Updated YouTube Chrome extension example documentation
+**错误修复：**
+- **Langchain LLM：** 修复了 Langchain LLM 集成的问题
+</更新>
 
-**Bug Fixes:**
-- **Core:** Fixed EmbedderFactory.create() in GraphMemory
-- **Azure OpenAI:** Added patch to fix Azure OpenAI
-- **Telemetry:** Fixed telemetry issue
+<更新标签=“2025-04-07”描述=“v0.1.82”>**新功能：**
+- **LLM 集成：** 添加了对 Langchain LLM、Google 作为新的 LLM 和嵌入器的支持
+- **开发：**添加了开发docker compose**改进：**
+- **输出格式：** 设置output_format='v1.1'并更新文档
 
-</Update>
+**文件：**
+- **集成：**添加了 LMStudio 和 Together.ai 文档
+- **API参考：**更新了output_format文档
+- **集成：** 添加了 PipeCat 集成文档
+- **集成：** 添加了 Mem0 内存设置的 Flowise 集成文档
 
-<Update label="2025-04-11" description="v0.1.89">
+**错误修复：**
+- **测试：**修复了失败的单元测试
+</更新>
 
-**New Features:**
-- **Langchain Integration:** Added support for Langchain VectorStores
-- **Examples:**
-  - Added personal assistant example
-  - Added personal study buddy example
-  - Added YouTube assistant Chrome extension example
-  - Added agno example
-  - Updated OpenAI Responses API examples
-- **Vector Store:** Added capability to store user_id in vector database
-- **Async Memory:** Added async support for OSS
+<更新标签=“2025-04-02”描述=“v0.1.79”>
 
-**Improvements:**
-- **Documentation:** Updated formatting and examples
+**新功能：**
+- **FAISS 支持：** 添加了 FAISS 矢量存储支持
 
-</Update>
+</更新>
 
-<Update label="2025-04-09" description="v0.1.87">
+<更新标签=“2025-04-02”描述=“v0.1。78">
 
-**New Features:**
-- **Upstash Vector:** Added support for Upstash Vector store
+**新功能：**
+- **Livekit 集成：** 添加了 Mem0 livekit 示例
+- **评估：**添加了评估框架和工具
 
-**Improvements:**
-- **Code Quality:** Removed redundant code lines
-- **Build:** Updated MAKEFILE
-- **Documentation:** Updated memory export documentation
+**文件：**
+- **多式联运：**更新了多式联运文档
+- **示例：** 添加了电子邮件处理示例
+- **API 参考：** 更新了 API 参考部分
+- **Elevenlabs：** 添加了 Elevenlabs 集成示例**错误修复：**
+- **OpenAI 环境变量：** 修复了 OpenAI 环境变量的问题
+- **部署错误：** 添加了 `package.json` 文件来修复部署错误
+- **工具：**修复了工具问题并改进了格式
+- **文档：** 更新了“到期日期”的 API 参考部分
+</更新>
 
-</Update>
+<更新标签=“2025-03-26”描述=“v0.1.77”>
 
-<Update label="2025-04-07" description="v0.1.86">
+**错误修复：**
+- **OpenAI 环境变量：** 修复了 OpenAI 环境变量的问题
+- **部署错误：** 添加了 `package.json` 文件来修复部署错误
+- **工具：**修复了工具问题并改进了格式
+- **文档：** 更新了“到期日期”的 API 参考部分
+</更新>
 
-**Improvements:**
-- **FAISS:** Added embedding_dims parameter to FAISS vector store
+<更新标签=“2025-03-19”描述=“v0.1。76">
+**新功能：**
+- **Supabase Vector Store：** 添加了对 Supabase Vector Store 的支持
+- **Supabase 历史数据库：** 添加了 Supabase 历史数据库以在无服务器上运行 Mem0 OSS
+- **反馈方式：** 向客户端添加反馈方式**错误修复：**
+- **Azure OpenAI：** 修复了 Azure OpenAI 的问题
+- **Azure AI 搜索：** 修复了 Azure AI 搜索的测试用例
+</更新>
 
-</Update>
+</标签>
 
-<Update label="2025-04-07" description="v0.1.84">
+<选项卡标题=“TypeScript”>
+<更新标签=“2026-04-25”描述=“v3.0.2”>**错误修复：**
+- **LLM：** 将“timeout”配置转发到 JS OSS LLM 提供程序中的 OpenAI 客户端（[#4770](https://github.com/mem0ai/mem0/pull/4770)）
 
-**New Features:**
-- **Langchain Embedder:** Added Langchain embedder integration
+**改进：**
+- **遥测：** 强化 TS 遥测版本注入并要求在版本更新时输入更改日志 ([#4900](https://github.com/mem0ai/mem0/pull/4900))
+- **文档：**更新内存工具列表、CLI 使用和配置文件读取逻辑 ([#4861](https://github.com/mem0ai/mem0/pull/4861))
 
-**Improvements:**
-- **Langchain LLM:** Updated Langchain LLM integration to directly pass the Langchain object LLM
-</Update>
+</更新>
 
-<Update label="2025-04-07" description="v0.1.83">
+<更新标签=“2026-04-20”描述=“v3.0.1”>
 
-**Bug Fixes:**
-- **Langchain LLM:** Fixed issues with Langchain LLM integration
-</Update>
+**错误修复：**
+- **遥测：** SDK版本现在通过esbuild的`define`在构建时注入到遥测中，替换`src/client/telemetry.ts`和`src/oss/src/utils/telemetry.ts`中的两个硬编码版本字符串。以前，这些版本卡在“2.1.36”和“2.1.34”，而发布的包位于“3.x”，因此每个遥测事件都报告错误的“client_version”。占位符在捆绑时被替换为字符串文字 - 交付的捆绑中没有运行时 `require("./package.json")` ([#4897](https://github.com/mem0ai/mem0/pull/4897))。
 
-<Update label="2025-04-07" description="v0.1.82">
-
-**New Features:**
-- **LLM Integrations:** Added support for Langchain LLMs, Google as new LLM and embedder
-- **Development:** Added development docker compose
-
-**Improvements:**
-- **Output Format:** Set output_format='v1.1' and updated documentation
-
-**Documentation:**
-- **Integrations:** Added LMStudio and Together.ai documentation
-- **API Reference:** Updated output_format documentation
-- **Integrations:** Added PipeCat integration documentation
-- **Integrations:** Added Flowise integration documentation for Mem0 memory setup
-
-**Bug Fixes:**
-- **Tests:** Fixed failing unit tests
-</Update>
-
-<Update label="2025-04-02" description="v0.1.79">
-
-**New Features:**
-- **FAISS Support:** Added FAISS vector store support
-
-</Update>
-
-<Update label="2025-04-02" description="v0.1.78">
-
-**New Features:**
-- **Livekit Integration:** Added Mem0 livekit example
-- **Evaluation:** Added evaluation framework and tools
-
-**Documentation:**
-- **Multimodal:** Updated multimodal documentation
-- **Examples:** Added examples for email processing
-- **API Reference:** Updated API reference section
-- **Elevenlabs:** Added Elevenlabs integration example
-
-**Bug Fixes:**
-- **OpenAI Environment Variables:** Fixed issues with OpenAI environment variables
-- **Deployment Errors:** Added `package.json` file to fix deployment errors
-- **Tools:** Fixed tools issues and improved formatting
-- **Docs:** Updated API reference section for `expiration date`
-</Update>
-
-<Update label="2025-03-26" description="v0.1.77">
-
-**Bug Fixes:**
-- **OpenAI Environment Variables:** Fixed issues with OpenAI environment variables
-- **Deployment Errors:** Added `package.json` file to fix deployment errors
-- **Tools:** Fixed tools issues and improved formatting
-- **Docs:** Updated API reference section for `expiration date`
-</Update>
-
-<Update label="2025-03-19" description="v0.1.76">
-**New Features:**
-- **Supabase Vector Store:** Added support for Supabase Vector Store
-- **Supabase History DB:** Added Supabase History DB to run Mem0 OSS on Serverless
-- **Feedback Method:** Added feedback method to client
-
-**Bug Fixes:**
-- **Azure OpenAI:** Fixed issues with Azure OpenAI
-- **Azure AI Search:** Fixed test cases for Azure AI Search
-</Update>
-
-</Tab>
-
-<Tab title="TypeScript">
-<Update label="2026-04-25" description="v3.0.2">
-
-**Bug Fixes:**
-- **LLMs:** Forward `timeout` config to OpenAI client in JS OSS LLM providers ([#4770](https://github.com/mem0ai/mem0/pull/4770))
-
-**Improvements:**
-- **Telemetry:** Harden TS telemetry version injection and require changelog entry on version bump ([#4900](https://github.com/mem0ai/mem0/pull/4900))
-- **Docs:** Update memory tool list, CLI usage, and config file reading logic ([#4861](https://github.com/mem0ai/mem0/pull/4861))
-
-</Update>
-
-<Update label="2026-04-20" description="v3.0.1">
-
-**Bug Fixes:**
-- **Telemetry:** SDK version is now injected into telemetry at build time via esbuild's `define`, replacing the two hardcoded version strings in `src/client/telemetry.ts` and `src/oss/src/utils/telemetry.ts`. Previously these were stuck at `2.1.36` and `2.1.34` while the published package was on `3.x`, so every telemetry event was reporting the wrong `client_version`. The placeholder is substituted with a string literal at bundle time — no runtime `require("./package.json")` in the shipped bundle ([#4897](https://github.com/mem0ai/mem0/pull/4897)).
-
-</Update>
-
-<Update label="2026-04-14" description="v3.0.0">
-
-**Major Release** — TypeScript SDK with V3 memory pipeline, camelCase parameters, and cleaned-up API surface.
-
-**V3 Memory Pipeline (OSS):**
-- **Single-Pass Extraction:** Additive extraction pipeline aligned with Python SDK — memories accumulate, no UPDATE/DELETE events ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **Entity Extraction & Linking:** New `entity_extraction.ts` module (720+ lines) with cross-memory relationship retrieval ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **Message Persistence:** SQLite-based message history via new `SQLiteManager.ts` with rolling window for LLM context ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **Batch Embeddings:** `embedBatch()` support in OpenAI and Azure embedding providers ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **Scoring & Lemmatization:** New `scoring.ts` and `lemmatization.ts` utilities for hybrid search ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **New Prompts:** `prompts/index.ts` (592+ lines) with additive extraction prompt aligned with Python SDK ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **V3 API Endpoints:** `MemoryClient.add()` now posts to `/v3/memories/add/`; `MemoryClient.getAll()` posts to `/v3/memories/` with paginated envelope `{ count, next, previous, results }` ([#4856](https://github.com/mem0ai/mem0/pull/4856))
-- **Default model:** `gpt-5-mini` is now the default in `OpenAI`, `OpenAIStructured`, and `Azure` LLM providers ([#4829](https://github.com/mem0ai/mem0/pull/4829))
-
-**Breaking Changes:**
-- **Graph Memory Removed (OSS):** `graph_memory.ts` (675 lines), `graphs/tools.ts` (267 lines), `graphs/utils.ts` (116 lines), `graphs/configs.ts` (30 lines) deleted. Graph memory is no longer supported in the OSS SDK — use Platform API for graph features ([#4805](https://github.com/mem0ai/mem0/pull/4805))
-- **camelCase Parameters (Client SDK):** All user-facing parameters converted from snake_case to camelCase. Mapping is transparent at API boundary via `camelToSnakeKeys()` / `snakeToCamelKeys()` ([#4776](https://github.com/mem0ai/mem0/pull/4776))
-  ```typescript
+</更新><更新标签=“2026-04-14”描述=“v3.0.0”>**主要版本** — TypeScript SDK 具有 V3 内存管道、camelCase 参数和清理的 API 表面。**V3 内存管道 (OSS)：**
+- **单通道提取：** 与 Python SDK 一致的附加提取管道 - 内存累积，无更新/删除事件 ([#4805](https://github.com/mem0ai/mem0/pull/4805))
+- **实体提取和链接：**新的`entity_extraction.ts`模块（720多行）具有跨内存关系检索（[#4805](https://github.com/mem0ai/mem0/pull/4805)）
+- **消息持久化：** 通过新的 `SQLiteManager.ts` 实现基于 SQLite 的消息历史记录，并带有 LLM 上下文的滚动窗口 ([#4805](https://github.com/mem0ai/mem0/pull/4805))
+- **批量嵌入：** OpenAI 和 Azure 嵌入提供程序中的 `embedBatch()` 支持 ([#4805](https://github.com/mem0ai/mem0/pull/4805))
+- **评分和词形还原：** 用于混合搜索的新 `scoring.ts` 和 `lemmatization.ts` 实用程序 ([#4805](https://github.com/mem0ai/mem0/pull/4805))
+- **新提示：** `prompts/index.htmlts`（592 多行），具有与 Python SDK 一致的附加提取提示（[#4805](https://github.com/mem0ai/mem0/pull/4805)）
+- **V3 API 端点：** `MemoryClient.add()` 现在发布到 `/v3/memories/add/`； `MemoryClient.getAll()` 使用分页信封 `{ count, next, previous, results }` 发布到 `/v3/memories/` ([#4856](https://github.com/mem0ai/mem0/pull/4856))
+- **默认模型：** `gpt-5-mini` 现在是 `OpenAI`、`OpenAIStructured` 和 `Azure` LLM 提供商的默认模型 ([#4829](https://github.com/mem0ai/mem0/pull/4829))**重大变更：**
+- **图形内存删除（OSS）：** `graph_memory.ts`（675行），`graphs/tools.ts`（267行），`graphs/utils.ts`（116行），`graphs/configs.ts`（30行）被删除。 OSS SDK 不再支持图形内存 - 使用平台 API 来实现图形功能 ([#4805](https://github.com/mem0ai/mem0/pull/4805))
+- **camelCase 参数（客户端 SDK）：** 所有面向用户的参数都从 Snake_case 转换为 CamelCase。通过 `camelToSnakeKeys()` / `snakeToCamelKeys()` 在 API 边界映射是透明的 ([#4776](https://github.com/mem0ai/mem0/pull/4776))  ```typescript
   // Before
   client.add(messages, { user_id: "alice", top_k: 5 });
   // After
-  client.add(messages, { userId: "alice", topK: 5 });
-  ```
-- **Per-Method Option Types:** Replaced monolithic `MemoryOptions` with typed interfaces: `AddMemoryOptions`, `SearchMemoryOptions`, `GetAllMemoryOptions`, `DeleteAllMemoryOptions` ([#4740](https://github.com/mem0ai/mem0/pull/4740))
-- **Removed Deprecated Parameters:** `org_id`, `project_id`, `api_version`, `output_format`, `async_mode`, `enable_graph`, `limit` removed from client method signatures. `ClientOptions` reduced to `{ apiKey, host }` only ([#4740](https://github.com/mem0ai/mem0/pull/4740))
-- **`limit` renamed to `topK` (OSS):** Update all search calls ([#4740](https://github.com/mem0ai/mem0/pull/4740))
-- **`topK` default changed 100 → 20** in `Memory.getAll()` and `Memory.search()`. Pass `topK: 100` explicitly to restore the old behavior ([#4843](https://github.com/mem0ai/mem0/pull/4843))
-- **Entity ID validation:** `userId` / `agentId` / `runId` are trimmed; empty-string and whitespace-only values now throw ([#4843](https://github.com/mem0ai/mem0/pull/4843))
-- **Search params validation:** `threshold` must be in `[0, 1]`; `topK` must be a non-negative integer — invalid inputs throw ([#4843](https://github.com/mem0ai/mem0/pull/4843))
-- **`messages` in `Memory.add()` is required:** Passing `undefined` or `null` now throws ([#4843](https://github.com/mem0ai/mem0/pull/4843))
-- **`customPrompt` renamed to `customInstructions` (OSS):** Update memory and vector store configurations ([#4740](https://github.com/mem0ai/mem0/pull/4740))
-- **`enableGraph` removed (OSS):** Config option removed — graph memory no longer available in OSS ([#4776](https://github.com/mem0ai/mem0/pull/4776))
+  client.add(messages, { userId: "alice", topK: 5 });  ```
+- **每方法选项类型：** 用类型化接口替换了整体的 `MemoryOptions`：`AddMemoryOptions`、`SearchMemoryOptions`、`GetAllMemoryOptions`、`DeleteAllMemoryOptions` ([#4740](https://github.com/mem0ai/mem0/pull/4740))
+- **删除了已弃用的参数：** 从客户端方法签名中删除了“org_id”、“project_id”、“api_version”、“output_format”、“async_mode”、“enable_graph”、“limit”。 `ClientOptions` 减少为仅 `{ apiKey, host }` ([#4740](https://github.com/mem0ai/mem0/pull/4740))
+- **`limit` 重命名为 `topK` (OSS)：** 更新所有搜索调用 ([#4740](https://github.com/mem0ai/mem0/pull/4740))
+- **`Memory.getAll()` 和 `Memory.search()` 中`topK` 默认值更改为 100 → 20**。显式传递 `topK: 100` 以恢复旧行为 ([#4843](https://github.com/mem0ai/mem0/pull/4843))
+- **实体 ID 验证：** `userId` / `agentId` / `runId` 被修剪；空字符串和仅空白值现在抛出 ([#4843](https://github.com/mem0ai/mem0/pull/4843))
+- **搜索参数验证：** `threshold` 必须在 `[0, 1]` 中； `topK` 必须是非负整数 - 无效输入抛出 ([#4843](https://github.com/mem0ai/mem0/pull/4843))
+- **需要 `Memory.add()` 中的`messages`：** 传递 `undefined` 或 `null` 现在会抛出异常 ([#4843](https://github.com/mem0ai/mem0/pull/4843))
+- **`customPrompt` 重命名为 `customInstructions` (OSS)：** 更新内存和向量存储配置 ([#4740](https://github.com/mem0ai/mem0/pull/4740))
+- **`enableGraph` 已删除 (OSS)：** 已删除配置选项 — OSS 中不再提供图形内存 ([#4776](https://github.com/mem0ai/mem0/pull/4776))**新功能：**
+- **LLM：** 使用自定义 baseURL 添加了具有 OpenAI 兼容集成的 DeepSeek LLM 提供程序到 `api.deepseek.com` ([#4613](https://github.com/mem0ai/mem0/pull/4613))
+- **实体存储隔离：** `MemoryVectorStore` 现在使用专用的 `_entities.db` 文件，防止实体/内存存储冲突（[#4829](https://github.com/mem0ai/mem0/pull/4829)、[#4841](https://github.com/mem0ai/mem0/pull/4841))
+- **有效负载向后兼容性：** 传统的camelCase有效负载密钥在读取时标准化为snake_case（[#4841]（https://github.com/mem0ai/mem0/pull/4841））**错误修复：**
+- **V3迁移：**修复了OSS迁移路径中的崩溃问题；实体链接端到端工作（[#4836](https://github.com/mem0ai/mem0/pull/4836)）
+- **PGVector 初始化竞赛：** `PGVector.initialize()` 现在会记住运行中的初始化承诺 ([#4841](https://github.com/mem0ai/mem0/pull/4841))
+- **Redis 模块检测：** 处理 node-redis v4+ 和旧版 `moduleList` 响应形状 ([#4841](https://github.com/mem0ai/mem0/pull/4841))
+- **配置：** 修复了 `ConfigManager.mergeConfig()` 以仅在用户明确提供时包含 `graphStore`，从而防止默认的 Neo4j 连接尝试 ([#4776](https://github.com/mem0ai/mem0/pull/4776))
+- **LLM：** 配置管理器现在回退到 `baseURL` 的 `userConf.url` — 防止自定义 LLM 提供程序（Ollama、LMStudio）静默连接到 OpenAI ([#4761](https://github.com)com/mem0ai/mem0/pull/4761))
 
-**New Features:**
-- **LLMs:** Added DeepSeek LLM provider with OpenAI-compatible integration using custom baseURL to `api.deepseek.com` ([#4613](https://github.com/mem0ai/mem0/pull/4613))
-- **Entity store isolation:** `MemoryVectorStore` now uses a dedicated `_entities.db` file, preventing entity/memory store collisions ([#4829](https://github.com/mem0ai/mem0/pull/4829), [#4841](https://github.com/mem0ai/mem0/pull/4841))
-- **Payload backward compatibility:** Legacy camelCase payload keys normalized to snake_case on read ([#4841](https://github.com/mem0ai/mem0/pull/4841))
+**改进：**
+- **遥测：** 以 10% 采样 OSS 热路径事件，以减少 PostHog 事件量 ([#4771](https://github.com/mem0ai/mem0/pull/4771))
 
-**Bug Fixes:**
-- **V3 migration:** Fixed crashes in the OSS migration path; entity linking works end-to-end ([#4836](https://github.com/mem0ai/mem0/pull/4836))
-- **PGVector init race:** `PGVector.initialize()` now memoises the in-flight init promise ([#4841](https://github.com/mem0ai/mem0/pull/4841))
-- **Redis module detection:** Handles both node-redis v4+ and legacy `moduleList` response shapes ([#4841](https://github.com/mem0ai/mem0/pull/4841))
-- **Config:** Fixed `ConfigManager.mergeConfig()` to only include `graphStore` when explicitly provided by user, preventing default Neo4j connection attempts ([#4776](https://github.com/mem0ai/mem0/pull/4776))
-- **LLMs:** Config manager now falls back to `userConf.url` for `baseURL` — prevents custom LLM providers (Ollama, LMStudio) from silently connecting to OpenAI ([#4761](https://github.com/mem0ai/mem0/pull/4761))
+请参阅 [TypeScript SDK 迁移指南](https://docs.mem0.ai/migration/ts-v2-to-v3) 了解升级说明。
 
-**Improvements:**
-- **Telemetry:** Sample OSS hot-path events at 10% to reduce PostHog event volume ([#4771](https://github.com/mem0ai/mem0/pull/4771))
+</更新>
 
-See the [TypeScript SDK migration guide](https://docs.mem0.ai/migration/ts-v2-to-v3) for upgrade instructions.
+<更新标签=“2026-04-06”描述=“v2.4.6”>**新功能和更新：**
+- **客户端：** 在项目更新类型中添加了“多语言”参数（[#4314](https://github.com/mem0ai/mem0/pull/4314)）
 
-</Update>
+</更新>
 
-<Update label="2026-04-06" description="v2.4.6">
+<更新标签=“2026-04-01”描述=“v2.4.5”>
 
-**New Features & Updates:**
-- **Client:** Added `multilingual` parameter to project update types ([#4314](https://github.com/mem0ai/mem0/pull/4314))
+**错误修复：**
+- **OSS：** 将 SupabaseDB.get() 中的 `.single()` 替换为 `.maybeSingle()` 以处理丢失的行 ([#4599](https://github.com/mem0ai/mem0/pull/4599))
+- **嵌入：** 将维度参数传递给 OpenAI 嵌入 API ([#4632](https://github.com/mem0ai/mem0/pull/4632))
+- **OSS：** 在事实检索中从喋喋不休的 LLM 响应中提取 JSON ([#4533](https://github.com/mem0ai/mem0/pull/4533))
 
-</Update>
+</更新>
 
-<Update label="2026-04-01" description="v2.4.5">
+<更新标签=“2026-03-28”描述=“v2.4.4”>
 
-**Bug Fixes:**
-- **OSS:** Replace `.single()` with `.maybeSingle()` in SupabaseDB.get() to handle missing rows ([#4599](https://github.com/mem0ai/mem0/pull/4599))
-- **Embeddings:** Pass dimensions parameter to OpenAI embeddings API ([#4632](https://github.com/mem0ai/mem0/pull/4632))
-- **OSS:** Extract JSON from chatty LLM responses in fact retrieval ([#4533](https://github.com/mem0ai/mem0/pull/4533))
+**错误修复：**
+- **OSS：** 当 URL 没有显式端口时，通过默认端口 6333 修复了 Qdrant Cloud“非法主机”错误 ([#4565](https://github.com)com/mem0ai/mem0/pull/4565))
 
-</Update>
+</更新>
 
-<Update label="2026-03-28" description="v2.4.4">
+<更新标签=“2026-03-26”描述=“v2.4.3”>
 
-**Bug Fixes:**
-- **OSS:** Fixed Qdrant Cloud "Illegal host" error by defaulting to port 6333 when URL has no explicit port ([#4565](https://github.com/mem0ai/mem0/pull/4565))
+**新功能和更新：**
+- **OSS：** 添加了对 NodeJS OSS `VectorStoreFactory` 的 pgvector 支持 ([#3997](https://github.com/mem0ai/mem0/pull/3997))**错误修复：**
+- **OSS：** 使 pgvector `pg` 导入与 ESM 兼容（[#4544](https://github.com/mem0ai/mem0/pull/4544)）
+- **OSS：** 在 `VectorStoreFactory` 中注册了 pgvector ([#4502](https://github.com/mem0ai/mem0/pull/4502))
+- **OSS：** 使用根 LLM 配置作为图形存储的后备，而不是硬编码 OpenAI 默认值 ([#4466](https://github.com/mem0ai/mem0/pull/4466))
+- **OSS：** 修复了有效负载的 Redis `get` 方法中的 `toCamelCase` ([#3172](https://github.com/mem0ai/mem0/pull/3172))
+- **客户端：**修复了 Zod 架构与 OpenAI 结构化输出 API 的不兼容性（[#3462](https://github.com/mem0ai/mem0/pull/3462)）
 
-</Update>
+</更新>
 
-<Update label="2026-03-26" description="v2.4.3">
+<更新标签=“2026-03-19”描述=“v2.4。2">
 
-**New Features & Updates:**
-- **OSS:** Added pgvector support to NodeJS OSS `VectorStoreFactory` ([#3997](https://github.com/mem0ai/mem0/pull/3997))
+**错误修复：**
+- **客户端：**修复了 webhook `createWebhook` 和 `updateWebhook` API 序列化
+- **客户端：**将缺少的“MEMORY_CATEGORIZED”事件类型添加到“WebhookEvent”枚举中
+- **类型：** 添加了 `WebhookCreatePayload` 和 `WebhookUpdatePayload` 以提高类型安全性**测试：**
+- 为平台客户端添加了端到端单元测试覆盖范围 - CRUD、批处理、搜索、webhooks、用户、项目和初始化 (#4357)
+- 添加了针对内存 CRUD、批量操作、搜索、用户管理、项目配置和 webhook 生命周期的真实 API 集成测试 (#4395)
+- 删除了过时的 e2e 测试文件，替换为新的结构化测试套件 (#4419)
 
-**Bug Fixes:**
-- **OSS:** Made pgvector `pg` import compatible with ESM ([#4544](https://github.com/mem0ai/mem0/pull/4544))
-- **OSS:** Registered pgvector in `VectorStoreFactory` ([#4502](https://github.com/mem0ai/mem0/pull/4502))
-- **OSS:** Used root LLM config as fallback for graph store instead of hardcoded OpenAI default ([#4466](https://github.com/mem0ai/mem0/pull/4466))
-- **OSS:** Fixed `toCamelCase` in Redis `get` method for the payload ([#3172](https://github.com/mem0ai/mem0/pull/3172))
-- **Client:** Fixed Zod Schema incompatibility with OpenAI Structured Outputs API ([#3462](https://github.com/mem0ai/mem0/pull/3462))
+</更新>
 
-</Update>
+<更新标签=“2026-03-16”描述=“v2.4.1”>
 
-<Update label="2026-03-19" description="v2.4.2">
+**错误修复：**
+- **核心：** 修复了代码块内容提取 - 代码块内的内容现在可以正确提取而不是被删除（#4317）
 
-**Bug Fixes:**
-- **Client:** Fixed webhook `createWebhook` and `updateWebhook` API serialization
-- **Client:** Added missing `MEMORY_CATEGORIZED` event type to `WebhookEvent` enum
-- **Types:** Added `WebhookCreatePayload` and `WebhookUpdatePayload` for better type safety
+**改进：**
+- **代码质量：** 修复了 SDK 中的 linting 问题 (#4334)
 
-**Tests:**
-- Added end-to-end unit test coverage for the platform client — CRUD, batch, search, webhooks, users, project, and initialization (#4357)
-- Added real API integration tests for memory CRUD, batch operations, search, user management, project configuration, and webhook lifecycle (#4395)
-- Deleted obsolete e2e test files replaced by the new structured test suite (#4419)
+</更新>
 
-</Update>
+<更新标签=“2026-03-14”描述=“v2.4.0”>**错误修复：**
+- **OSS 存储：** 修复了作为 LaunchAgent、systemd 服务运行或在“process.cwd()”为只读（例如“/”）的容器中运行时出现的“SQLITE_CANTOPEN”错误。默认 `vector_store.db` 位置从 `process.cwd()/vector_store.db` 更改为 `~/.mem0/vector_store.db`。
+- **OSS 存储：** 修复了被默默忽略的 `historyDbPath` 配置 — 配置合并总是用默认值覆盖它。顶级“historyDbPath”现在已正确传播到“historyStore.config”并具有适当的优先级。
+- **OSS 存储：** 添加了 `ensureSQLiteDirectory()` — SQLite 数据库文件的父目录现在会在打开之前自动创建，从而在使用嵌套路径时防止出现 `SQLITE_CANTOPEN`。
 
-<Update label="2026-03-16" description="v2.4.1">
+**改进：**
+- **迁移：**当在旧的“process.cwd()”位置找到现有的“vector_store.db”时添加弃用警告，指导用户移动它或设置“vectorStore.config”。明确 dbPath`。
+- **配置：** 有限的默认 SQLite 配置仅传播到 SQLite 历史记录提供程序，防止配置泄漏到 Supabase 或其他提供程序。
 
-**Bug Fixes:**
-- **Core:** Fixed code block content extraction — content inside code blocks is now properly extracted instead of being deleted (#4317)
+</更新>
 
-**Improvements:**
-- **Code Quality:** Fixed linting issues across the SDK (#4334)
+<更新标签=“2026-03-09”描述=“v2.3.0”>**重大变更：**
+- **依赖项：** OSS sqlite 功能的最低 Node.js 版本现在是 Node 20+（由于 `better-sqlite3` v12）
 
-</Update>
+**错误修复：**
+- **OSS 存储：** 将 `sqlite3` 替换为 `better-sqlite3` 以修复基于 jiti 的加载器（例如 OpenClaw 插件系统）下的本机绑定解析失败。修复了“绑定”模块使用合成文件名遍历 V8 堆栈帧，无法找到本机“.node”插件的问题。- **OSS 存储：** 修复了 `SQLiteManager` 中的异步初始化竞争条件 — `init()` 现在是同步的
+- **OSS Vector Store：** 通过事务批量插入将“MemoryVectorStore”从“sqlite3”迁移到“better-sqlite3”
 
-<Update label="2026-03-14" description="v2.4.0">
-
-**Bug Fixes:**
-- **OSS Storage:** Fixed `SQLITE_CANTOPEN` errors when running as a LaunchAgent, systemd service, or in containers where `process.cwd()` is read-only (e.g. `/`). Default `vector_store.db` location changed from `process.cwd()/vector_store.db` to `~/.mem0/vector_store.db`.
-- **OSS Storage:** Fixed `historyDbPath` config being silently ignored — config merging always overwrote it with defaults. Top-level `historyDbPath` is now correctly propagated into `historyStore.config` with proper precedence.
-- **OSS Storage:** Added `ensureSQLiteDirectory()` — parent directories for SQLite database files are now auto-created before opening, preventing `SQLITE_CANTOPEN` when using nested paths.
-
-**Improvements:**
-- **Migration:** Added deprecation warning when an existing `vector_store.db` is found at the old `process.cwd()` location, guiding users to move it or set `vectorStore.config.dbPath` explicitly.
-- **Config:** Limited default SQLite config spreading to only SQLite history providers, preventing config leaking into Supabase or other providers.
-
-</Update>
-
-<Update label="2026-03-09" description="v2.3.0">
-
-**Breaking Changes:**
-- **Dependencies:** Minimum Node.js version for OSS sqlite features is now Node 20+ (due to `better-sqlite3` v12)
-
-**Bug Fixes:**
-- **OSS Storage:** Replaced `sqlite3` with `better-sqlite3` to fix native binding resolution failures under jiti-based loaders (e.g. OpenClaw plugin system). Fixes issues where the `bindings` module walked V8 stack frames with synthetic filenames, failing to locate the native `.node` addon.
-- **OSS Storage:** Fixed async init race condition in `SQLiteManager` — `init()` is now synchronous
-- **OSS Vector Store:** Migrated `MemoryVectorStore` from `sqlite3` to `better-sqlite3` with transactional batch inserts
-
-**Improvements:**
-- **Performance:** Cached prepared statements in `SQLiteManager` for faster history operations
-- **Performance:** Batch `insert()` in `MemoryVectorStore` wrapped in a transaction for atomicity
-- **Build:** Updated `tsup.config.ts` externals from `sqlite3` to `better-sqlite3`
-
-</Update>
-
-<Update label="2026-02-17" description="v2.2.3">
-
-**New Features & Updates:**
-- **Memory Update:**
-  - Added `timestamp` parameter to `update()` — accepts Unix epoch or ISO 8601 string
-
-</Update>
-
-<Update label="2026-01-29" description="v2.2.2">
-
-**New Features & Updates:**
-- **Project Settings:**
-  - Added inclusion prompt, exclusion prompt, memory depth, and usecase setting
-
-</Update>
-
-<Update label="2025-12-30" description="v2.2.1">
-
-**Improvements:**
-- **Client:** Added support for keyword arguments in `add` and `search` methods, allowing additional properties beyond defined options for experimental features
-
-</Update>
-
-<Update label="2025-12-29" description="v2.2.0">
-
-**New Features:**
-- **Vector Stores:** Added Azure AI Search vector store support
-
-**Improvements:**
-- **Config:** Fixed embedder config schema to support `embeddingDims` and `url` parameters
-- **Graph Memory:** Replaced hardcoded LLM provider with provider from configuration
-
-**Bug Fixes:**
-- **Embedders:** Fixed hardcoded `embeddingDims` values in embedders (OpenAI, Ollama, Google, Azure)
-- **Build:** Fixed TypeScript build errors
-
-</Update>
-
-<Update label="2025-09-04" description="v2.1.38">
-**New Features:**
-- **Client:** Added `metadata` param to `update` method.
-</Update>
-
-<Update label="2025-08-04" description="v2.1.37">
-**New Features:**
-- **OSS:** Added `RedisCloud` search module check
-</Update>
-
-<Update label="2025-07-08" description="v2.1.36">
-**New Features:**
-- **Client:** Added `structured_data_schema` param to `add` method.
-</Update>
-
-<Update label="2025-07-08" description="v2.1.35">
-**New Features:**
-- **Client:** Added `createMemoryExport` and `getMemoryExport` methods.
-</Update>
-
-<Update label="2025-07-03" description="v2.1.34">
-**New Features:**
-- **OSS:** Added Gemini support
-</Update>
-
-<Update label="2025-06-24" description="v2.1.33">
-**Improvement:**
-- **Client:** Added `immutable` param to `add` method.
-</Update>
-
-<Update label="2025-06-20" description="v2.1.32">
-**Improvement:**
-- **Client:** Made `api_version` V2 as default.
-</Update>
-
-<Update label="2025-06-17" description="v2.1.31">
-**Improvement:**
-- **Client:** Added param `filter_memories`.
-</Update>
-
-<Update label="2025-06-06" description="v2.1.30">
-**New Features:**
-- **OSS:** Added Cloudflare support
-
-**Improvements:**
-- **OSS:** Fixed baseURL param in LLM Config.
-</Update>
-
-<Update label="2025-05-30" description="v2.1.29">
-**Improvements:**
-- **Client:** Added Async Mode Param for `add` method.
-</Update>
-
-<Update label="2025-05-30" description="v2.1.28">
-**Improvements:**
-- **SDK:** Update Google SDK Peer Dependency Version.
-</Update>
-
-<Update label="2025-05-27" description="v2.1.27">
-**Improvements:**
-- **OSS:** Added baseURL param in LLM Config.
-</Update>
-<Update label="2025-05-23" description="v2.1.26">
-**Improvements:**
-- **Client:** Removed type `string` from `messages` interface
-</Update>
-
-<Update label="2025-05-08" description="v2.1.25">
-**Improvements:**
-- **Client:** Improved error handling in client.
-</Update>
-
-<Update label="2025-05-06" description="v2.1.24">
-**New Features:**
-- **Client:** Added new param `output_format` to match Python SDK.
-- **Client:** Added new enum `OutputFormat` for `v1.0` and `v1.1`
-</Update>
-
-<Update label="2025-05-05" description="v2.1.23">
-**New Features:**
-- **Client:** Updated `deleteUsers` to use `v2` API.
-- **Client:** Deprecated `deleteUser` and added deprecation warning.
-</Update>
-
-<Update label="2025-05-02" description="v2.1.22">
-**New Features:**
-- **Client:** Updated `deleteUser` to use `entity_id` and `entity_type`
-</Update>
-
-<Update label="2025-05-01" description="v2.1.21">
-**Improvements:**
-- **OSS SDK:** Bumped version of `@anthropic-ai/sdk` to `0.40.1`
-</Update>
-
-<Update label="2025-04-28" description="v2.1.20">
-**Improvements:**
-- **Client:** Fixed `organizationId` and `projectId` being assigned to default in `ping` method
-</Update>
-
-<Update label="2025-04-22" description="v2.1.19">
-**Improvements:**
-- **Client:** Added support for `timestamps`
-</Update>
-
-<Update label="2025-04-17" description="v2.1.18">
-**Improvements:**
-- **Client:** Added support for custom instructions
-</Update>
-
-<Update label="2025-04-15" description="v2.1.17">
-**New Features:**
-- **OSS SDK:** Added support for Langchain LLM
-- **OSS SDK:** Added support for Langchain Embedder
-- **OSS SDK:** Added support for Langchain Vector Store
-- **OSS SDK:** Added support for Azure OpenAI Embedder
-
-
-**Improvements:**
-- **OSS SDK:** Changed `model` in LLM and Embedder to use type any from `string` to use langchain llm models
-- **OSS SDK:** Added client to vector store config for langchain vector store
-- **OSS SDK:** - Updated Azure OpenAI to use new OpenAI SDK
-</Update>
-
-<Update label="2025-04-11" description="v2.1.16-patch.1">
-**Bug Fixes:**
-- **Azure OpenAI:** Fixed issues with Azure OpenAI
-</Update>
-
-<Update label="2025-04-11" description="v2.1.16">
-**New Features:**
-- **Azure OpenAI:** Added support for Azure OpenAI
-- **Mistral LLM:** Added Mistral LLM integration in OSS
-
-**Improvements:**
-- **Zod:** Updated Zod to 3.24.1 to avoid conflicts with other packages
-</Update>
-
-<Update label="2025-04-09" description="v2.1.15">
-**Improvements:**
-- **Client:** Added support for Mem0 to work with Chrome Extensions
-</Update>
-
-<Update label="2025-04-01" description="v2.1.14">
-**New Features:**
-- **Mastra Example:** Added Mastra example
-- **Integrations:** Added Flowise integration documentation for Mem0 memory setup
-
-**Improvements:**
-- **Demo:** Updated Demo Mem0AI
-- **Client:** Enhanced Ping method in Mem0 Client
-- **AI SDK:** Updated AI SDK implementation
-</Update>
-
-<Update label="2025-03-29" description="v2.1.13">
-**Improvements:**
-- **Introduced `ping` method to check if API key is valid and populate org/project id**
-</Update>
-
-<Update label="2025-03-29" description="AI SDK v1.0.0">
-**New Features:**
-- **Vercel AI SDK Update:** Support threshold and rerank
-
-**Improvements:**
-- **Made add calls async to avoid blocking**
-- **Bump `mem0ai` to use `2.1.12`**
-
-</Update>
-
-<Update label="2025-03-26" description="v2.1.12">
-**New Features:**
-- **Mem0 OSS:** Support infer param
-
-**Improvements:**
-- **Updated Supabase TS Docs**
-- **Made package size smaller**
-
-</Update>
-
-<Update label="2025-03-19" description="v2.1.11">
-**New Features:**
-- **Supabase Vector Store Integration**
-- **Feedback Method**
-</Update>
-
-</Tab>
-
-<Tab title="CLI">
-
-<Update label="2026-04-22" description="Python v0.2.4 / Node v0.2.4">
-
-**New Features:**
-- **V3 API Routes:** Migrated `add`, `search`, and `list` commands from v1/v2 to v3 API endpoints — `POST /v3/memories/add/`, `POST /v3/memories/search/`, `POST /v3/memories/`. Aligns both CLIs with the Python and TypeScript SDKs which already use v3 ([#4916](https://github.com/mem0ai/mem0/pull/4916))
-
-**Breaking Changes:**
-- **`--graph` / `--no-graph` removed:** The `enable_graph` config option, `--graph` and `--no-graph` CLI flags, and `MEM0_ENABLE_GRAPH` environment variable have been removed from both CLIs. Graph memory is now a project-level setting on the Platform ([#4916](https://github.com/mem0ai/mem0/pull/4916))
-
-</Update>
-
-<Update label="2026-04-11" description="Python v0.2.3 / Node v0.2.3">
-
-**Bug Fixes:**
-- **Telemetry:** Replaced shared `"anonymous-cli"` fallback with a persistent per-machine random hash (`cli-anon-<uuid>`), so anonymous CLI users are counted individually in PostHog instead of collapsing into one identity ([#4789](https://github.com/mem0ai/mem0/pull/4789))
-- **Telemetry:** Added PostHog `$identify` event on first authenticated run to stitch pre-signup anonymous history onto the authenticated user profile ([#4789](https://github.com/mem0ai/mem0/pull/4789))
-
-**Improvements:**
-- **API:** All API calls now include `source=CLI` in request bodies (POST/PUT) and query params (GET/DELETE) for server-side attribution ([#4789](https://github.com/mem0ai/mem0/pull/4789))
-
-</Update>
-
-<Update label="2026-04-06" description="Python v0.2.2 / Node v0.2.2">
-
-**New Features:**
-- **Telemetry:** Added PostHog telemetry and source tracking to both Python and Node CLIs ([#4699](https://github.com/mem0ai/mem0/pull/4699))
-- **Validation:** API key validated upfront via `/v1/ping/` on startup — fail-fast with a helpful error instead of cryptic 401s ([#4701](https://github.com/mem0ai/mem0/pull/4701))
-
-**Bug Fixes:**
-- **CD:** Fixed OIDC trusted publishing with `npx npm@latest` ([#4724](https://github.com/mem0ai/mem0/pull/4724))
-- **CD:** Removed npm self-upgrade from CD workflows ([#4723](https://github.com/mem0ai/mem0/pull/4723))
-
-</Update>
-
-<Update label="2026-04-03" description="Python v0.2.1 / Node v0.2.1">
-
-**New Features:**
-- **Docs:** Comprehensive README with installation, usage examples, and purple branding ([#4680](https://github.com/mem0ai/mem0/pull/4680))
-
-**Bug Fixes:**
-- **npm:** Added `repository` field to Node packages for npm provenance ([#4671](https://github.com/mem0ai/mem0/pull/4671))
-- **CD:** Added CD workflows for Node SDK packages with OIDC trusted publishing ([#4670](https://github.com/mem0ai/mem0/pull/4670))
-
-</Update>
-
-<Update label="2026-04-02" description="Python v0.2.0 / Node v0.1.1">
-
-**New Features:**
-- **`event` commands:** `mem0 event list` shows recent background processing events in a table; `mem0 event status <id>` shows full detail including nested memory results ([#4649](https://github.com/mem0ai/mem0/pull/4649))
-- **`--json` / `--agent` flag:** Root-level flag switches all command output to a structured JSON envelope for programmatic/agent consumption. Envelope format: `{"status", "command", "duration_ms", "scope", "count", "data"}` ([#4649](https://github.com/mem0ai/mem0/pull/4649))
-- **Agent output sanitization:** Raw API responses projected to only relevant fields per command (e.g., `add` → `{id, memory, event}`, `search` → `{id, memory, score, created_at, categories}`) ([#4649](https://github.com/mem0ai/mem0/pull/4649))
-- **Email login:** Added email verification code login to `mem0 init` ([#4623](https://github.com/mem0ai/mem0/pull/4623))
-- **Brand update:** Updated color palette from purple to golden ([#4664](https://github.com/mem0ai/mem0/pull/4664))
-- **CI/CD:** Added CI pipelines and CD workflows for both CLIs ([#4640](https://github.com/mem0ai/mem0/pull/4640), [#4653](https://github.com/mem0ai/mem0/pull/4653))
-
-**Bug Fixes:**
-- **Node:** Fixed critical `MODULE_NOT_FOUND` crash on `status`, `import`, and all commands when installed globally — replaced runtime `createRequire` with build-time version injection ([#4636](https://github.com/mem0ai/mem0/pull/4636))
-- **Node:** API errors now show full response detail instead of bare "Bad Request" ([#4636](https://github.com/mem0ai/mem0/pull/4636))
-- **Python:** Fixed double error printing on all commands ([#4636](https://github.com/mem0ai/mem0/pull/4636))
-- **`status` command:** Replaced heavyweight `/v1/entities/` check with dedicated `GET /v1/ping/` endpoint ([#4649](https://github.com/mem0ai/mem0/pull/4649))
-- **`add` command:** Deduplicated PENDING results from API; changed misleading count message ([#4649](https://github.com/mem0ai/mem0/pull/4649))
-- **`init` command:** Partial flags now work in non-TTY; warns before overwriting existing config; added `--force` flag ([#4649](https://github.com/mem0ai/mem0/pull/4649))
-- **`delete` command:** Fixed entity delete via v2 API for all entity types ([#4649](https://github.com/mem0ai/mem0/pull/4649))
-
-**Improvements:**
-- Tables now show full UUIDs (was truncated to 8 chars, making `mem0 get <id>` fail) ([#4636](https://github.com/mem0ai/mem0/pull/4636))
-- Search table includes Score column ([#4636](https://github.com/mem0ai/mem0/pull/4636))
-- `config get api_key` short-form aliases added ([#4636](https://github.com/mem0ai/mem0/pull/4636))
-- Client-side validation for `--expires`, `--page-size`, `--page`, `--top-k`, `--threshold`, and empty content ([#4636](https://github.com/mem0ai/mem0/pull/4636))
-- `printInfo` / `printScope` moved to stderr to avoid contaminating JSON piping ([#4636](https://github.com/mem0ai/mem0/pull/4636))
-
-</Update>
-
-<Update label="2026-03-26" description="Python v0.1.0 / Node v0.1.0">
-
-**Initial Release — Official Mem0 CLI**
-
-A full-featured command-line interface for Mem0, available in both Python and Node.js:
-
-- **Install:** `pip install mem0-cli` (Python) or `npm install -g @mem0/cli` (Node.js)
-- **Full command suite:** `add`, `search`, `list`, `get`, `update`, `delete`, `import`, `config`, `init`, `status`, `entity`
-- **Interactive setup:** `mem0 init` with API key entry and user ID configuration
-- **Works everywhere:** Platform (Mem0 Cloud) and self-hosted OSS modes
-- **Scriptable:** `-o json` flag for CI/CD pipelines and automation
-- **Dual SDK:** Same commands, same experience across Python and Node.js
-- **Shared spec:** Both implementations driven by a single `cli-spec.json` ensuring identical behavior ([#4575](https://github.com/mem0ai/mem0/pull/4575))
-
-</Update>
-
-</Tab>
-
-<Tab title="Plugins">
-
-<Update label="2026-04-02" description="mem0-plugin v1.0.0">
-
-**Mem0 Plugin for Claude Code, Cursor, and Codex**
-
-The unified Mem0 plugin for AI development environments:
-
-- **9 MCP memory tools:** `add_memory`, `search_memories`, `get_memories`, `get_memory`, `update_memory`, `delete_memory`, `delete_all_memories`, `delete_entities`, `list_entities` — all via `mcp.mem0.ai`
-- **Lifecycle hooks:** Automatic memory capture at session start, context compaction, task completion, and session end
-- **Cloud MCP server:** Managed endpoint replaces local MCP and Smithery setup
-- **Streamable HTTP transport:** New MCP transport protocol for real-time streaming
-- **Codex-specific skill:** Dedicated skill in `mem0-plugin/skills/mem0-codex` for Codex workflows
-- **Supported editors:** Claude Code, Claude Cowork, Cursor, Codex
-
-</Update>
-
-<Update label="2025-12-26" description="Vercel AI SDK v2.0.5">
-**Bug Fix:**
-- Removed unnecessary dependencies to make the package lighter.
-</Update>
-
-<Update label="2025-09-25" description="Vercel AI SDK v2.0.3 – v2.0.4">
-**New Features:**
-- Added file support for multimodal capabilities with memory context (v2.0.3)
-
-**Bug Fix:**
-- Fixed version parameter to use V2 for addition (v2.0.4)
-</Update>
-
-<Update label="2025-09-03" description="Vercel AI SDK v2.0.2">
-**Bug Fix:**
-- Fixed streaming response in the AI SDK.
-</Update>
-
-<Update label="2025-08-05" description="Vercel AI SDK v2.0.0 – v2.0.1">
-**New Features:**
-- Migration to AI SDK V5 (v2.0.0)
-- Added `host` param to the config (v2.0.1)
-</Update>
-
-<Update label="2025-06-15" description="Vercel AI SDK v1.0.6">
-**New Features:**
-- Added `filter_memories` param.
-</Update>
-
-<Update label="2025-05-23" description="Vercel AI SDK v1.0.5">
-**New Features:**
-- Added support for Google provider.
-</Update>
-
-<Update label="2025-05-10" description="Vercel AI SDK v1.0.3 – v1.0.4">
-**New Features:**
-- Added support for `output_format` param (v1.0.4)
-
-**Improvements:**
-- Added graceful failure handling when services are down (v1.0.3)
-</Update>
-
-<Update label="2025-05-01" description="Vercel AI SDK v1.0.1">
-**New Features:**
-- Added support for graph memories.
-</Update>
-
-</Tab>
-
-</Tabs>
+**改进：**
+- **性能：** 在“SQLiteManager”中缓存准备好的语句，以实现更快的历史操作
+- **性能：** 包裹在事务中的“MemoryVectorStore”中的批量“insert()”以实现原子性
+- **构建：** 将“tsup.config.ts”外部从“sqlite3”更新为“better-sqlite3”
+
+</更新>
+
+<更新标签=“2026-02-17”描述=“v2.2.3”>
+
+**新功能和更新：**
+- **内存更新：**
+  - 将“timestamp”参数添加到“update()”——接受 Unix 纪元或 ISO 8601 字符串
+
+</更新><更新标签=“2026-01-29”描述=“v2.2.2”>
+
+**新功能和更新：**
+- **项目设置：**
+  - 新增包含提示、排除提示、内存深度、用例设置
+
+</更新>
+
+<更新标签=“2025-12-30”描述=“v2.2.1”>
+
+**改进：**
+- **客户端：** 在“add”和“search”方法中添加了对关键字参数的支持，允许超出实验功能定义选项的其他属性
+
+</更新>
+
+<更新标签=“2025-12-29”描述=“v2.2。0">
+
+**新功能：**
+- **矢量存储：** 添加了 Azure AI 搜索矢量存储支持
+
+**改进：**
+- **配置：**修复了嵌入器配置架构以支持 `embeddingDims` 和 `url` 参数
+- **图形内存：** 用配置中的提供程序替换了硬编码的 LLM 提供程序
+
+**错误修复：**
+- **嵌入器：**修复了嵌入器中硬编码的“embeddingDims”值（OpenAI、Ollama、Google、Azure）
+- **构建：**修复了 TypeScript 构建错误
+
+</更新>
+
+<更新标签=“2025-09-04”描述=“v2.1.38”>
+**新功能：**
+- **客户端：** 在“update”方法中添加了“metadata”参数。
+</更新>
+
+<更新标签=“2025-08-04”描述=“v2.1.37”>
+**新功能：**
+- **OSS：**添加了`RedisCloud`搜索模块检查
+</更新><更新标签=“2025-07-08”描述=“v2.1.36”>
+**新功能：**
+- **客户端：** 将“structed_data_schema”参数添加到“add”方法中。
+</更新>
+
+<更新标签=“2025-07-08”描述=“v2.1.35”>
+**新功能：**
+- **客户端：** 添加了 `createMemoryExport` 和 `getMemoryExport` 方法。
+</更新>
+
+<更新标签=“2025-07-03”描述=“v2.1.34”>
+**新功能：**
+- **OSS：** 添加了 Gemini 支持
+</更新>
+
+<更新标签=“2025-06-24”描述=“v2.1.33”>
+**改进：**
+- **客户端：** 在“add”方法中添加了“immutable”参数。
+</更新>
+
+<更新标签=“2025-06-20”描述=“v2.1.32”>
+**改进：**
+- **客户端：** 将 `api_version` V2 设置为默认值。
+</更新>
+
+<更新标签=“2025-06-17”描述=“v2.1.31”>
+**改进：**
+- **客户端：**添加了参数`filter_memories`。
+</更新>
+
+<更新标签=“2025-06-06”描述=“v2.1。30">
+**新功能：**
+- **OSS：** 添加了 Cloudflare 支持
+
+**改进：**
+- **OSS：** 修复了 LLM 配置中的 baseURL 参数。
+</更新>
+
+<更新标签=“2025-05-30”描述=“v2.1.29”>
+**改进：**
+- **客户端：**为“add”方法添加了异步模式参数。
+</更新><更新标签=“2025-05-30”描述=“v2.1.28”>
+**改进：**
+- **SDK：** 更新 Google SDK 对等依赖版本。
+</更新>
+
+<更新标签=“2025-05-27”描述=“v2.1.27”>
+**改进：**
+- **OSS：** 在LLM配置中添加了baseURL参数。
+</更新>
+<更新标签=“2025-05-23”描述=“v2.1.26”>
+**改进：**
+- **客户端：**从“messages”接口中删除了“string”类型
+</更新>
+
+<更新标签=“2025-05-08”描述=“v2.1.25”>
+**改进：**
+- **客户端：**改进了客户端中的错误处理。
+</更新>
+
+<更新标签=“2025-05-06”描述=“v2.1.24”>
+**新功能：**
+- **客户端：** 添加了新参数 `output_format` 以匹配 Python SDK。
+- **客户端：**为“v1.0”和“v1.1”添加了新的枚举“OutputFormat”
+</更新>
+
+<更新标签=“2025-05-05”描述=“v2.1.23”>
+**新功能：**
+- **客户端：**更新了 `deleteUsers` 以使用 `v2` API。- **客户端：** 已弃用 `deleteUser` 并添加弃用警告。
+</更新>
+
+<更新标签=“2025-05-02”描述=“v2.1.22”>
+**新功能：**
+- **客户端：**更新了“deleteUser”以使用“entity_id”和“entity_type”
+</更新><更新标签=“2025-05-01”描述=“v2.1.21”>
+**改进：**
+- **OSS SDK：** 将“@anthropic-ai/sdk”版本提升至“0.40.1”
+</更新>
+
+<更新标签=“2025-04-28”描述=“v2.1.20”>
+**改进：**
+- **客户端：**修复了在“ping”方法中将“organizationId”和“projectId”分配为默认值的问题
+</更新>
+
+<更新标签=“2025-04-22”描述=“v2.1.19”>
+**改进：**
+- **客户端：**添加了对“时间戳”的支持
+</更新>
+
+<更新标签=“2025-04-17”描述=“v2.1.18”>
+**改进：**
+- **客户端：**添加了对自定义指令的支持
+</更新>
+
+<更新标签=“2025-04-15”描述=“v2.1。17">
+**新功能：**
+- **OSS SDK：** 添加了对 Langchain LLM 的支持
+- **OSS SDK：** 添加了对 Langchain Embedder 的支持
+- **OSS SDK：** 添加了对 Langchain Vector Store 的支持
+- **OSS SDK：** 添加了对 Azure OpenAI Embedder 的支持
+
+
+**改进：**
+- **OSS SDK：** 更改了 LLM 和 Embedder 中的“model”，以使用“string”中的任何类型来使用 langchain llm 模型
+- **OSS SDK：** 将客户端添加到 langchain 矢量存储的矢量存储配置中
+- **OSS SDK：** - 更新了 Azure OpenAI 以使用新的 OpenAI SDK
+</更新><更新标签=“2025-04-11”描述=“v2.1.16-patch.1”>
+**错误修复：**
+- **Azure OpenAI：** 修复了 Azure OpenAI 的问题
+</更新>
+
+<更新标签=“2025-04-11”描述=“v2.1.16”>
+**新功能：**
+- **Azure OpenAI：** 添加了对 Azure OpenAI 的支持
+- **Mistral LLM：** 在 OSS 中添加了 Mistral LLM 集成
+
+**改进：**
+- **Zod：** 将 Zod 更新到 3.24.1 以避免与其他软件包冲突
+</更新>
+
+<更新标签=“2025-04-09”描述=“v2.1.15”>
+**改进：**
+- **客户端：** 添加了对 Mem0 与 Chrome 扩展程序配合使用的支持
+</更新>
+
+<更新标签=“2025-04-01”描述=“v2.1。14">
+**新功能：**
+- **Mastra 示例：** 添加了 Mastra 示例
+- **集成：** 添加了 Mem0 内存设置的 Flowise 集成文档
+
+**改进：**
+- **演示：**更新了演示 Mem0AI
+- **客户端：** Mem0 客户端中增强的 Ping 方法
+- **AI SDK：**更新了AI SDK实现
+</更新>
+
+<更新标签=“2025-03-29”描述=“v2.1.13”>
+**改进：**
+- **引入了 `ping` 方法来检查 API 密钥是否有效并填充组织/项目 ID**
+</更新><更新标签=“2025-03-29”描述=“AI SDK v1.0.0”>
+**新功能：**
+- **Vercel AI SDK 更新：** 支持阈值和重新排名
+
+**改进：**
+- **使添加调用异步以避免阻塞**
+- **碰撞`mem0ai`以使用`2.1.12`**
+
+</更新>
+
+<更新标签=“2025-03-26”描述=“v2.1.12”>
+**新功能：**
+- **Mem0 OSS:** 支持推断参数
+
+**改进：**
+- **更新了 Supabase TS 文档**
+- **缩小包装尺寸**
+
+</更新>
+
+<更新标签=“2025-03-19”描述=“v2.1.11”>
+**新功能：**
+- **Supabase 矢量商店集成**
+- **反馈方式**
+</更新>
+
+</标签>
+
+<选项卡标题=“CLI”>
+
+<更新标签=“2026-04-22”描述=“Python v0.2.4 / Node v0.2.4”>
+
+**新功能：**
+- **V3 API 路由：** 将 `add`、`search` 和 `list` 命令从 v1/v2 迁移到 v3 API 端点 — `POST /v3/memories/add/`、`POST /v3/memories/search/`、`POST /v3/memories/`。将 CLI 与已使用 v3 的 Python 和 TypeScript SDK 保持一致 ([#4916](https://github.com/mem0ai/mem0/pull/4916))**重大变更：**
+- **`--graph` / `--no-graph` 已删除：** `enable_graph` 配置选项、`--graph` 和 `--no-graph` CLI 标志以及 `MEM0_ENABLE_GRAPH` 环境变量已从两个 CLI 中删除。图内存现在是平台上的项目级设置 ([#4916](https://github.com/mem0ai/mem0/pull/4916))
+
+</更新>
+
+<更新标签=“2026-04-11”描述=“Python v0.2.3 / Node v0.2.3”>
+
+**错误修复：**
+- **遥测：** 将共享的“anonymous-cli”后备替换为持久的每台机器随机哈希 (`cli-anon-<uuid>`)，因此匿名 CLI 用户在 PostHog 中单独计数，而不是合并为一个身份 ([#4789](https://github.com/mem0ai/mem0/pull/4789))
+- **遥测：** 在第一次经过身份验证的运行时添加了 PostHog `$identify` 事件，以将注册前匿名历史记录到经过身份验证的用户配置文件中（[#4789](https://github.com/github.com/#4789)com/mem0ai/mem0/pull/4789))
+
+**改进：**
+- **API：** 所有 API 调用现在都在请求正文 (POST/PUT) 和查询参数 (GET/DELETE) 中包含 `source=CLI` 以进行服务器端归因 ([#4789](https://github.com/mem0ai/mem0/pull/4789))
+
+</更新>
+
+<更新标签=“2026-04-06”描述=“Python v0.2.2 / Node v0.2.2”>**新功能：**
+- **遥测：** 添加了 PostHog 遥测和源跟踪到 Python 和 Node CLI ([#4699](https://github.com/mem0ai/mem0/pull/4699))
+- **验证：** API 密钥在启动时通过 `/v1/ping/` 进行预先验证 - 快速失败并出现有用的错误，而不是神秘的 401 ([#4701](https://github.com/mem0ai/mem0/pull/4701))
+
+**错误修复：**
+- **CD：** 使用 `npx npm@latest` 修复了 OIDC 可信发布 ([#4724](https://github.com/mem0ai/mem0/pull/4724))
+- **CD：** 从 CD 工作流程中删除了 npm 自升级 ([#4723](https://github.com/mem0ai/mem0/pull/4723))
+
+</更新>
+
+<更新标签=“2026-04-03”描述=“Python v0.2.1 / Node v0.2.1”>
+
+**新功能：**
+- **文档：** 全面的自述文件，包含安装、使用示例和紫色品牌（[#4680](https://github.com/github.com/github/github.com/#4680)com/mem0ai/mem0/pull/4680))
+
+**错误修复：**
+- **npm:** 在 Node 包中添加了 `repository` 字段以获取 npm 出处 ([#4671](https://github.com/mem0ai/mem0/pull/4671))
+- **CD：** 通过 OIDC 可信发布为 Node SDK 包添加了 CD 工作流程 ([#4670](https://github.com/mem0ai/mem0/pull/4670))
+
+</更新>
+
+<更新标签=“2026-04-02”描述=“Python v0.2.0 / Node v0.1.1”>**新功能：**
+- **`event`命令：** `mem0 event list`显示表中最近的后台处理事件； `mem0 事件状态 <id>` 显示完整详细信息，包括嵌套内存结果 ([#4649](https://github.com/mem0ai/mem0/pull/4649))
+- **`--json` / `--agent` 标志：** 根级标志将所有命令输出切换到结构化 JSON 信封以供编程/代理使用。信封格式：`{"status", "command", "duration_ms", "scope", "count", "data"}` ([#4649](https://github.com/mem0ai/mem0/pull/4649))
+- **代理输出清理：** 原始 API 响应仅投射到每个命令的相关字段（例如，`add`→`{id，内存，事件}`，`search`→`{id，内存，分数，created_at，类别}`）（[#4649]（https://github.com/mem0ai/mem0/pull/4649））
+- **电子邮件登录：** 添加电子邮件验证码登录到`mem0 init` ([#4623](https://github.com/mem0init)com/mem0ai/mem0/pull/4623))
+- **品牌更新：** 将调色板从紫色更新为金色（[#4664](https://github.com/mem0ai/mem0/pull/4664)）
+- **CI/CD：** 为两个 CLI 添加了 CI 管道和 CD 工作流程（[#4640](https://github.com/mem0ai/mem0/pull/4640)、[#4653](https://github.com/mem0ai/mem0/pull/4653))**错误修复：**
+- **Node：**修复了全局安装时“status”、“import”和所有命令上的关键“MODULE_NOT_FOUND”崩溃 - 用构建时版本注入替换了运行时“createRequire”（[#4636](https://github.com/mem0ai/mem0/pull/4636)）
+- **节点：** API 错误现在显示完整的响应详细信息，而不是裸露的“错误请求”([#4636](https://github.com/mem0ai/mem0/pull/4636))
+- **Python：**修复了所有命令上的双重错误打印（[#4636](https://github.com/mem0ai/mem0/pull/4636)）
+- **`status` 命令：** 使用专用的 `GET /v1/ping/` 端点替换了重量级的 `/v1/entities/` 检查（[#4649](https://github.com/mem0ai/mem0/pull/4649)）
+- **`add` 命令：** 从 API 中删除重复的 PENDING 结果；更改了误导性计数消息（[#4649](https://github.com/mem0ai/mem0/pull/4649)）
+- **`init` 命令：** 部分标志现在可以在非 TTY 中使用；在覆盖现有配置之前发出警告；添加了 `--force` 标志（[#4649](https://github.com/mem0ai/mem0/pull/4649)）
+- **`delete` 命令：** 通过 v2 API 修复所有实体类型的实体删除 ([#4649](https://github.com/mem0ai/mem0/pull/4649))**改进：**
+- 表格现在显示完整的 UUID（被截断为 8 个字符，使 `mem0 get <id>` 失败）（[#4636](https://github.com/mem0ai/mem0/pull/4636)）
+- 搜索表包括分数列（[#4636](https://github.com/mem0ai/mem0/pull/4636)）
+- 添加了“config get api_key”短格式别名（[#4636](https://github.com/mem0ai/mem0/pull/4636)）
+- 对 `--expires`、`--page-size`、`--page`、`--top-k`、`--threshold` 和空内容的客户端验证 ([#4636](https://github.com/mem0ai/mem0/pull/4636))
+- `printInfo` / `printScope` 移至 stderr 以避免污染 JSON 管道 ([#4636](https://github.com/mem0ai/mem0/pull/4636))
+
+</更新>
+
+<更新标签=“2026-03-26”描述=“Python v0.1.0 / Node v0.1.0”>
+
+**初始版本 - 官方 Mem0 CLI**
+
+Mem0 的全功能命令行界面，可在 Python 和 Node.js 中使用：- **安装：** `pip install mem0-cli` (Python) 或 `npm install -g @mem0/cli` (Node.js)
+- **完整命令套件：** `add`、`search`、`list`、`get`、`update`、`delete`、`import`、`config`、`init`、`status`、`entity`
+- **交互式设置：** `mem0 init` 以及 API 密钥输入和用户 ID 配置
+- **随处可用：** 平台（Mem0 Cloud）和自托管 OSS 模式
+- **可编写脚本：** 用于 CI/CD 管道和自动化的 `-o json` 标志
+- **双 SDK：** 相同的命令，相同的 Python 和 Node.js 体验
+- **共享规范：** 两种实现均由单个 `cli-spec.json` 驱动，确保相同的行为 ([#4575](https://github.com/mem0ai/mem0/pull/4575))
+
+</更新>
+
+</标签>
+
+<选项卡标题=“插件”>
+
+<更新标签=“2026-04-02”描述=“mem0-plugin v1.0.0”>
+
+**用于 Claude 代码、光标和 Codex 的 Mem0 插件**
+
+用于AI开发环境的统一Mem0插件：- **9 个 MCP 内存工具：** `add_memory`、`search_memories`、`get_memories`、`get_memory`、`update_memory`、`delete_memory`、`delete_all_memories`、`delete_entities`、`list_entities` — 全部通过 `mcp.mem0.ai`
+- **生命周期挂钩：** 在会话开始、上下文压缩、任务完成和会话结束时自动捕获内存
+- **云 MCP 服务器：** 托管端点取代本地 MCP 和 Smithery 设置
+- **可流式 HTTP 传输：** 用于实时流式传输的新 MCP 传输协议
+- **Codex 特定技能：** Codex 工作流程的“mem0-plugin/skills/mem0-codex”专用技能
+- **支持的编辑器：** Claude Code、Claude Cowork、Cursor、Codex
+
+</更新>
+
+<更新标签=“2025-12-26”描述=“Vercel AI SDK v2.0.5”>
+**错误修复：**
+- 删除了不必要的依赖项以使包更轻。
+</更新>
+
+<更新标签=“2025-09-25”描述=“Vercel AI SDK v2.0.3 – v2.0。4">
+**新功能：**
+- 添加了对具有内存上下文的多模式功能的文件支持（v2.0.3）
+
+**错误修复：**
+- 修复版本参数以使用 V2 进行添加 (v2.0.4)
+</更新>
+
+<更新标签=“2025-09-03”描述=“Vercel AI SDK v2.0.2”>
+**错误修复：**
+- 修复了 AI SDK 中的流响应。
+</更新><更新标签=“2025-08-05”描述=“Vercel AI SDK v2.0.0 – v2.0.1”>
+**新功能：**
+- 迁移至AI SDK V5 (v2.0.0)
+- 在配置中添加了“host”参数（v2.0.1）
+</更新>
+
+<更新标签=“2025-06-15”描述=“Vercel AI SDK v1.0.6”>
+**新功能：**
+- 添加了“filter_memories”参数。
+</更新>
+
+<更新标签=“2025-05-23”描述=“Vercel AI SDK v1.0.5”>
+**新功能：**
+- 添加了对 Google 提供商的支持。
+</更新>
+
+<更新标签=“2025-05-10”描述=“Vercel AI SDK v1.0.3 – v1.0.4”>
+**新功能：**
+- 添加了对“output_format”参数的支持（v1.0.4）
+
+**改进：**
+- 添加了服务关闭时的优雅故障处理（v1.0.3）
+</更新>
+
+<更新标签=“2025-05-01”描述=“Vercel AI SDK v1.0.1”>
+**新功能：**
+- 添加了对图形存储器的支持。
+</更新>
+
+</标签>
+
+</标签>

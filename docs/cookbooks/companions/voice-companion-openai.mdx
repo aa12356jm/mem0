@@ -3,39 +3,34 @@ title: Voice-First AI Companion
 description: "Pair the OpenAI Agents SDK with Mem0 to build a voice assistant that remembers."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-This guide demonstrates how to combine OpenAI's Agents SDK for voice applications with Mem0's memory capabilities to create a voice assistant that remembers user preferences and past interactions.
 
-## Prerequisites
 
-Before you begin, make sure you have:
+本指南演示了如何将 OpenAI 的语音应用程序代理 SDK 与 Mem0 的内存功能相结合，创建一个能够记住用户偏好和过去交互的语音助手。
 
-1. Installed OpenAI Agents SDK with voice dependencies:
-```bash
+## 先决条件
+
+在开始之前，请确保您拥有：
+
+1. 安装具有语音依赖项的 OpenAI Agents SDK：```bash
 pip install 'openai-agents[voice]'
 ```
-
-2. Installed Mem0 SDK:
-```bash
+2.安装Mem0 SDK：```bash
 pip install mem0ai
 ```
-
-3. Installed other required dependencies:
-```bash
+3.安装其他所需的依赖项：```bash
 pip install numpy sounddevice pydantic
 ```
+4. 设置您的 API 密钥：
+   - Agents SDK 的 OpenAI API 密钥
+   - 来自 Mem0 平台的 Mem0 API 密钥
 
-4. Set up your API keys:
-   - OpenAI API key for the Agents SDK
-   - Mem0 API key from the Mem0 Platform
+## 代码分解
 
-## Code Breakdown
+让我们分解一下这个实现的关键组件：
 
-Let's break down the key components of this implementation:
-
-### 1. Setting Up Dependencies and Environment
-
-```python
+### 1. 设置依赖项和环境```python
 # OpenAI Agents SDK imports
 from agents import (
     Agent,
@@ -61,20 +56,17 @@ USER_ID = "voice_user"
 # Initialize Mem0 client
 mem0_client = AsyncMemoryClient()
 ```
+本节处理：
+- 从 OpenAI Agents SDK 和 Mem0 导入所需模块
+- 设置 API 密钥的环境变量
+- 定义一个简单的用户识别系统（使用全局变量）
+- 初始化将处理内存操作的 Mem0 客户端
 
-This section handles:
-- Importing required modules from OpenAI Agents SDK and Mem0
-- Setting up environment variables for API keys
-- Defining a simple user identification system (using a global variable)
-- Initializing the Mem0 client that will handle memory operations
+### 2.带有函数装饰器的记忆工具
 
-### 2. Memory Tools with Function Decorators
+`@function_tool` 装饰器将 Python 函数转换为 OpenAI 代理的可调用工具。以下是关键的记忆工具：
 
-The `@function_tool` decorator transforms Python functions into callable tools for the OpenAI agent. Here are the key memory tools:
-
-#### Storing User Memories
-
-```python
+#### 存储用户记忆```python
 import logging
 
 # Set up logging at the top of your file
@@ -103,17 +95,14 @@ async def save_memories(
 
     return f"I've saved your memory: {memory}"
 ```
+这个功能：
+- 获取一个内存字符串
+- 创建格式化的内存字符串
+- 使用`add()`方法将其存储在Mem0中
+- 包括元数据来对内存进行分类，以便于检索
+- 返回代理将发言的确认消息
 
-This function:
-- Takes a memory string
-- Creates a formatted memory string
-- Stores it in Mem0 using the `add()` method
-- Includes metadata to categorize the memory for easier retrieval
-- Returns a confirmation message that the agent will speak
-
-#### Finding Relevant Memories
-
-```python
+#### 寻找相关记忆```python
 @function_tool
 async def search_memories(
     query: str
@@ -138,16 +127,13 @@ async def search_memories(
     memories = [f"• {result['memory']}" for result in results.get('results', [])]
     return "Here's what I remember that might be relevant:\n" + "\n".join(memories)
 ```
+这个工具：
+- 获取搜索查询字符串
+- 将其传递给Mem0的语义搜索以查找相关记忆
+- 设置相关性阈值以确保质量结果
+- 返回相关记忆的格式化列表或默认消息
 
-This tool:
-- Takes a search query string
-- Passes it to Mem0's semantic search to find related memories
-- Sets a threshold for relevance to ensure quality results
-- Returns a formatted list of relevant memories or a default message
-
-### 3. Creating the Voice Agent
-
-```python
+### 3. 创建语音代理```python
 def create_memory_voice_agent():
     # Create the agent with memory-enabled tools
     agent = Agent(
@@ -166,16 +152,13 @@ def create_memory_voice_agent():
     
     return agent
 ```
+这个功能：
+- 创建具有特定指令的 OpenAI 代理
+- 将其配置为使用 gpt-4.1-nano （您可以使用其他型号）
+- 向代理注册与内存相关的工具
+- 使用“prompt_with_handoff_instructions”来包含标准语音代理行为
 
-This function:
-- Creates an OpenAI Agent with specific instructions
-- Configures it to use gpt-4.1-nano (you can use other models)
-- Registers the memory-related tools with the agent
-- Uses `prompt_with_handoff_instructions` to include standard voice agent behaviors
-
-### 4. Microphone Recording Functionality
-
-```python
+### 4. 麦克风录音功能```python
 async def record_from_microphone(duration=5, samplerate=24000):
     """Record audio from the microphone for a specified duration."""
     print(f"Recording for {duration} seconds...")
@@ -195,17 +178,14 @@ async def record_from_microphone(duration=5, samplerate=24000):
     audio_data = np.concatenate(frames)
     return audio_data
 ```
+这个功能：
+- 创建简单的异步麦克风录音功能
+- 使用声音设备库捕获音频输入
+- 录制期间将帧存储在缓冲区中
+- 完成后将帧组合成单个 numpy 数组
+- 返回音频数据进行处理
 
-This function:
-- Creates a simple asynchronous microphone recording function
-- Uses the sounddevice library to capture audio input
-- Stores frames in a buffer during recording
-- Combines frames into a single numpy array when complete
-- Returns the audio data for processing
-
-### 5. Main Loop and Voice Processing
-
-```python
+### 5. 主循环和语音处理```python
 async def main():
     # Create the agent
     agent = create_memory_voice_agent()
@@ -261,20 +241,17 @@ async def main():
     except KeyboardInterrupt:
         print("\nExiting...")
 ```
+这个主函数协调整个过程：
+1. 创建具有记忆功能的语音代理
+2. 使用 TTS 设置设置语音管道
+3. 实现用于录制和处理语音输入的交互循环
+4. 处理响应事件流（音频和文本）
+5. 自动将座席的响应保存到内存中
+6. 包括适当的错误处理和退出机制
 
-This main function orchestrates the entire process:
-1. Creates the memory-enabled voice agent
-2. Sets up the voice pipeline with TTS settings
-3. Implements an interactive loop for recording and processing voice input
-4. Handles streaming of response events (both audio and text)
-5. Automatically saves the agent's responses to memory
-6. Includes proper error handling and exit mechanisms
+## 创建一个支持内存的语音代理
 
-## Create a Memory-Enabled Voice Agent
-
-Now that we've explained each component, here's the complete implementation that combines OpenAI Agents SDK for voice with Mem0's memory capabilities:
-
-```python
+现在我们已经解释了每个组件，下面是将用于语音的 OpenAI Agents SDK 与 Mem0 的内存功能相结合的完整实现：```python
 import asyncio
 import os
 import logging
@@ -460,58 +437,49 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 ```
+## 此实现的主要特点
 
-## Key Features of This Implementation
+该实现提供了几个关键特性：
 
-This implementation offers several key features:
+1. **简化用户管理**：为了简单起见，使用全局“USER_ID”变量，但可以扩展以管理多个用户。
 
-1. **Simplified User Management**: Uses a global `USER_ID` variable for simplicity, but can be extended to manage multiple users.
+2. **真实麦克风输入**：包括“record_from_microphone()”函数，可捕获来自麦克风的实际语音输入。
 
-2. **Real Microphone Input**: Includes a `record_from_microphone()` function that captures actual voice input from your microphone.
+3. **交互式语音循环**：实现连续的交互循环，允许多次来回交换。
 
-3. **Interactive Voice Loop**: Implements a continuous interaction loop, allowing for multiple back-and-forth exchanges.
+4. **内存管理工具**：
+   - `save_memories`：将用户记忆存储在 Mem0 中
+   - `search_memories`：搜索相关的过去信息
 
-4. **Memory Management Tools**:
-   - `save_memories`: Stores user memories in Mem0
-   - `search_memories`: Searches for relevant past information
+5. **语音配置**：演示如何配置语音响应的 TTS 设置。
 
-5. **Voice Configuration**: Demonstrates how to configure TTS settings for the voice response.
+## 运行示例
 
-## Running the Example
+要运行此示例：
 
-To run this example:
+1. 将占位符 API 密钥替换为您的实际密钥
+2.确保麦克风连接正确
+3.使用 Python 3.8 或更高版本运行脚本
+4. 按 Enter 开始录音，然后说出您的请求
+5. 按“q”退出应用程序
 
-1. Replace the placeholder API keys with your actual keys
-2. Make sure your microphone is properly connected
-3. Run the script with Python 3.8 or newer
-4. Press Enter to start recording, then speak your request
-5. Press 'q' to quit the application
+代理将听取您的请求，通过 OpenAI 模型对其进行处理，根据需要利用 Mem0 进行内存操作，并通过文本输出和语音进行响应。## 带记忆的语音代理的最佳实践
 
-The agent will listen to your request, process it through the OpenAI model, utilize Mem0 for memory operations as needed, and respond both through text output and voice speech.
+1. **优化语音记忆**：保持记忆简洁且与语音响应相关。
 
-## Best Practices for Voice Agents with Memory
+2. **遗忘机制**：实现一种删除或过期不再相关的记忆的方法。
 
-1. **Optimizing Memory for Voice**: Keep memories concise and relevant for voice responses.
+3. **上下文保留**：在每个记忆中存储足够的上下文以使检索有效。
 
-2. **Forgetting Mechanism**: Implement a way to delete or expire memories that are no longer relevant.
+4. **错误处理**：为内存操作实现强大的错误处理，因为即使内存操作失败，语音交互也应该继续顺利进行。
 
-3. **Context Preservation**: Store enough context with each memory to make retrieval effective.
+## 结论
 
-4. **Error Handling**: Implement robust error handling for memory operations, as voice interactions should continue smoothly even if memory operations fail.
+通过将 OpenAI 的 Agents SDK 与 Mem0 的内存功能相结合，您可以创建语音代理，以持久存储用户偏好和过去的交互。这使对话更加自然和个性化，从而显着增强了用户体验。在构建语音应用程序时，请尝试不同的内存策略和过滤方法，以找到针对您的特定用例的全面内存和高效检索之间的最佳平衡。
 
-## Conclusion
+## 调试功能工具使用 OpenAI Agents SDK 时，您可能会注意到“@function_tool”修饰函数内的常规“print()”语句不会出现在控制台输出中。这是因为 Agents SDK 在执行这些函数时捕获并重定向标准输出。
 
-By combining OpenAI's Agents SDK with Mem0's memory capabilities, you can create voice agents that maintain persistent memory of user preferences and past interactions. This significantly enhances the user experience by making conversations more natural and personalized.
-
-As you build your voice application, experiment with different memory strategies and filtering approaches to find the optimal balance between comprehensive memory and efficient retrieval for your specific use case.
-
-## Debugging Function Tools
-
-When working with the OpenAI Agents SDK, you might notice that regular `print()` statements inside `@function_tool` decorated functions don't appear in your console output. This is because the Agents SDK captures and redirects standard output when executing these functions.
-
-To effectively debug your function tools, use Python's `logging` module instead:
-
-```python
+要有效地调试函数工具，请改用 Python 的“logging”模块：```python
 import logging
 
 # Set up logging at the top of your file
@@ -533,14 +501,13 @@ async def save_memories(
 
     # Rest of your function...
 ```
-
 ---
 
-<CardGroup cols={2}>
-  <Card title="Multimodal Support" icon="image" href="/platform/features/multimodal-support">
-    Learn how to add vision and audio memory alongside voice interactions.
-  </Card>
-  <Card title="Build a Mem0 Companion" icon="users" href="/cookbooks/essentials/building-ai-companion">
-    Master the core patterns for building memory-powered companions.
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="多模式支持" icon="image" href="/platform/features/multimodal-support">
+    了解如何在语音交互的同时添加视觉和音频记忆。
+  </卡>
+  <Card title="构建 Mem0 伴侣" icon="users" href="/cookbooks/essentials/building-ai-companion">
+    掌握构建记忆驱动同伴的核心模式。
+  </卡>
+</卡组>

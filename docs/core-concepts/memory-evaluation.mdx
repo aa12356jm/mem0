@@ -5,149 +5,137 @@ icon: "chart-bar"
 iconType: "solid"
 ---
 
-## Why Memory Evaluation Matters
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Most AI agent memory systems retrieve information by maximizing context window size. That works on benchmarks but not in production, where every token adds cost. **Token efficiency** — achieving high accuracy with less context per query — is what separates benchmark performance from production viability.
 
-The new Mem0 algorithm achieves competitive accuracy on LoCoMo, LongMemEval, and BEAM while averaging **under 7,000 tokens per retrieval call**. Full-context approaches on the same benchmarks routinely consume 25,000+ tokens per query.
 
-Evaluating a memory system at scale comes down to three parameters: **accuracy** (what the benchmarks measure), **cost** (context tokens per query), and **performance** (latency). Optimizing one is easy. Balancing all three at scale is the actual problem.
+## 为什么内存评估很重要
 
-Some benchmarks today — particularly smaller ones like LoCoMo and LongMemEval — can be materially improved by aggressive retrieval strategies, larger context windows, or frontier models. That does not necessarily mean the underlying memory system has gotten better. We evaluate under constraints that reflect how memory systems actually run in production: limited context windows and practical token budgets.
+大多数人工智能代理内存系统通过最大化上下文窗口大小来检索信息。这适用于基准测试，但不适用于生产环境，因为每个代币都会增加成本。 **令牌效率**——以更少的每次查询上下文实现高精度——是基准性能与生产可行性的区别。
 
-## Architecture Overview
+新的 Mem0 算法在 LoCoMo、LongMemEval 和 BEAM 上实现了具有竞争力的准确性，同时**每次检索调用平均低于 7,000 个令牌**。相同基准的全上下文方法每次查询通常会消耗 25,000 多个标记。
 
-Mem0's memory system operates across two phases — **extraction** (writing) and **retrieval** (reading) — with an entity linking layer connecting them.
+大规模评估内存系统可以归结为三个参数：**准确性**（基准测试的衡量标准）、**成本**（每个查询的上下文标记）和**性能**（延迟）。优化一个很容易。大规模平衡这三者才是真正的问题。如今的一些基准测试——尤其是像 LoCoMo 和 LongMemEval 这样的小型基准测试——可以通过积极的检索策略、更大的上下文窗口或前沿模型来显着改进。这并不一定意味着底层内存系统已经变得更好。我们在反映内存系统在生产中实际运行方式的约束下进行评估：有限的上下文窗口和实际的代币预算。
 
-### Memory Extraction (Distillation)
+## 架构概述
 
-When new conversations arrive, the extraction pipeline processes them through five stages:
+Mem0 的内存系统跨两个阶段运行——**提取**（写入）和**检索**（读取），并通过实体链接层连接它们。
 
-1. **Store New Memories** — Conversation enters the pipeline asynchronously (after the agent responds)
-2. **Context Lookup** — Find related existing memories to avoid duplicates
-3. **Distill Memories** — Single-pass LLM extraction produces ADD-only facts from input + context
-4. **Deduplicate + Embed** — Hash-based deduplication, then vectorize new memories
-5. **Entity Linking** — Identify entities (proper nouns, quoted text, compound noun phrases) and link them across memories
+### 内存提取（蒸馏）
 
-Memories are distributed across three storage layers, each tuned for a specific retrieval pattern:
+当新的对话到达时，提取管道通过五个阶段对其进行处理：
 
-| Store | Contents | Purpose |
+1. **存储新记忆** — 对话异步进入管道（在代理响应后）
+2. **上下文查找** — 查找相关的现有记忆以避免重复
+3.**Distill Memories** — 单通道 LLM 提取从输入 + 上下文中生成仅 ADD 事实
+4. **去重+嵌入**——基于哈希的去重，然后向量化新的内存
+5. **实体链接** — 识别实体（专有名词、引用文本、复合名词短语）并将它们链接到记忆中内存分布在三个存储层中，每个存储层都针对特定的检索模式进行了调整：
+
+|商店 |内容 |目的|
 |---|---|---|
-| **Vector Database** | Memory text, embeddings, metadata (timestamps, hash, categories, attributed_to) | Primary fact storage + semantic retrieval |
-| **Entity Store** | Entities + embeddings + linked memory IDs | Entity-based retrieval boost |
-| **SQL Database** | History log (ADD events) + rolling message window | Audit trail + extraction dedup context |
+| **矢量数据库** |内存文本、嵌入、元数据（时间戳、哈希、类别、attributed_to）|初级事实存储+语义检索|
+| **实体店** |实体+嵌入+链接内存ID |基于实体的检索提升 |
+| **SQL 数据库** |历史记录（ADD事件）+滚动消息窗口|审计跟踪+提取重复数据删除上下文|
 
-<Info>
-The key architectural decision is **ADD-only extraction**. New facts are stored alongside old ones — nothing is overwritten or deleted. When information changes, both the old and new facts survive. This preserves temporal context and eliminates information loss from premature consolidation.
-</Info>
+<信息>
+关键的架构决策是**仅添加提取**。新事实与旧事实一起存储——没有任何内容被覆盖或删除。当信息发生变化时，新旧事实都会保留下来。这保留了时间上下文并消除了过早合并造成的信息丢失。</信息>
 
-### Multi-Signal Retrieval
+### 多信号检索
 
-When a query arrives, the retrieval pipeline scores candidates across three signals in parallel:
+当查询到达时，检索管道会并行对三个信号的候选者进行评分：
 
-1. **Semantic Search** — Vector similarity scoring against memory embeddings
-2. **Keyword Search** — Normalized term matching via BM25 with verb-form lemmatization
-3. **Entity Search** — Entity graph matching boosts memories linked to query entities
+1. **语义搜索** - 针对内存嵌入的向量相似度评分
+2. **关键字搜索** — 通过 BM25 进行规范化术语匹配，并进行动词形式词形还原
+3. **实体搜索** - 实体图匹配增强与查询实体链接的记忆结果通过排名评分融合到最终的前 K 组中。不同的查询类型依赖于不同的信号：
 
-Results are fused via rank scoring into a final top-K set. Different query types lean on different signals:
-
-| Query Type | Primary Signal | Example |
+|查询类型 |主要信号 |示例|
 |---|---|---|
-| Conceptual | Semantic | "What does the user think about remote work?" |
-| Factual/exact | BM25 keyword | "What meetings did I attend last week?" |
-| Entity-centric | Entity matching | "What do we know about Alice?" |
-| Temporal | Semantic + keyword | "When did the user first mention the project?" |
+|概念|语义 | “用户对远程工作有何看法？” |
+|事实/准确 | BM25 关键字 | “我上周参加了哪些会议？” |
+|以实体为中心 |实体匹配| “我们对爱丽丝了解多少？” |
+|颞叶 |语义+关键词| “用户什么时候第一次提到这个项目？” |
 
-The combined score outperformed every individual signal across every category tested.
+综合得分优于每个测试类别中的每个单独信号。
 
-## Benchmarks
+## 基准测试
 
-### LoCoMo
+### 洛科莫
 
-[LoCoMo](https://github.com/snap-stanford/locomo) tests single-hop, multi-hop, open-domain, and temporal memory recall across conversational sessions.
+[LoCoMo](https://github.com/snap-stanford/locomo) 测试对话会话中的单跳、多跳、开放域和时间记忆回忆。
 
-| Category | Old Algorithm | New Algorithm | Delta |
+|类别 |旧算法 |新算法 |达美航空 |
 |---|---|---|---|
-| **Overall** | **71.4** | **91.6** | **+20.2** |
-| Single-hop | 76.6 | 92.3 | +15.7 |
-| Multi-hop | 70.2 | 93.3 | +23.1 |
-| Open-domain | 57.3 | 76.0 | +18.7 |
-| Temporal | 63.2 | 92.8 | +29.6 |
+| **总体** | **71.4** | **91.6** | **+20.2** |
+|单跳 | 76.6 | 76.6 92.3 | 92.3 +15。7 |
+|多跳| 70.2 | 70.2 93.3 | 93.3 +23.1 |
+|开放域 | 57.3 | 57.3 76.0 | 76.0 +18.7 |
+|颞叶 | 63.2 | 63.2 92.8 | 92.8 +29.6 |
 
-*Mean tokens: 6,956*
-
-The two largest gains are **temporal queries (+29.6)** and **multi-hop reasoning (+23.1)**. Both categories directly test the ADD-only architecture (preserving temporal context) and entity linking (connecting facts across memories).
+*平均代币：6,956*两个最大的收益是**时间查询（+29.6）**和**多跳推理（+23.1）**。这两个类别都直接测试仅 ADD 架构（保留时间上下文）和实体链接（跨内存连接事实）。
 
 ### LongMemEval
 
-[LongMemEval](https://github.com/xiaowu0162/LongMemEval) evaluates memory across single-session and multi-session contexts, including knowledge updates and temporal reasoning.
+[LongMemEval](https://github.com/xiaowu0162/LongMemEval) 评估单会话和多会话上下文中的记忆，包括知识更新和时间推理。
 
-| Category | Old Algorithm | New Algorithm | Delta |
+|类别 |旧算法 |新算法 |达美航空 |
 |---|---|---|---|
-| **Overall** | **67.8** | **93.4** | **+25.6** |
-| Single-session (user) | 94.3 | 97.1 | +2.8 |
-| Single-session (assistant) | 46.4 | 100.0 | +53.6 |
-| Single-session (preference) | 76.7 | 96.7 | +20.0 |
-| Knowledge update | 79.5 | 96.2 | +16.7 |
-| Temporal reasoning | 51.1 | 93.2 | +42.1 |
-| Multi-session | 70.7 | 86.5 | +15.8 |
+| **总体** | **67.8** | **93.4** | **+25.6** |
+|单会话（用户）| 94.3 | 94.3 97.1 | 97.1 +2.8 |
+|单次（助理）| 46.4 | 46.4 100.0 | 100.0 +53.6 |
+|单次会议（首选）| 76.7 | 76.7 96.7 | 96.7 +20.0 |
+|知识更新 | 79.5 | 79.5 96.2 | 96.2 +16.7 |
+|时间推理 | 51.1 | 51.1 93.2 | 93.2 +42.1 |
+|多场会议 | 70.7 | 70.7 86.5 | 86.5 +15。8 |
 
-*Mean tokens: 6,787*
+*平均代币：6,787*
 
-The biggest gain is **single-session assistant (+53.6)** — the previous algorithm had a blind spot for agent-generated facts. The new algorithm treats them as first-class memories.
+最大的收获是**单会话助手（+53.6）**——之前的算法对于代理生成的事实存在盲点。新算法将它们视为一流的存储器。
 
-The **+42.1 on temporal reasoning** reflects the ADD-only architecture preserving chronological context that the previous UPDATE/DELETE model would destroy.
+时间推理上的 **+42.1** 反映了仅 ADD 架构，保留了先前的 UPDATE/DELETE 模型会破坏的时间顺序上下文。### 光束
 
-### BEAM
+[BEAM](https://github.com/mem0ai/memory-benchmarks) 在 10 个任务类别中以 1M 和 10M 令牌规模评估内存系统。它是唯一一个在人工智能代理实际遇到的生产环境中运行的公共基准。
 
-[BEAM](https://github.com/mem0ai/memory-benchmarks) evaluates memory systems at 1M and 10M token scales across ten task categories. It is the only public benchmark that operates at context volumes production AI agents actually encounter.
-
-| Category | 1M | 10M |
+|类别 | 1M | 10M |
 |---|---|---|
-| **Overall** | **64.1** | **48.6** |
-| preference_following | 88.3 | 90.4 |
-| instruction_following | 85.2 | 82.5 |
-| information_extraction | 70.0 | 56.3 |
-| knowledge_update | 65.0 | 75.0 |
-| multi_session_reasoning | 65.2 | 26.1 |
-| summarization | 63.5 | 46.9 |
-| temporal_reasoning | 61.8 | 16.3 |
-| event_ordering | 53.6 | 20.2 |
-| abstention | 52.5 | 40.0 |
-| contradiction_resolution | 35.7 | 32.5 |
+| **总体** | **64.1** | **48.6** |
+|偏好_以下 | 88.3 | 88.3 90.4 | 90.4
+|指令如下 | 85.2 | 85.2 82.5 | 82.5
+|信息提取 | 70.0 | 70.0 56.3 | 56.3
+|知识更新 | 65.0 | 65.0 75.0 | 75.0
+|多会话推理 | 65.2 | 65.2 26.1 | 26.1
+|总结| 63.5 | 63.5 46.9 | 46.9
+|时间推理 | 61.8 | 16.3 | 16.3
+|事件排序 | 53.6 | 53.6 20.2 | 20.2
+|弃权 | 52.5 | 52.5 40.0 | 40.0
+|矛盾解决 | 35.7 | 35.7 32.5 | 32.5
 
-*Mean tokens (1M): 6,719. Mean tokens (10M): 6,914.*
+*平均代币数 (1M)：6,719。平均代币（10M）：6,914。*<信息>
+**BEAM 是这里最相关的基准。** 它以 1M 和 10M 代币规模运行，不能通过简单地扩展上下文窗口来解决。 10M 的结果反映了内存系统在生产环境卷中的实际情况。该系统在两个层面上都在偏好遵循、指令遵循和知识更新方面表现良好。 10M 的较弱类别（时间推理、事件排序、多会话推理）是整个领域的开放性问题——它们需要对事件在时间上如何相互关联进行高阶表示，这是我们正在进行的研究的主要焦点。
+</信息>
 
-<Info>
-**BEAM is the most relevant benchmark here.** It operates at 1M and 10M token scales and cannot be solved by simply expanding the context window. The results at 10M reflect where memory systems actually stand at production context volumes. The system holds up well on preference following, instruction following, and knowledge updates at both scales. Weaker categories at 10M (temporal reasoning, event ordering, multi-session reasoning) are open problems across the field — they require higher-order representations of how events relate to each other across time, which is a primary focus of our ongoing research.
-</Info>
+### 性能总结
 
-### Performance Summary
+所有结果均使用单遍检索设置：一次检索调用，一次应答，无代理循环。
 
-All results use a single-pass retrieval setup: one retrieval call, one answer, no agentic loops.
-
-| Benchmark | Old Algorithm | New Algorithm | Average tokens / query |
+|基准|旧算法 |新算法 |平均令牌/查询 |
 |---|---|---|---|
-| **LoCoMo** | 71.4 | **91.6** | 6,956 |
-| **LongMemEval** | 67.8 | **93.4** | 6,787 |
-| **BEAM (1M)** | — | **64.1** | 6,719 |
-| **BEAM (10M)** | — | **48.6** | 6,914 |
+| **LoCoMo** | 71.4 | 71.4 **91。6** | 6,956 |
+| **LongMemEval** | 67.8 | 67.8 **93.4** | 6,787 |
+| **梁 (1M)** | — | **64.1** | 6,719 |
+| **BEAM (10M)** | — | **48.6** | 6,914 |<信息>
+分数反映了 Mem0 的托管平台，其中包括开源 SDK 中不提供的专有优化。开源用户应该期望方向相似的收益，但数字不同。
+</信息>
 
-<Info>
-Scores reflect Mem0's managed platform, which includes proprietary optimizations not available in the open-source SDK. Open-source users should expect directionally similar gains but not identical numbers.
-</Info>
+所有基准测试都在相同的生产代表模型堆栈上运行。由于判断不一致，分数具有 ±1 分置信区间。
 
-All benchmarks run on the same production-representative model stack. Scores carry a ±1 point confidence interval due to judge inconsistency.
+## 运行评估
 
-## Running Evaluations
+完整的评估框架是[开源的](https://github.com/mem0ai/memory-benchmarks)，因此任何人都可以独立重现这些数字。它支持 Mem0 Cloud 和自托管 OSS 后端。
 
-The full evaluation framework is [open-sourced](https://github.com/mem0ai/memory-benchmarks) so anyone can reproduce the numbers independently. It supports both Mem0 Cloud and self-hosted OSS backends.
+### 设置
 
-### Setup
-
-<Tabs>
-  <Tab title="Mem0 Cloud">
-    ```bash
+<标签>
+  <选项卡标题=“Mem0云”>    ```bash
     git clone https://github.com/mem0ai/memory-benchmarks.git
     cd memory-benchmarks
     pip install -r requirements.txt
@@ -156,9 +144,8 @@ The full evaluation framework is [open-sourced](https://github.com/mem0ai/memory
     export MEM0_API_KEY=m0-your-key
     export OPENAI_API_KEY=sk-your-key
     ```
-  </Tab>
-  <Tab title="Mem0 OSS (Docker)">
-    ```bash
+</标签>
+  <Tab title="Mem0 OSS (Docker)">    ```bash
     git clone https://github.com/mem0ai/memory-benchmarks.git
     cd memory-benchmarks
     pip install -r requirements.txt
@@ -172,32 +159,29 @@ The full evaluation framework is [open-sourced](https://github.com/mem0ai/memory
     # Mem0 server: http://localhost:8888
     # Qdrant:      http://localhost:6333
     ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-### Running a Benchmark
+### 运行基准测试
 
-Each benchmark is a Python module with its own runner ([source code](https://github.com/mem0ai/memory-benchmarks/tree/main/benchmarks)). All share common CLI options:
-
-| Option | Default | Description |
+每个基准测试都是一个具有自己的运行程序的 Python 模块（[源代码](https://github.com/mem0ai/memory-benchmarks/tree/main/benchmarks)）。所有共享共同的 CLI 选项：|选项 |默认|描述 |
 |---|---|---|
-| `--project-name` | (required) | Run identifier for tracking results |
-| `--backend` | `oss` | `oss` (self-hosted) or `cloud` (Mem0 Platform) |
-| `--mem0-api-key` | — | Mem0 API key (required for `cloud` backend) |
-| `--mem0-host` | `http://localhost:8888` | Mem0 server URL (for `oss` backend) |
-| `--top-k` | `200` | Number of memories to retrieve per query |
-| `--top-k-cutoffs` | `10,20,50,200` | Evaluate accuracy at multiple retrieval depths (BEAM default: `100`) |
-| `--answerer-model` | *(varies)* | LLM for generating answers from retrieved memories |
-| `--judge-model` | *(varies)* | LLM for judging answer correctness |
-| `--provider` | `openai` | LLM provider: `openai`, `anthropic`, `azure` |
-| `--judge-provider` | (same as `--provider`) | Override provider for the judge model |
-| `--max-workers` | `10` | Parallel workers for evaluation |
-| `--predict-only` | — | Stop after search, skip answer + judge phases |
-| `--evaluate-only` | — | Skip ingest + search, evaluate existing results |
-| `--resume` | — | Resume from checkpoint (BEAM and LongMemEval; on by default for LongMemEval) |
+| `--项目名称` | （必填）|跟踪结果的运行标识符 |
+| `--后端` | `oss` | `oss`（自托管）或`cloud`（Mem0 平台）|
+| `--mem0-api-key` | — | Mem0 API 密钥（“云”后端所需）|
+| `--mem0-主机` | `http://localhost:8888` | Mem0 服务器 URL（用于 `oss` 后端）|
+| `--top-k` | `200` |每个查询检索的内存数量 |
+| `--top-k-cutoffs` | `10,20,50,200` |评估多个检索深度的准确性（BEAM 默认值：“100”）|
+| `--answerer-model` | *（可变）* | LLM 用于从检索到的记忆中生成答案 |
+| `--法官模型` | *（可变）* | LLM用于判断答案正确性|
+| `--provider` | `openai` | LLM 提供商：`openai`、`anthropic`、`azure` |
+| `--法官提供者` | （与“--provider”相同）|判断模型的覆盖提供者 |
+| `--max-workers` | `10` |并行工作者评估 |
+| `--仅预测` | — |搜索后停止，跳过回答+判断阶段 |
+| `--仅评估` | — |跳过摄取 + 搜索，评估现有结果 |
+| `--继续` | — |从检查点恢复（BEAM 和 LongMemEval; LongMemEval 默认打开）|
 
-<CodeGroup>
-```bash LoCoMo
+<代码组>```bash LoCoMo
 # ~300 questions across 10 conversations (fastest benchmark)
 python -m benchmarks.locomo.run \
   --project-name my-eval \
@@ -246,13 +230,11 @@ python -m benchmarks.beam.run \
   --conversations 0-99 \
   --top-k 200
 ```
-</CodeGroup>
+</代码组>
 
-### Custom Model Configuration
+### 自定义模型配置
 
-To run evaluations with custom models (Azure OpenAI, Ollama, etc.), copy one of the provided configs:
-
-```bash
+要使用自定义模型（Azure OpenAI、Ollama 等）运行评估，请复制提供的配置之一：```bash
 # Available configs: openai.yaml, azure-openai.yaml, ollama.yaml
 cp configs/azure-openai.yaml mem0-config.yaml
 # Edit mem0-config.yaml with your model details
@@ -260,24 +242,18 @@ cp configs/azure-openai.yaml mem0-config.yaml
 # Uncomment the volume mount in docker-compose.yml, then restart:
 docker compose down && docker compose up -d
 ```
+### 查看结果
 
-### Viewing Results
-
-Results are saved to `results/[benchmark]/` and can be explored through the built-in web UI:
-
-```bash
+结果保存到“results/[benchmark]/”，并且可以通过内置的 Web UI 进行探索：```bash
 npm install
 npm run dev -- -p 3001
 # Open http://localhost:3001
 ```
+用户界面允许您浏览每个问题的结果、检查检索详细信息并比较多次运行。
 
-The UI lets you browse per-question results, inspect retrieval details, and compare multiple runs.
+### 结果格式
 
-### Result Format
-
-Each evaluated question produces a structured result:
-
-```json
+每个评估的问题都会产生一个结构化结果：```json
 {
   "id": "locomo_q_001",
   "group": "temporal",
@@ -308,47 +284,42 @@ Each evaluated question produces a structured result:
   }
 }
 ```
+## 解释结果
 
-## Interpreting Results
+在评估内存系统时，请记住以下注意事项：
 
-When evaluating memory systems, keep these considerations in mind:
+- **饱和小型基准测试与构建大规模运行的内存系统不同。**小型基准测试可以通过激进的检索和前沿模型进行暴力破解。
+- **令牌效率与准确性同样重要。** 每次查询使用 25K 令牌得分 95% 的系统与使用 7K 令牌得分 90% 的系统无法相比。报告每个查询的平均标记以及分数。
+- **在同等约束下进行比较。** 始终使用相同的检索预算、相同的模型和相同的延迟预算来比较系统。最大召回率的前沿模型无法与生产现实检索深度的较小生产级模型相比。
+- **注意分数上限效应。** 像“单会话用户”这样的类别已经接近饱和（97%+）。这些类别的改进不如时间推理或多会话等较难类别的进步有意义。
+- **10M 的 BEAM 是真正的测试。**任何系统在小规模下都可以看起来很好。 10M 代币 BEAM 基准测试揭示了检索系统是否真正可扩展。
 
-- **Saturating a small benchmark is not the same as building a memory system that works at scale.** Small benchmarks can be brute-forced with aggressive retrieval and frontier models.
-- **Token efficiency matters as much as accuracy.** A system that scores 95% using 25K tokens per query isn't comparable to one scoring 90% using 7K tokens. Report mean tokens per query alongside scores.
-- **Compare at equal constraints.** Always compare systems using the same retrieval budget, the same model, and the same latency budget. A frontier model at maximum recall is not comparable to a smaller production-grade model at production-realistic retrieval depth.
-- **Watch for score ceiling effects.** Categories like "single-session user" are already near-saturated (97%+). Improvements in these categories are less meaningful than gains in harder categories like temporal reasoning or multi-session.
-- **BEAM at 10M is the real test.** Any system can look good at small scale. The 10M-token BEAM benchmark reveals whether the retrieval system actually scales.
+＃＃ 常问问题<手风琴组>
+  <Accordion title="使用什么评委模型进行评估？">
+    法官模型可通过“--judge-model”和“--judge-provider”标志进行配置。有关当前默认值，请参阅[评估存储库](https://github.com/mem0ai/memory-benchmarks)。由于判断不一致，分数具有 ±1 分置信区间。
+  </手风琴>
+  <Accordion title="我可以使用不同的提取模型进行评估吗？">
+    是的。对于自托管，请在“mem0-config.yaml”中配置提取模型（有关特定于提供程序的示例，请参阅评估存储库的“configs/”目录）。对于 Mem0 Cloud，提取使用平台的默认值。使用前沿模型可能会产生更高的分数，但成本和延迟更高。
+  </手风琴>
+  <Accordion title="为什么 BEAM 分数低于 LoCoMo/LongMemEval？” >
+    BEAM 以 1M 和 10M 代币规模运行——比 LoCoMo 或 LongMemEval 大几个数量级。在这些尺度下，相似的内容会在窗口中多次出现，并且记忆系统必须在许多接近的匹配中显示出完全正确的记忆。分数反映了任务的真正难度，而不是算法的回归。
+  </手风琴>
+  <Accordion title="我如何贡献新的基准？">
+    使用您的基准实现向 [memory-benchmarks 存储库](https://github.com/mem0ai/memory-benchmarks) 发起拉取请求。有关预期的接口和格式，请参阅存储库自述文件。
+  </手风琴>
+</手风琴组>## 资源
 
-## FAQ
-
-<AccordionGroup>
-  <Accordion title="What judge model is used for evaluation?">
-    The judge model is configurable via `--judge-model` and `--judge-provider` flags. See the [evaluation repository](https://github.com/mem0ai/memory-benchmarks) for the current defaults. Scores carry a ±1 point confidence interval due to judge inconsistency.
-  </Accordion>
-  <Accordion title="Can I evaluate with a different extraction model?">
-    Yes. For self-hosted, configure the extraction model in your `mem0-config.yaml` (see the `configs/` directory of the evaluation repo for provider-specific examples). For Mem0 Cloud, extraction uses the platform's default. Using a frontier model will likely produce higher scores but at higher cost and latency.
-  </Accordion>
-  <Accordion title="Why are BEAM scores lower than LoCoMo/LongMemEval?">
-    BEAM operates at 1M and 10M token scales — orders of magnitude larger than LoCoMo or LongMemEval. At these scales, similar content appears multiple times across the window, and the memory system must surface the exact correct memory over many close matches. The scores reflect the genuine difficulty of the task, not a regression in the algorithm.
-  </Accordion>
-  <Accordion title="How do I contribute a new benchmark?">
-    Open a pull request to the [memory-benchmarks repository](https://github.com/mem0ai/memory-benchmarks) with your benchmark implementation. See the repository README for the expected interface and format.
-  </Accordion>
-</AccordionGroup>
-
-## Resources
-
-<CardGroup cols={2}>
-  <Card title="Evaluation Repository" icon="github" href="https://github.com/mem0ai/memory-benchmarks">
-    Open-source evaluation framework for reproducing all benchmark results
-  </Card>
+<卡组列={2}>
+  <Card title="评估存储库" icon="github" href="https://github.com/mem0ai/memory-benchmarks">
+    用于重现所有基准测试结果的开源评估框架
+  </卡>
   <Card title="Research" icon="flask" href="https://mem0.ai/research">
-    Published research papers and technical reports
-  </Card>
+    发表研究论文和技术报告
+  </卡>
   <Card title="Blog Post" icon="newspaper" href="https://mem0.ai/blog/new-algorithm">
-    Detailed writeup of the new algorithm design and results
-  </Card>
-  <Card title="Platform Migration" icon="arrow-right" href="/migration/platform-v2-to-v3">
-    Guide for migrating your Platform integration
-  </Card>
-</CardGroup>
+    新算法设计和结果的详细记录
+  </卡>
+  <Card title="平台迁移" icon="arrow-right" href="/migration/platform-v2-to-v3">
+    平台集成迁移指南
+  </卡>
+</卡组>

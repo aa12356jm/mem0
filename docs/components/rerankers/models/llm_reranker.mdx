@@ -3,15 +3,17 @@ title: LLM Reranker
 description: 'Use any language model as a reranker with custom prompts'
 ---
 
-## Overview
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-The LLM reranker allows you to use any supported language model as a reranker. This approach uses prompts to instruct the LLM to score and rank memories based on their relevance to the query. While slower than specialized rerankers, it offers maximum flexibility and can be fine-tuned with custom prompts.
 
-## Configuration
 
-### Basic Setup
+## 概述
 
-```python
+LLM 重新排序器允许您使用任何支持的语言模型作为重新排序器。这种方法使用提示来指示法学硕士根据记忆与查询的相关性对记忆进行评分和排名。虽然比专门的重新排序器慢，但它提供了最大的灵活性，并且可以使用自定义提示进行微调。
+
+## 配置
+
+### 基本设置```python
 from mem0 import Memory
 
 config = {
@@ -27,23 +29,20 @@ config = {
 
 m = Memory.from_config(config)
 ```
+### 配置参数
 
-### Configuration Parameters
+|参数|类型 |默认|描述 |
+|------------|------|---------|------------|
+| `提供者` | STR | `"openai"` | LLM 提供商（openai、anthropic 等）|
+| `模型` | STR | `"gpt-4o-mini"` |用于重新排名的LLM模型|
+| `api_key` | STR |无 | LLM 提供商的 API 密钥 |
+| `top_k` |整数 |无 |重新排名后返回的热门文档数量 |
+| `温度` |浮动| 0.0 | 0.0 LLM温度的一致性|
+| `max_tokens` |整数 | 100 | 100 LLM 响应的最大令牌数 |
+| `scoring_prompt` | STR |无 |评分文档的自定义提示模板 |
+| `llm` |字典 |无 |用于特定于提供商的字段的可选嵌套 LLM 配置（例如“ollama_base_url”、“azure_endpoint”）。提供时覆盖顶级 `provider`/`model`/`api_key`。 |
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `provider` | str | `"openai"` | LLM provider (openai, anthropic, etc.) |
-| `model` | str | `"gpt-4o-mini"` | LLM model to use for reranking |
-| `api_key` | str | None | API key for the LLM provider |
-| `top_k` | int | None | Number of top documents to return after reranking |
-| `temperature` | float | 0.0 | LLM temperature for consistency |
-| `max_tokens` | int | 100 | Maximum tokens for LLM response |
-| `scoring_prompt` | str | None | Custom prompt template for scoring documents |
-| `llm` | dict | None | Optional nested LLM config for provider-specific fields (e.g., `ollama_base_url`, `azure_endpoint`). Overrides top-level `provider`/`model`/`api_key` when provided. |
-
-### Advanced Configuration
-
-```python
+### 高级配置```python
 config = {
     "reranker": {
         "provider": "llm_reranker",
@@ -66,12 +65,9 @@ config = {
     }
 }
 ```
+## 支持的法学硕士提供商
 
-## Supported LLM Providers
-
-### OpenAI
-
-```python
+### 开放人工智能```python
 config = {
     "reranker": {
         "provider": "llm_reranker",
@@ -84,10 +80,7 @@ config = {
     }
 }
 ```
-
-### Anthropic
-
-```python
+### 人择```python
 config = {
     "reranker": {
         "provider": "llm_reranker",
@@ -99,10 +92,7 @@ config = {
     }
 }
 ```
-
-### Ollama (Local)
-
-```python
+### 奥拉马（本地）```python
 config = {
     "reranker": {
         "provider": "llm_reranker",
@@ -120,14 +110,11 @@ config = {
     }
 }
 ```
+<注意>
+  对于像 Ollama 这样需要额外字段（例如“ollama_base_url”）的提供程序，请使用可选的嵌套“llm”键来传递特定于提供程序的配置。嵌套的“llm”配置在提供时会覆盖顶级“provider”/“model”/“api_key”。
+</注>
 
-<Note>
-  For providers like Ollama that need extra fields (e.g., `ollama_base_url`), use the optional nested `llm` key to pass provider-specific configuration. The nested `llm` config overrides top-level `provider`/`model`/`api_key` when provided.
-</Note>
-
-### Azure OpenAI
-
-```python
+### Azure OpenAI```python
 config = {
     "reranker": {
         "provider": "llm_reranker",
@@ -148,14 +135,11 @@ config = {
     }
 }
 ```
+## 自定义提示
 
-## Custom Prompts
+### 默认提示行为
 
-### Default Prompt Behavior
-
-The default prompt asks the LLM to score relevance on a 0.0-1.0 scale:
-
-```
+默认提示要求 LLM 在 0.0-1.0 范围内对相关性进行评分：```
 You are a relevance scoring assistant. Given a query and a document, you need to score how relevant the document is to the query.
 
 Score the relevance on a scale from 0.0 to 1.0, where:
@@ -170,12 +154,9 @@ Document: "{document}"
 
 Provide only a single numerical score between 0.0 and 1.0. Do not include any explanation or additional text.
 ```
+### 自定义提示示例
 
-### Custom Prompt Examples
-
-#### Domain-Specific Scoring
-
-```python
+#### 特定领域的评分```python
 custom_prompt = """
 You are a medical information specialist. Rate how relevant each memory is for answering the medical query.
 Consider clinical accuracy, specificity, and practical applicability.
@@ -202,10 +183,7 @@ config = {
     }
 }
 ```
-
-#### Contextual Relevance
-
-```python
+#### 上下文相关性```python
 contextual_prompt = """
 Rate how well this memory answers the specific question asked.
 Consider:
@@ -226,10 +204,7 @@ Document: "{document}"
 Score:
 """
 ```
-
-#### Conversational Context
-
-```python
+#### 对话上下文```python
 conversation_prompt = """
 You are helping evaluate which memories are most useful for a conversational AI assistant.
 Rate how helpful this memory would be for generating a relevant response.
@@ -246,16 +221,13 @@ Document: "{document}"
 Score:
 """
 ```
+<注意>
+  自定义提示必须包含“{query}”和“{document}”占位符。 LLM 回复应包含自动提取的数字分数。
+</注>
 
-<Note>
-  Custom prompts must include `{query}` and `{document}` placeholders. The LLM response should contain a numerical score which is automatically extracted.
-</Note>
+## 用法示例
 
-## Usage Examples
-
-### Basic Usage
-
-```python
+### 基本用法```python
 from mem0 import Memory
 
 m = Memory.from_config(config)
@@ -276,10 +248,7 @@ for result in results["results"]:
     print(f"Memory: {result['memory']}")
     print(f"LLM Score: {result['score']:.2f}")
 ```
-
-### Batch Processing with Error Handling
-
-```python
+### 带错误处理的批处理```python
 def safe_llm_rerank_search(query, user_id, max_retries=3):
     for attempt in range(max_retries):
         try:
@@ -293,21 +262,18 @@ def safe_llm_rerank_search(query, user_id, max_retries=3):
 # Use the safe function
 results = safe_llm_rerank_search("What are my preferences?", "alice")
 ```
+## 性能考虑因素
 
-## Performance Considerations
+### 速度与质量的权衡
 
-### Speed vs Quality Trade-offs
+|型号类型 |速度|品质 |成本|最适合 |
+|------------|---------|---------|-----|----------|
+| GPT-4o 迷你 |快|好 |低|大批量应用 |
+| GPT-4o |中等|优秀|中等|质量关键型应用 |
+|克劳德十四行诗|中等|优秀|中等|均衡的性能|
+|奥拉马当地 |变量|好 |免费|隐私敏感应用程序 |
 
-| Model Type | Speed | Quality | Cost | Best For |
-|------------|-------|---------|------|----------|
-| GPT-4o mini | Fast | Good | Low | High-volume applications |
-| GPT-4o | Medium | Excellent | Medium | Quality-critical applications |
-| Claude Sonnet | Medium | Excellent | Medium | Balanced performance |
-| Ollama Local | Variable | Good | Free | Privacy-sensitive applications |
-
-### Optimization Strategies
-
-```python
+### 优化策略```python
 # Fast configuration for high-volume use
 fast_config = {
     "reranker": {
@@ -336,12 +302,9 @@ quality_config = {
     }
 }
 ```
+## 高级用例
 
-## Advanced Use Cases
-
-### Multi-Step Reasoning
-
-```python
+### 多步推理```python
 reasoning_prompt = """
 Evaluate this memory's relevance using multi-step reasoning:
 
@@ -363,10 +326,7 @@ Step 4 (Context):
 Final Score:
 """
 ```
-
-## Error Handling and Fallbacks
-
-```python
+## 错误处理和回退```python
 class RobustLLMReranker:
     def __init__(self, primary_config, fallback_config=None):
         self.primary = Memory.from_config(primary_config)
@@ -416,43 +376,40 @@ fallback_config = {
 reranker = RobustLLMReranker(primary_config, fallback_config)
 results = reranker.search("What are my preferences?", "alice")
 ```
+## 最佳实践
 
-## Best Practices
+1. **使用特定提示**：根据您的领域和用例定制提示
+2. **将温度设置为 0**：确保运行期间得分一致
+3. **限制 Top-K**：不要对太多候选人进行重新排名以控制成本
+4. **实施后备措施**：始终为 API 故障制定备份计划
+5. **监控成本**：跟踪 API 使用情况，尤其是昂贵的模型
+6. **缓存结果**：考虑缓存重复查询的重排序结果
+7. **测试提示**：尝试不同的提示以找到最有效的
 
-1. **Use Specific Prompts**: Tailor prompts to your domain and use case
-2. **Set Temperature to 0**: Ensure consistent scoring across runs
-3. **Limit Top-K**: Don't rerank too many candidates to control costs
-4. **Implement Fallbacks**: Always have a backup plan for API failures
-5. **Monitor Costs**: Track API usage, especially with expensive models
-6. **Cache Results**: Consider caching reranking results for repeated queries
-7. **Test Prompts**: Experiment with different prompts to find what works best
+## 故障排除
 
-## Troubleshooting
+### 常见问题
 
-### Common Issues
+**分数不一致**
+- 将温度设置为 0。0
+- 使用更具体的提示
+- 考虑使用多次调用并取平均值
 
-**Inconsistent Scores**
-- Set temperature to 0.0
-- Use more specific prompts
-- Consider using multiple calls and averaging
+**API 速率限制**
+- 实施指数退避
+- 在大批量场景中使用更便宜的型号
+- 添加有延迟的重试逻辑
 
-**API Rate Limits**
-- Implement exponential backoff
-- Use cheaper models for high-volume scenarios
-- Add retry logic with delays
+**排名质量较差**
+- 完善您的自定义提示
+- 尝试不同的LLM模式
+- 在提示中添加示例
 
-**Poor Ranking Quality**
-- Refine your custom prompt
-- Try different LLM models
-- Add examples to your prompt
-
-## Next Steps
-
-<CardGroup cols={2}>
-  <Card title="Custom Prompts Guide" icon="pencil" href="/components/rerankers/custom-prompts">
-    Learn to craft effective reranking prompts
-  </Card>
-  <Card title="Performance Optimization" icon="bolt" href="/components/rerankers/optimization">
-    Optimize LLM reranker performance
-  </Card>
-</CardGroup>
+## 后续步骤<卡组列={2}>
+  <Card title="自定义提示指南" icon="pencil" href="/components/rerankers/custom-prompts">
+    学习制作有效的重新排名提示
+  </卡>
+  <Card title="性能优化" icon="bolt" href="/components/rerankers/optimization">
+    优化 LLM 重新排名器性能
+  </卡>
+</卡组>

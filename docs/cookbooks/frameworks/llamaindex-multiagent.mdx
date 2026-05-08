@@ -3,49 +3,45 @@ title: Multi-Agent Collaboration
 description: "Share a persistent memory layer across collaborating LlamaIndex agents."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Snippet file="blank-notif.mdx" />
 
-Build an intelligent multi-agent learning system that uses Mem0 to maintain persistent memory across multiple specialized agents. This example demonstrates how to create a tutoring system where different agents collaborate while sharing a unified memory layer.
 
-## Overview
+<片段文件=“blank-notif.mdx”/>
 
-This example showcases a **Multi-Agent Personal Learning System** that combines:
-- **LlamaIndex AgentWorkflow** for multi-agent orchestration
-- **Mem0** for persistent, shared memory across agents
-- **Multiple agents** that collaborate on teaching tasks
+构建一个智能多智能体学习系统，该系统使用 Mem0 跨多个专用智能体维护持久内存。此示例演示了如何创建一个辅导系统，其中不同的智能体在共享统一的内存层的同时进行协作。
 
-The system consists of two agents:
-- **TutorAgent**: Primary instructor for explanations and concept teaching
-- **PracticeAgent**: Generates exercises and tracks learning progress
+## 概述
 
-Both agents share the same memory context, enabling seamless collaboration and continuous learning from student interactions.
+此示例展示了一个**多代理个人学习系统**，它结合了：
+- **LlamaIndex AgentWorkflow** 用于多代理编排
+- **Mem0** 用于跨代理的持久共享内存
+- **多个代理**协作完成教学任务
 
-## Key Features
+该系统由两个代理组成：
+- **TutorAgent**：解释和概念教学的主要讲师
+- **PracticeAgent**：生成练习并跟踪学习进度
 
-- **Persistent Memory**: Agents remember previous interactions across sessions
-- **Multi-Agent Collaboration**: Agents can hand off tasks to each other
-- **Personalized Learning**: Adapts to individual student needs and learning styles
-- **Progress Tracking**: Monitors learning patterns and skill development
-- **Memory-Driven Teaching**: References past struggles and successes
+两个代理共享相同的记忆上下文，从而实现无缝协作并从学生互动中持续学习。
 
-## Prerequisites
+## 主要特点- **持久记忆**：代理记住之前跨会话的交互
+- **多代理协作**：代理可以互相传递任务
+- **个性化学习**：适应个别学生的需求和学习风格
+- **进度跟踪**：监控学习模式和技能发展
+- **记忆驱动教学**：参考过去的奋斗和成功
 
-Install the required packages:
+## 先决条件
 
-```bash
+安装所需的软件包：```bash
 pip install llama-index-core llama-index-memory-mem0 openai python-dotenv
 ```
-
-Set up your environment variables:
+设置您的环境变量：
 - `MEM0_API_KEY`: Your Mem0 Platform API key
 - `OPENAI_API_KEY`: Your OpenAI API key
 
-You can obtain your Mem0 Platform API key from the <a href="https://app.mem0.ai?utm_source=oss&utm_medium=cookbook-llamaindex-multiagent" rel="nofollow">Mem0 Platform</a>.
+您可以从 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=cookbook-llamaindex-multiagent" rel="nofollow">Mem0 平台</a>获取 Mem0 平台 API 密钥。
 
-## Complete Implementation
-
-```python
+## 完整实施```python
 """
 Multi-Agent Personal Learning System: Mem0 + LlamaIndex AgentWorkflow Example
 
@@ -257,52 +253,40 @@ if __name__ == "__main__":
 
     asyncio.run(main())
 ```
+## 它是如何工作的
 
-## How It Works
-
-### 1. Memory Context Setup
-
-```python
+### 1. Memory Context Setup```python
 # Memory context for this student
 self.memory_context = {"user_id": student_id, "app": "learning_assistant"}
 self.memory = Mem0Memory.from_client(context=self.memory_context)
 ```
+记忆上下文可识别特定的学生和应用程序，确保记忆隔离和正确检索。
 
-The memory context identifies the specific student and application, ensuring memory isolation and proper retrieval.
-
-### 2. Agent Collaboration
-
-```python
+### 2. Agent Collaboration```python
 # Agents can hand off to each other
 can_handoff_to=["PracticeAgent"]  # TutorAgent can hand off to PracticeAgent
 can_handoff_to=["TutorAgent"]     # PracticeAgent can hand off back
 ```
+座席通过 TutorAgent 处理解释和 PracticeAgent 管理练习进行无缝协作。
 
-Agents collaborate seamlessly, with the TutorAgent handling explanations and the PracticeAgent managing exercises.
-
-### 3. Shared Memory
-
-```python
+### 3.共享内存```python
 # Both agents share the same memory instance
 response = await self.workflow.run(
     user_msg=request,
     memory=self.memory  # Shared across all agents
 )
 ```
+工作流程中的所有代理共享相同的内存上下文，从而实现真正的协作学习。
 
-All agents in the workflow share the same memory context, enabling true collaborative learning.
+### 4. 记忆驱动的交互
 
-### 4. Memory-Driven Interactions
+系统提示引导座席：
+- 参考以前的学习课程
+- 适应发现的学习方式
+- 逐步借鉴过去的经验教训
+- 跟踪和响应学习模式
 
-The system prompts guide agents to:
-- Reference previous learning sessions
-- Adapt to discovered learning styles
-- Build progressively on past lessons
-- Track and respond to learning patterns
-
-## Running the Example
-
-```python
+## 运行示例```python
 # Initialize the learning system
 learning_system = MultiAgentLearningSystem(student_id="Alexander")
 
@@ -321,12 +305,9 @@ response2 = await learning_system.start_learning_session(
 # Check learning history
 history = await learning_system.get_learning_history()
 ```
+## 预期输出
 
-## Expected Output
-
-The system will demonstrate memory-aware interactions:
-
-```
+系统将演示内存感知交互：```
 Session 1:
 I understand you want to learn about Vision Language Models and you mentioned you're new to machine learning but have a strong Python background with 4 years of experience. That's a great foundation to build on!
 
@@ -337,35 +318,32 @@ Session 2:
 Based on our previous session, I remember we covered Vision Language Models and I noted that you have a strong Python background with 4 years of experience. You mentioned being new to machine learning, so we started with foundational concepts...
 [Agent references previous session and builds upon it]
 ```
+## 主要优点
 
-## Key Benefits
-
-1. **Persistent Learning**: Agents remember across sessions, creating continuity
-2. **Collaborative Teaching**: Multiple specialized agents work together seamlessly
-3. **Personalized Adaptation**: System learns and adapts to individual learning styles
-4. **Scalable Architecture**: Easy to add more specialized agents
-5. **Memory Efficiency**: Shared memory prevents duplication and ensures consistency
+1. **持续学习**：座席跨会话记住，创造连续性
+2. **协作教学**：多个专业代理无缝协作
+3. **个性化适应**：系统学习并适应个人的学习方式
+4. **可扩展架构**：轻松添加更多专业代理
+5. **内存效率**：共享内存防止重复并确保一致性
 
 
-## Best Practices
+## 最佳实践
 
-1. **Clear Agent Roles**: Define specific responsibilities for each agent
-2. **Memory Context**: Use descriptive context for memory isolation
-3. **Handoff Strategy**: Design clear handoff criteria between agents
-4. **Memory Hygiene**: Regularly review and clean memory for optimal performance
+1. **明确代理角色**：定义每个代理的具体职责
+2. **内存上下文**：使用描述性上下文进行内存隔离
+3. **切换策略**：设计代理之间明确的切换标准
+4. **内存卫生**：定期检查和清理内存以获得最佳性能
 
-## Help & Resources
+## 帮助和资源
 
-- [LlamaIndex Agent Workflows](https://docs.llamaindex.ai/en/stable/use_cases/agents/)
-- <a href="https://app.mem0.ai/?utm_source=oss&utm_medium=cookbook-llamaindex-multiagent" rel="nofollow">Mem0 Platform</a>
+- [LlamaIndex 代理工作流程](https://docs.llamaindex.ai/en/stable/use_cases/agents/)
+- <a href="https://app.mem0.ai/?utm_source=oss&utm_medium=cookbook-llamaindex-multiagent" rel="nofollow">Mem0 平台</a>
 
----
-
-<CardGroup cols={2}>
+---<卡组列={2}>
   <Card title="LlamaIndex ReAct with Mem0" icon="brain" href="/cookbooks/frameworks/llamaindex-react">
-    Start with single-agent patterns before scaling to multi-agent systems.
-  </Card>
-  <Card title="Partition Memories by Entity" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
-    Learn how to scope memories across multiple agents, users, and sessions.
-  </Card>
-</CardGroup>
+    从单代理模式开始，然后扩展到多代理系统。
+  </卡>
+  <Card title="按实体划分记忆" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
+    了解如何跨多个代理、用户和会话确定内存范围。
+  </卡>
+</卡组>

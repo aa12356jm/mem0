@@ -3,15 +3,17 @@ title: Async Client
 description: "Use the AsyncMemoryClient for non-blocking memory operations in high-concurrency Python applications."
 ---
 
-The `AsyncMemoryClient` is an asynchronous client for interacting with the Mem0 API. It provides similar functionality to the synchronous `MemoryClient` but allows for non-blocking operations, which can be beneficial in applications that require high concurrency.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Initialization
 
-To use the async client, you first need to initialize it:
 
-<CodeGroup>
+`AsyncMemoryClient` 是一个用于与 Mem0 API 交互的异步客户端。它提供与同步“MemoryClient”类似的功能，但允许非阻塞操作，这在需要高并发性的应用程序中非常有用。
 
-```python Python
+## 初始化
+
+要使用异步客户端，首先需要初始化它：
+
+<代码组>```python Python
 import os
 from mem0 import AsyncMemoryClient
 
@@ -24,20 +26,17 @@ client = AsyncMemoryClient()
 const { MemoryClient } = require('mem0ai');
 const client = new MemoryClient({ apiKey: 'your-api-key'});
 ```
+</代码组>
 
-</CodeGroup>
+## 方法
 
-## Methods
+`AsyncMemoryClient` 提供以下方法：
 
-The `AsyncMemoryClient` provides the following methods:
+### 添加
 
-### Add
+异步添加新内存。
 
-Add a new memory asynchronously.
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 messages = [
     {"role": "user", "content": "Alice loves playing badminton"},
     {"role": "assistant", "content": "That's great! Alice is a fitness freak"},
@@ -52,133 +51,111 @@ const messages = [
 ];
 await client.add(messages, { userId: "alice" });
 ```
+</代码组>
 
-</CodeGroup>
+### 搜索
 
-### Search
+根据异步查询搜索内存。
 
-Search for memories based on a query asynchronously.
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 await client.search("What is Alice's favorite sport?", filters={"user_id": "alice"})
 ```
 
 ```javascript JavaScript
 await client.search("What is Alice's favorite sport?", { filters: { userId: "alice" } });
 ```
+</代码组>
 
-</CodeGroup>
+### 获取全部
 
-### Get All
+异步检索用户的所有记忆。
 
-Retrieve all memories for a user asynchronously.
+<Callout type="warning" title="需要过滤器">
+`get_all()` 现在需要指定过滤器。
+</标注>
 
-<Callout type="warning" title="Filters Required">
-`get_all()` now requires filters to be specified.
-</Callout>
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 await client.get_all(filters={"AND": [{"user_id": "alice"}]})
 ```
 
 ```javascript JavaScript
 await client.getAll({ filters: {"AND": [{"user_id": "alice"}]} });
 ```
+</代码组>
 
-</CodeGroup>
+### 删除
 
-### Delete
+异步删除特定内存。
 
-Delete a specific memory asynchronously.
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 await client.delete(memory_id="memory-id-here")
 ```
 
 ```javascript JavaScript
 await client.delete("memory-id-here");
 ```
+</代码组>
 
-</CodeGroup>
+### 全部删除
 
-### Delete All
+异步删除用户的所有记忆。
 
-Delete all memories for a user asynchronously.
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 await client.delete_all(user_id="alice")
 ```
 
 ```javascript JavaScript
 await client.deleteAll({ userId: "alice" });
 ```
+</代码组>
 
-</CodeGroup>
+<注意>
+  至少需要一个过滤器（“user_id”、“agent_id”、“app_id”或“run_id”）——在没有过滤器的情况下调用“delete_all”会引发错误，以防止意外数据丢失。您可以传递 `"*"` 作为值来删除给定实体类型的所有记忆（例如，`user_id="*"` 删除每个用户的记忆）。完整的项目擦除需要将所有四个过滤器设置为“*”。
+</注>
 
-<Note>
-  At least one filter (`user_id`, `agent_id`, `app_id`, or `run_id`) is required — calling `delete_all` with no filters raises an error to prevent accidental data loss. You can pass `"*"` as a value to delete all memories for a given entity type (e.g., `user_id="*"` removes memories for every user). A full project wipe requires all four filters set to `"*"`.
-</Note>
+### 历史
 
-### History
+异步获取特定内存的历史记录。
 
-Get the history of a specific memory asynchronously.
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 await client.history(memory_id="memory-id-here")
 ```
 
 ```javascript JavaScript
 await client.history("memory-id-here");
 ```
+</代码组>
 
-</CodeGroup>
+### 用户
 
-### Users
+异步获取具有与其关联的内存的所有用户、代理和运行。
 
-Get all users, agents, and runs which have memories associated with them asynchronously.
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 await client.users()
 ```
 
 ```javascript JavaScript
 await client.users();
 ```
+</代码组>
 
-</CodeGroup>
+### 重置
 
-### Reset
+重置客户端，异步删除所有用户和内存。
 
-Reset the client, deleting all users and memories asynchronously.
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 await client.reset()
 ```
 
 ```javascript JavaScript
 await client.reset();
 ```
+</代码组>
 
-</CodeGroup>
+## 结论
 
-## Conclusion
+`AsyncMemoryClient` 提供了一种与 Mem0 API 异步交互的强大方法，从而实现更高效、响应更快的应用程序。通过使用此客户端，您可以执行内存操作，而不会阻止应用程序的执行。
 
-The `AsyncMemoryClient` provides a powerful way to interact with the Mem0 API asynchronously, allowing for more efficient and responsive applications. By using this client, you can perform memory operations without blocking your application's execution.
+如果您有任何疑问或需要进一步帮助，请随时联系：
 
-If you have any questions or need further assistance, please don't hesitate to reach out:
-
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

@@ -4,33 +4,32 @@ description: Use Mem0 with the same chat-completions flow you already built for 
 icon: "message-bot"
 ---
 
-Mem0 mirrors the OpenAI client interface so you can plug memories into existing chat-completion code with minimal changes. Point your OpenAI-compatible client at Mem0, keep the same request shape, and gain persistent memory between calls.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Info>
-  **You’ll use this when…**
-  - Your app already relies on OpenAI chat completions and you want Mem0 to feel familiar.
-  - You need to reuse existing middleware that expects OpenAI-compatible responses.
-  - You plan to switch between Mem0 Platform and the self-hosted client without rewriting code.
-</Info>
 
-## Feature
 
-- **Drop-in client:** `client.chat.completions.create(...)` works the same as OpenAI’s method signatures.
-- **Shared parameters:** Mem0 accepts `messages`, `model`, and optional memory-scoping fields (`user_id`, `agent_id`, `run_id`).
-- **Memory-aware responses:** Each call saves relevant facts so future prompts automatically reflect past conversations.
-- **OSS parity:** Use the same API surface whether you call the hosted proxy or the OSS configuration.
+Mem0 镜像了 OpenAI 客户端界面，因此您可以通过最少的更改将内存插入现有的聊天完成代码中。将兼容 OpenAI 的客户端指向 Mem0，保持相同的请求形状，并在调用之间获得持久内存。
 
-<Info icon="check">
-  Run one request with `user_id` set. If the next call references that ID and its reply uses the stored memory, compatibility is confirmed.
-</Info>
+<信息>
+  **你会在以下情况下使用它......**
+  - 您的应用程序已经依赖于 OpenAI 聊天完成，并且您希望 Mem0 感觉熟悉。
+  - 您需要重用需要 OpenAI 兼容响应的现有中间件。
+  - 您计划在 Mem0 平台和自托管客户端之间切换，而无需重写代码。
+</信息>
 
----
+## 特点
 
-## Configure it
+- **插入客户端：** `client.chat.completions.create(...)` 与 OpenAI 的方法签名相同。
+- **共享参数：** Mem0 接受 `messages`、`model` 和可选的内存范围字段（`user_id`、`agent_id`、`run_id`）。- **记忆感知响应：** 每次调用都会保存相关事实，以便将来的提示自动反映过去的对话。
+- **OSS奇偶校验：** 无论您调用托管代理还是OSS配置，都使用相同的API接口。
 
-### Call the managed Mem0 proxy
+<信息图标=“检查”>
+  运行一个设置了“user_id”的请求。如果下一次调用引用该 ID 并且其回复使用存储的内存，则确认兼容性。
+</信息>
 
-```python
+---## 配置它
+
+### 调用托管 Mem0 代理```python
 from mem0.proxy.main import Mem0
 
 client = Mem0(api_key="m0-xxx")
@@ -45,14 +44,11 @@ chat_completion = client.chat.completions.create(
     user_id="alice"
 )
 ```
+<提示>
+  重复使用 OpenAI 客户端已发送的相同标识符，以便您可以在提供者之间切换，而无需分支逻辑。
+</提示>
 
-<Tip>
-  Reuse the same identifiers your OpenAI client already sends so you can switch between providers without branching logic.
-</Tip>
-
-### Use the OpenAI-compatible OSS client
-
-```python
+### 使用兼容OpenAI的OSS客户端```python
 from mem0.proxy.main import Mem0
 
 config = {
@@ -72,12 +68,9 @@ chat_completion = client.chat.completions.create(
     model="gpt-5-mini"
 )
 ```
+## 查看实际效果
 
-## See it in action
-
-### Memory-aware restaurant recommendation
-
-```python
+###记忆感知餐厅推荐```python
 from mem0.proxy.main import Mem0
 
 client = Mem0(api_key="m0-xxx")
@@ -98,50 +91,46 @@ response = client.chat.completions.create(
 
 print(response.choices[0].message.content)
 ```
-
-<Info icon="check">
-  The second response should call out Indian restaurants and avoid cheese, proving Mem0 recalled the stored preference.
-</Info>
-
----
-
-## Verify the feature is working
-
-- Compare responses from Mem0 vs. OpenAI for identical prompts—both should return the same structure (`choices`, `usage`, etc.).
-- Inspect stored memories after each request to confirm the fact extraction captured the right details.
-- Test switching between hosted (`Mem0(api_key=...)`) and OSS configurations to ensure both respect the same request body.
+<信息图标=“检查”>
+  第二个响应应该叫出印度餐馆并避免奶酪，证明 Mem0 召回了存储的偏好。
+</信息>
 
 ---
 
-## Best practices
+## 验证该功能是否正常工作
 
-1. **Scope context intentionally:** Pass identifiers only when you want conversations to persist; skip them for one-off calls.
-2. **Log memory usage:** Inspect `response.metadata.memories` (if enabled) to see which facts the model recalled.
-3. **Reuse middleware:** Point your existing OpenAI client wrappers to the Mem0 proxy URL to avoid code drift.
-4. **Handle fallbacks:** Keep a code path for plain OpenAI calls in case Mem0 is unavailable, then resync memory later.
-
----
-
-## Parameter reference
-
-| Parameter | Type | Purpose |
-| --- | --- | --- |
-| `user_id` | `str` | Associates the conversation with a user so memories persist. |
-| `agent_id` | `str` | Optional agent or bot identifier for multi-agent scenarios. |
-| `run_id` | `str` | Optional session/run identifier for short-lived flows. |
-| `metadata` | `dict` | Store extra fields alongside each memory entry. |
-| `filters` | `dict` | Restrict retrieval to specific memories while responding. |
-| `top_k` | `int` | Cap how many memories Mem0 pulls into the context (default 10). |
-
-Other request fields mirror OpenAI’s chat completion API.
+- 比较 Mem0 与 OpenAI 的响应是否有相同的提示——两者都应返回相同的结构（“选择”、“用法”等）。
+- 在每次请求后检查存储的内存，以确认事实提取捕获了正确的详细信息。
+- 测试托管（`Mem0(api_key=...)`）和 OSS 配置之间的切换，以确保两者遵循相同的请求正文。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Connect Vision Models" icon="circle-dot" href="/components/llms/models/openai">
-    Review LLM options that support OpenAI-compatible calls in Mem0.
-  </Card>
-  <Card title="Automate OpenAI Tool Calls" icon="plug" href="/cookbooks/integrations/openai-tool-calls">
-    See a full workflow that layers Mem0 memories on top of tool-calling agents.
-  </Card>
-</CardGroup>
+## 最佳实践
+
+1. **有意限定上下文：** 仅当您希望对话持续时才传递标识符；跳过它们进行一次性呼叫。
+2. **记录内存使用情况：** 检查“response.metadata.memories”（如果启用）以查看模型调用了哪些事实。
+3.**重用中间件：** 将现有的 OpenAI 客户端包装器指向 Mem0 代理 URL，以避免代码漂移。
+4. **处理后备：** 保留普通 OpenAI 调用的代码路径，以防 Mem0 不可用，然后稍后重新同步内存。
+
+---
+
+## 参数参考|参数|类型 |目的|
+| ---| ---| ---|
+| `用户 ID` | `str` |将对话与用户关联起来，以便保留记忆。 |
+| `agent_id` | `str` |用于多代理场景的可选代理或机器人标识符。 |
+| `run_id` | `str` |短期流的可选会话/运行标识符。 |
+| `元数据` | `字典` |在每个内存条目旁边存储额外的字段。 |
+| `过滤器` | `字典` |在做出反应时限制检索特定的记忆。 |
+| `top_k` | `int` |限制 Mem0 拉入上下文的内存数量（默认 10）。 |
+
+其他请求字段反映了 OpenAI 的聊天完成 API。
+
+---
+
+<卡组列={2}>
+  <Card title="连接视觉模型" icon="circle-dot" href="/components/llms/models/openai">
+    查看 Mem0 中支持 OpenAI 兼容调用的 LLM 选项。</卡>
+  <Card title="自动化 OpenAI 工具调用" icon="plug" href="/cookbooks/integrations/openai-tool-calls">
+    查看将 Mem0 内存分层在工具调用代理之上的完整工作流程。
+  </卡>
+</卡组>

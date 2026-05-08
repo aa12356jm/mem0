@@ -3,21 +3,20 @@ title: Amazon S3 Vectors
 description: "Use Amazon S3 Vectors as a cost-optimized vector storage service in Mem0 with AWS credential authentication."
 ---
 
-[Amazon S3 Vectors](https://aws.amazon.com/s3/features/vectors/) is a purpose-built, cost-optimized vector storage and query service for semantic search and AI applications. It provides S3-level elasticity and durability with sub-second query performance.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Installation
 
-S3 Vectors support requires additional dependencies. Install them with:
 
-```bash
+[Amazon S3 Vectors](https://aws.amazon.com/s3/features/vectors/) 是一种专门构建的、成本优化的矢量存储和查询服务，用于语义搜索和 AI 应用程序。它提供 S3 级别的弹性和持久性以及亚秒级查询性能。
+
+### 安装
+
+S3 Vectors 支持需要额外的依赖项。安装它们：```bash
 pip install boto3
 ```
+### 用法
 
-### Usage
-
-To use Amazon S3 Vectors with Mem0, you need to have an AWS account and the necessary IAM permissions (`s3vectors:*`). Ensure your environment is configured with AWS credentials (e.g., via `~/.aws/credentials` or environment variables).
-
-```python
+要将 Amazon S3 Vectors 与 Mem0 结合使用，您需要拥有 AWS 账户和必要的 IAM 权限 (`s3vectors:*`)。确保您的环境配置了 AWS 凭证（例如，通过“~/.aws/credentials”或环境变量）。```python
 import os
 from mem0 import Memory
 
@@ -46,24 +45,19 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+### 配置
 
-### Config
+以下是可用于配置 Amazon S3 矢量的参数：
 
-Here are the parameters available for configuring Amazon S3 Vectors:
+|参数|描述 |默认值 |
+| ---------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `向量桶名称` |要使用的 S3 矢量存储桶的名称。如果不存在，则会创建它。 |必填|
+| `集合名称` |存储桶内向量索引的名称。                                  | `mem0` |
+| `embedding_model_dims` |嵌入模型的尺寸。必须与您的嵌入器匹配。                     | `1536` |
+| `距离度量` |用于相似性搜索的距离度量。选项：“余弦”、“欧氏”。           | `余弦` |
+| `地区名称` |存储桶和索引所在的 AWS 区域。                                | “无”（使用 AWS 配置中的默认值）|
 
-| Parameter              | Description                                                                      | Default Value                         |
-| ---------------------- | -------------------------------------------------------------------------------- | ------------------------------------- |
-| `vector_bucket_name`   | The name of the S3 Vector bucket to use. It will be created if it doesn't exist. | Required                              |
-| `collection_name`      | The name of the vector index within the bucket.                                  | `mem0`                                |
-| `embedding_model_dims` | Dimensions of the embedding model. Must match your embedder.                     | `1536`                                |
-| `distance_metric`      | Distance metric for similarity search. Options: `cosine`, `euclidean`.           | `cosine`                              |
-| `region_name`          | The AWS region where the bucket and index reside.                                | `None` (uses default from AWS config) |
-
-### IAM Permissions
-
-Your AWS identity (user or role) needs permissions to perform actions on S3 Vectors. A minimal policy would look like this:
-
-```json
+### IAM 权限您的 AWS 身份（用户或角色）需要权限才能对 S3 矢量执行操作。最低限度的政策如下所示：```json
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -75,5 +69,4 @@ Your AWS identity (user or role) needs permissions to perform actions on S3 Vect
   ]
 }
 ```
-
-For production, it is recommended to scope down the resource ARN to your specific buckets and indexes.
+对于生产，建议将资源 ARN 的范围缩小到您的特定存储桶和索引。

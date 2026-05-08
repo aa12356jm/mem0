@@ -3,52 +3,52 @@ title: Flowise
 description: "Add persistent Mem0 memory to Flowise chatflows for context-aware conversations in the low-code builder."
 ---
 
-The [**Mem0 Memory**](https://github.com/mem0ai/mem0) integration with [Flowise](https://github.com/FlowiseAI/Flowise) enables persistent memory capabilities for your AI chatflows. [Flowise](https://flowiseai.com/) is an open-source low-code tool for developers to build customized LLM orchestration flows & AI agents using a drag & drop interface.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-1. Provides persistent memory storage for Flowise chatflows
-2. Seamless integration with existing Flowise templates
-3. Compatible with various LLM nodes in Flowise
-4. Supports custom memory configurations
-5. Easy to set up and manage
 
-## Prerequisites
+[**Mem0 Memory**](https://github.com/mem0ai/mem0) 与 [Flowise](https://github.com/FlowiseAI/Flowise) 集成，为您的 AI 聊天流提供持久内存功能。 [Flowise](https://flowiseai.com/) 是一款开源低代码工具，可供开发人员使用拖放界面构建定制的 LLM 编排流程和 AI 代理。
 
-Before setting up Mem0 with Flowise, ensure you have:
+## 概述
 
-1. [Flowise installed](https://github.com/FlowiseAI/Flowise#⚡quick-start) (NodeJS >= 18.15.0 required):
-```bash
+1. 为 Flowise 聊天流提供持久内存存储
+2. 与现有 Flowise 模板无缝集成
+3. 兼容Flowise中的各种LLM节点
+4.支持自定义内存配置
+5. 易于设置和管理
+
+## 先决条件
+
+在使用 Flowise 设置 Mem0 之前，请确保您拥有：
+
+1. [Flowise已安装](https://github.com/FlowiseAI/Flowise#⚡quick-start) (需要 NodeJS >= 18.15.0):```bash
 npm install -g flowise
 npx flowise start
 ```
+2. 访问 Flowise UI：http://localhost:3000
+3. 基本熟悉[Flowise 的 LLM 编排](https://flowiseai.com/#features) 概念
 
-2. Access to the Flowise UI at http://localhost:3000
-3. Basic familiarity with [Flowise's LLM orchestration](https://flowiseai.com/#features) concepts
+## 设置和配置
 
-## Setup and Configuration
+### 1. 设置 Flowise
 
-### 1. Set Up Flowise
+1. 打开 Flowise 应用程序并创建新画布，或从 Flowise 市场选择模板。
+2. 在此示例中，我们使用 **Conversation Chain** 模板。
+3. 将默认的 **Buffer Memory** 替换为 **Mem0 Memory**。
 
-1. Open the Flowise application and create a new canvas, or select a template from the Flowise marketplace.
-2. In this example, we use the **Conversation Chain** template.
-3. Replace the default **Buffer Memory** with **Mem0 Memory**.
+![Flowise 内存集成](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/flowise-flow.png)
 
-![Flowise Memory Integration](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/flowise-flow.png)
+### 2. 获取您的 Mem0 API 密钥
 
-### 2. Obtain Your Mem0 API Key
+1. 导航至 <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-flowise" rel="nofollow">Mem0 API 密钥仪表板</a>。
+2. 生成或复制现有的 Mem0 API 密钥。
 
-1. Navigate to the <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-flowise" rel="nofollow">Mem0 API Key dashboard</a>.
-2. Generate or copy your existing Mem0 API Key.
+![Mem0 API 密钥](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/。gitbook/assets/mem0/api-key.png)
 
-![Mem0 API Key](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/api-key.png)
+### 3.配置Mem0凭证
 
-### 3. Configure Mem0 Credentials
-
-1. Enter the **Mem0 API Key** in the Mem0 Credentials section.
-2. Configure additional settings as needed:
-
-```typescript
+1. 在 Mem0 凭证部分输入 **Mem0 API 密钥**。
+2. 根据需要配置其他设置：```typescript
 {
   "apiKey": "m0-xxx",
   "userId": "user-123",  // Optional: Specify user ID
@@ -56,72 +56,66 @@ npx flowise start
   "orgId": "org-xxx"  // Optional: Specify organization ID
 }
 ```
+<图>
+  <img src="https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/creds.png" alt="Mem0 凭证" />
+  <figcaption>配置 API 凭证</figcaption>
+</图>
 
-<figure>
-  <img src="https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/creds.png" alt="Mem0 Credentials" />
-  <figcaption>Configure API Credentials</figcaption>
-</figure>
+## 内存特性
 
-## Memory Features
+### 1. 基本内存存储
 
-### 1. Basic Memory Storage
+测试您的内存配置：
 
-Test your memory configuration:
+1. 保存您的 Flowise 配置
+2. 运行测试聊天并存储一些信息
+3. 验证<a href="https://app.mem0.ai/dashboard/requests?utm_source=oss&utm_medium=integration-flowise" rel="nofollow">Mem0 Dashboard</a>中存储的内存
 
-1. Save your Flowise configuration
-2. Run a test chat and store some information
-3. Verify the stored memories in the <a href="https://app.mem0.ai/dashboard/requests?utm_source=oss&utm_medium=integration-flowise" rel="nofollow">Mem0 Dashboard</a>
+![Flowise 测试聊天](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/flowise-chat-1.png)
 
-![Flowise Test Chat](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/flowise-chat-1.png)
+### 2. 记忆保留
 
-### 2. Memory Retention
+验证内存持久性：
 
-Validate memory persistence:
+1.清除Flowise中的聊天记录
+2.询问有关之前存储的信息的问题
+3. 确认AI记住了上下文
 
-1. Clear the chat history in Flowise
-2. Ask a question about previously stored information
-3. Confirm that the AI remembers the context
+![测试记忆保留](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/flowise-chat-2.png)
 
-![Testing Memory Retention](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/flowise-chat-2.png)
+## 高级配置
 
-## Advanced Configuration
+### 内存设置
 
-### Memory Settings
+![Mem0 设置](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/settings.png)
 
-![Mem0 Settings](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/settings.png)
+可用设置包括：1. **仅搜索模式**：启用内存检索而不创建新内存
+2. **Mem0实体**：配置标识符：
+   - `user_id`：每个用户的唯一标识符
+   - `run_id`：特定会话会话 ID
+   - `app_id`：应用程序标识符
+   - `agent_id`：AI代理标识符
+3. **项目ID**：将内存分配给特定项目
+4. **组织ID**：按组织组织记忆
 
-Available settings include:
+### 平台配置
 
-1. **Search Only Mode**: Enable memory retrieval without creating new memories
-2. **Mem0 Entities**: Configure identifiers:
-   - `user_id`: Unique identifier for each user
-   - `run_id`: Specific conversation session ID
-   - `app_id`: Application identifier
-   - `agent_id`: AI agent identifier
-3. **Project ID**: Assign memories to specific projects
-4. **Organization ID**: Organize memories by organization
+<a href="https://app.mem0.ai/dashboard/project-settings?utm_source=oss&utm_medium=integration-flowise" rel="nofollow">Mem0 项目设置</a>中提供了其他设置：
 
-### Platform Configuration
+1. **自定义指令**：定义内存提取规则
+2. **Expiration Date**：设置自动内存清理期限
 
-Additional settings available in <a href="https://app.mem0.ai/dashboard/project-settings?utm_source=oss&utm_medium=integration-flowise" rel="nofollow">Mem0 Project Settings</a>:
+![Mem0 项目设置](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/mem0-settings.png)
 
-1. **Custom Instructions**: Define memory extraction rules
-2. **Expiration Date**: Set automatic memory cleanup periods
+## 最佳实践
 
-![Mem0 Project Settings](https://raw.githubusercontent.com/FlowiseAI/FlowiseDocs/main/en/.gitbook/assets/mem0/mem0-settings.png)
-
-## Best Practices
-
-1. **User Identification**: Use consistent `user_id` values for reliable memory retrieval
-2. **Memory Organization**: Utilize projects and organizations for better memory management
-3. **Regular Maintenance**: Monitor and clean up unused memories periodically
-
-<CardGroup cols={2}>
+1.**用户识别**：使用一致的“user_id”值进行可靠的内存检索
+2. **内存组织**：利用项目和组织进行更好的内存管理
+3. **定期维护**：定期监控和清理未使用的内存<卡组列={2}>
   <Card title="LangChain Integration" icon="link" href="/integrations/langchain">
-    Build LangChain-powered flows with memory
-  </Card>
+    使用内存构建 LangChain 驱动的流程
+  </卡>
   <Card title="Dify Integration" icon="blocks" href="/integrations/dify">
-    Create AI workflows with Dify platform
-  </Card>
-</CardGroup>
-
+    使用 Dify 平台创建 AI 工作流程
+  </卡>
+</卡组>

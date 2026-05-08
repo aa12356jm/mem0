@@ -3,33 +3,32 @@ title: Keywords AI
 description: "Combine Mem0 persistent memory with Keywords AI observability for tracked, cost-optimized AI applications."
 ---
 
-Build AI applications with persistent memory and comprehensive LLM observability by integrating Mem0 with Keywords AI.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-Mem0 is a self-improving memory layer for LLM applications, enabling personalized AI experiences that save costs and delight users. Keywords AI provides complete LLM observability.
 
-Combining Mem0 with Keywords AI allows you to:
-1. Add persistent memory to your AI applications
-2. Track interactions across sessions
-3. Monitor memory usage and retrieval with Keywords AI observability
-4. Optimize token usage and reduce costs
+通过将 Mem0 与关键字 AI 集成，构建具有持久内存和全面的 LLM 可观察性的 AI 应用程序。
 
-<Note>
-You can get your Mem0 API key from the <a href="https://app.mem0.ai/?utm_source=oss&utm_medium=integration-keywords" rel="nofollow">Mem0 dashboard</a>.
-</Note>
+## 概述
 
-## Setup and Configuration
+Mem0 是一个用于 LLM 应用程序的自我改进的内存层，可实现个性化的 AI 体验，从而节省成本并让用户满意。关键字 AI 提供完整的 LLM 可观察性。
 
-Install the necessary libraries:
+将 Mem0 与关键字 AI 相结合可以让您：
+1. 为您的 AI 应用程序添加持久内存
+2. 跟踪会话之间的交互
+3. 使用关键字 AI 可观测性监控内存使用和检索
+4. 优化代币使用并降低成本
 
-```bash
+<注意>
+您可以从 <a href="https://app.mem0.ai/?utm_source=oss&utm_medium=integration-keywords" rel="nofollow">Mem0 仪表板</a>获取 Mem0 API 密钥。
+</注>
+
+## 设置和配置
+
+安装必要的库：```bash
 pip install mem0ai keywordsai-sdk
 ```
-
-Set up your environment variables:
-
-```python
+设置您的环境变量：```python
 import os
 
 # Set your API keys
@@ -37,12 +36,9 @@ os.environ["MEM0_API_KEY"] = "your-mem0-api-key"
 os.environ["KEYWORDSAI_API_KEY"] = "your-keywords-api-key"
 os.environ["KEYWORDSAI_BASE_URL"] = "https://api.keywordsai.co/api/"
 ```
+## 基本集成示例
 
-## Basic Integration Example
-
-Here's a simple example of using Mem0 with Keywords AI:
-
-```python
+以下是将 Mem0 与关键字 AI 结合使用的简单示例：```python
 from mem0 import Memory
 import os
 
@@ -76,12 +72,9 @@ result = memory.add(
 
 print(result)
 ```
+## 与 OpenAI SDK 的高级集成
 
-## Advanced Integration with OpenAI SDK
-
-For more advanced use cases, you can integrate Keywords AI with Mem0 through the OpenAI SDK:
-
-```python
+对于更高级的用例，您可以通过 OpenAI SDK 将 keywords AI 与 Mem0 集成：```python
 from openai import OpenAI
 import os
 import json
@@ -117,26 +110,22 @@ response = client.chat.completions.create(
 
 print(json.dumps(response.model_dump(), indent=4))
 ```
+有关此集成的详细信息，请参阅官方[Keywords AI Mem0集成文档](https://docs.keywordsai.co/integration/development-frameworks/mem0)。
 
-For detailed information on this integration, refer to the official [Keywords AI Mem0 integration documentation](https://docs.keywordsai.co/integration/development-frameworks/mem0).
+## 主要特点
 
-## Key Features
+1. **记忆整合**：存储和检索过去交互的相关信息
+2. **LLM 可观察性**：使用关键字 AI 跟踪内存使用情况和检索模式
+3. **会话持久性**：维护多个用户会话之间的上下文
+4. **成本优化**：通过高效的内存检索减少令牌使用
 
-1. **Memory Integration**: Store and retrieve relevant information from past interactions
-2. **LLM Observability**: Track memory usage and retrieval patterns with Keywords AI
-3. **Session Persistence**: Maintain context across multiple user sessions
-4. **Cost Optimization**: Reduce token usage through efficient memory retrieval
+## 结论
 
-## Conclusion
-
-Integrating Mem0 with Keywords AI provides a powerful combination for building AI applications with persistent memory and comprehensive observability. This integration enables more personalized user experiences while providing insights into your application's memory usage.
-
-<CardGroup cols={2}>
+将 Mem0 与关键字 AI 集成，为构建具有持久内存和全面可观察性的 AI 应用程序提供了强大的组合。这种集成可实现更加个性化的用户体验，同时提供对应用程序内存使用情况的深入了解。<卡组列={2}>
   <Card title="OpenAI Agents SDK" icon="cube" href="/integrations/openai-agents-sdk">
-    Build monitored agents with OpenAI SDK
-  </Card>
+    使用 OpenAI SDK 构建受监控的代理
+  </卡>
   <Card title="AgentOps Integration" icon="chart-line" href="/integrations/agentops">
-    Monitor agent performance with AgentOps
-  </Card>
-</CardGroup>
-
+    使用 AgentOps 监控代理性能
+  </卡>
+</卡组>

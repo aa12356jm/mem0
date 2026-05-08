@@ -2,31 +2,31 @@
 title: "OpenSearch"
 description: "Use OpenSearch as a vector database in Mem0 with k-NN search support via AWS OpenSearch Service serverless collections."
 ---
-[OpenSearch](https://opensearch.org/) is an enterprise-grade search and observability suite that brings order to unstructured data at scale. OpenSearch supports k-NN (k-Nearest Neighbors) and allows you to store and retrieve high-dimensional vector embeddings efficiently.
 
-### Installation
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-OpenSearch support requires additional dependencies. Install them with:
 
-```bash
+
+[OpenSearch](https://opensearch.org/) 是一个企业级搜索和可观察性套件，可大规模整理非结构化数据。 OpenSearch 支持 k-NN（k-最近邻）并允许您有效地存储和检索高维向量嵌入。
+
+### 安装
+
+OpenSearch 支持需要额外的依赖项。安装它们：```bash
 pip install opensearch-py
 ```
+### 先决条件
 
-### Prerequisites
+在将 OpenSearch 与 Mem0 结合使用之前，您需要在 AWS OpenSearch Service 中设置集合。
 
-Before using OpenSearch with Mem0, you need to set up a collection in AWS OpenSearch Service.
-
-#### AWS OpenSearch Service
-You can create a collection through the AWS Console:
-- Navigate to [OpenSearch Service Console](https://console.aws.amazon.com/aos/home)
-- Click "Create collection"
-- Select "Serverless collection" and then enable "Vector search" capabilities
-- Once created, note the endpoint URL (host) for your configuration
+#### AWS OpenSearch 服务
+您可以通过 AWS 控制台创建集合：
+- 导航到 [OpenSearch 服务控制台](https://console.aws.amazon.com/aos/home)
+- 点击“创建收藏”
+- 选择“无服务器集合”，然后启用“矢量搜索”功能
+- 创建后，记下您的配置的端点 URL（主机）
 
 
-### Usage
-
-```python
+### 用法```python
 import os
 from mem0 import Memory
 import boto3
@@ -55,10 +55,7 @@ config = {
     }
 }
 ```
-
-### Add Memories
-
-```python
+### 添加回忆```python
 m = Memory.from_config(config)
 messages = [
     {"role": "user", "content": "I'm planning to watch a movie tonight. Any recommendations?"},
@@ -68,18 +65,14 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
-
-### Search Memories
-
-```python
+### 搜索记忆```python
 results = m.search("What kind of movies does Alice like?", filters={"user_id": "alice"})
 ```
+### 特点
 
-### Features
-
-- Fast and Efficient Vector Search
-- Can be deployed on-premises, in containers, or on cloud platforms like AWS OpenSearch Service
-- Multiple authentication and security methods (Basic Authentication, API Keys, LDAP, SAML, and OpenID Connect)
-- Automatic index creation with optimized mappings for vector search
-- Memory optimization through disk-based vector search and quantization
-- Real-time analytics and observability
+- 快速高效的矢量搜索
+- 可以部署在本地、容器中或 AWS OpenSearch Service 等云平台上
+- 多种身份验证和安全方法（基本身份验证、API 密钥、LDAP、SAML 和 OpenID Connect）
+- 通过矢量搜索的优化映射自动创建索引
+- 通过基于磁盘的矢量搜索和量化进行内存优化
+- 实时分析和可观察性

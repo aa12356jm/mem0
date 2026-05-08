@@ -3,125 +3,115 @@ title: OpenClaw
 description: "Add long-term memory to OpenClaw agents using the Mem0 plugin with skills-based memory extraction and recall."
 ---
 
-Add long-term memory to [OpenClaw](https://github.com/openclaw/openclaw) agents with the `@mem0/openclaw-mem0` plugin. Your agent forgets everything between sessions — this plugin fixes that by automatically watching conversations, extracting what matters, and bringing it back when relevant.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-<Frame>
-  <img src="/images/openclaw-architecture.png" alt="OpenClaw Mem0 Architecture" />
-</Frame>
 
-The plugin provides:
-1. **Triage** — The agent extracts durable facts from conversations using a structured protocol with importance gates and domain overlays
-2. **Recall** — Before each turn, relevant memories are retrieved with reranking and injected into context
-3. **Dream** — Periodic memory consolidation: merges duplicates, resolves conflicts, prunes stale entries
-4. **Agent Tools** — Eight tools for explicit memory operations during conversations
+使用“@mem0/openclaw-mem0”插件为 [OpenClaw](https://github.com/openclaw/openclaw) 代理添加长期记忆。您的代理会忘记会话之间的所有内容 - 该插件通过自动监视对话、提取重要内容并在相关时将其返回来修复此问题。
 
-Skills mode, `autoRecall`, and `autoCapture` are all enabled by default during `openclaw mem0 init`.
+## 概述
 
-## Requirements
+<框架>
+  <img src="/images/openclaw-architecture.png" alt="OpenClaw Mem0 架构" />
+</框架>
 
-Check your OpenClaw version:
+该插件提供：
+1. **分类** — 代理使用具有重要性门和域覆盖的结构化协议从对话中提取持久事实
+2. **回忆** - 在每个回合之前，通过重新排序检索相关记忆并将其注入上下文中
+3. **梦想** - 定期内存整合：合并重复项、解决冲突、修剪过时的条目
+4.**代理工具** — 对话期间用于显式内存操作的八个工具
 
-```bash
+技能模式、“autoRecall”和“autoCapture”在“openclaw mem0 init”期间默认启用。
+
+## 要求
+
+检查您的 OpenClaw 版本：```bash
 openclaw --version
 # OpenClaw 2026.4.25 (aa36ee6)
 ```
-
-| OpenClaw Version | Plugin Support |
+| OpenClaw 版本 |插件支持 |
 |------------------|----------------|
-| `>= 2026.4.25`   | Fully supported |
+| `>= 2026.4.25` |全力支持 |
 
-## Installation
+## 安装
 
-The fastest way is to install directly from your OpenClaw chat, no CLI or config editing needed.
+最快的方法是直接从 OpenClaw 聊天安装，无需 CLI 或配置编辑。
 
-**Copy and paste this into your OpenClaw chat**; Telegram, WhatsApp, default chat, or any channel where your agent lives:
-
-```
+**将其复制并粘贴到您的 OpenClaw 聊天中**； Telegram、WhatsApp、默认聊天或您的代理所在的任何频道：```
 Setup Mem0 from mem0.ai/claw-setup
 ```
+OpenClaw 安装该插件，提示您输入电子邮件，并将您的 Mem0 帐户与 OTP 验证连接。有关完整演练，请参阅下面的[聊天设置](#option-1-chat-setup-recommended)。
 
-OpenClaw installs the plugin, prompts you for your email, and connects your Mem0 account with OTP verification. See [Chat Setup](#option-1-chat-setup-recommended) below for the full walkthrough.
+如果您更喜欢 OpenClaw CLI，或者正在设置自托管/开源模式，请参阅下面的[手动配置](#option-2-manual-config) 和[开源模式](#open-source-mode-self-hosted)。
 
-If you prefer the OpenClaw CLI, or are setting up self-hosted / open-source mode, see [Manual Config](#option-2-manual-config) and [Open-Source Mode](#open-source-mode-self-hosted) below.
+## 设置和配置
 
-## Setup and Configuration
+### 理解`userId`
 
-### Understanding `userId`
+`userId` 字段是您选择的**字符串**，用于唯一标识正在存储其记忆的用户。它**不是**您在 Mem0 仪表板中查找的内容 - 您可以自己定义它。
 
-The `userId` field is a **string you choose** to uniquely identify the user whose memories are being stored. It is **not** something you look up in the Mem0 dashboard — you define it yourself.
+为用户选择任何稳定、唯一的标识符。常见选择：
 
-Pick any stable, unique identifier for the user. Common choices:
+- 您的应用程序的内部用户 ID（例如“user_123”、“alice@example.com”）
+- UUID（例如“550e8400-e29b-41d4-a716-446655440000”）
+- 一个简单的用户名（例如`“爱丽丝”`）
 
-- Your application's internal user ID (e.g. `"user_123"`, `"alice@example.com"`)
-- A UUID (e.g. `"550e8400-e29b-41d4-a716-446655440000"`)
-- A simple username (e.g. `"alice"`)
+所有内存的作用域都是这个“userId”——不同的值创建单独的内存命名空间。如果您不设置，则默认为您的操作系统用户名。
 
-All memories are scoped to this `userId` — different values create separate memory namespaces. If you don't set it, it defaults to your OS username.
+<Tip>在多用户应用程序中，为每个用户动态设置“userId”（例如，从您的身份验证系统），而不是硬编码单个值。</Tip>### 平台模式（Mem0 云）
 
-<Tip>In a multi-user application, set `userId` dynamically per user (e.g. from your auth system) rather than hardcoding a single value.</Tip>
+在 Mem0 平台上设置 `@mem0/openclaw-mem0` 有两种方法：
 
-### Platform Mode (Mem0 Cloud)
+- **聊天设置（推荐）** — 在任何 OpenClaw 聊天中运行设置。无需编辑配置，无需处理 API 密钥。
+- **手动配置** — 直接编辑 `openclaw.json`。
 
-There are two ways to set up `@mem0/openclaw-mem0` on the Mem0 platform:
+#### 选项 1：聊天设置（推荐）
 
-- **Chat setup (recommended)** — run the setup inside any OpenClaw chat. No config editing, no API key handling.
-- **Manual config** — edit `openclaw.json` directly.
+您不再需要手动配置编辑即可开始使用。一切都发生在 OpenClaw 聊天本身内。
 
-#### Option 1: Chat Setup (Recommended)
-
-You no longer need manual config editing to get started. Everything happens inside the OpenClaw chat itself.
-
-<Steps>
-  <Step title="Send the setup command to your OpenClaw agent">
-    Open any OpenClaw channel — Telegram, WhatsApp, your default chat, wherever your agent lives. Paste and send this command:
-
-    ```
+<步骤>
+  <Step title="将设置命令发送到您的 OpenClaw 代理">
+    打开任何 OpenClaw 频道 - Telegram、WhatsApp、您的默认聊天，无论您的客服人员身在何处。粘贴并发送此命令：    ```
     Setup Mem0 from mem0.ai/claw-setup
     ```
+OpenClaw 使用 Mem0 设置卡进行响应，并立即询问：
 
-    OpenClaw responds with a Mem0 setup card and immediately asks:
+    >“您的电子邮件地址是什么？我会向您发送验证码以连接您的 Mem0 帐户。”
+  </步骤>
 
-    > "What's your email address? I'll send you a verification code to connect your Mem0 account."
-  </Step>
+  <步骤标题=“输入您的电子邮件”>
+    输入您的电子邮件地址并发送。 Mem0 发回：
 
-  <Step title="Enter your email">
-    Type your email address and send it. Mem0 sends back:
+    >“检查您的电子邮件中是否有 6 位数代码并将其粘贴到此处。”
+  </步骤>
 
-    > "Check your email for a 6-digit code and paste it here."
-  </Step>
+  <Step title="粘贴 OTP">
+    从电子邮件收件箱复制 6 位数代码并将其粘贴到聊天中。
 
-  <Step title="Paste the OTP">
-    Copy the 6-digit code from your email inbox and paste it into the chat.
+    您将看到确认信息：
 
-    You'll see the confirmation:
+    > “连接到 Mem0。”
+  </步骤>
+</步骤>
 
-    > "Connected to Mem0."
-  </Step>
-</Steps>
+就是这样。没有 API 密钥、没有配置文件编辑、没有环境变量。该插件现在处于活动状态，并且自动运行基于技能的记忆（分类、回忆和梦想）。
 
-That's it. No API key, no config file editing, no environment variables. The plugin is now active with skills-based memory (triage, recall, and dream) running automatically.
+<注意>聊天流程使用与手动设置相同的底层配置 - 它将“apiKey”、“userId”和“skills”配置写入“openclaw.json”中。之后您仍然可以打开文件来检查或覆盖值。</Note>
 
-<Note>The chat flow uses the same underlying config as manual setup — it writes `apiKey`, `userId`, and `skills` config into `openclaw.json` for you. You can still open the file to inspect or override values afterward.</Note>
+#### 选项 2：手动配置
 
-#### Option 2: Manual Config
-
-<Steps>
-  <Step title="Install the plugin via the OpenClaw CLI">
-    ```bash
+<步骤>
+  <Step title="通过 OpenClaw CLI 安装插件">    ```bash
     openclaw plugins install @mem0/openclaw-mem0
     ```
-  </Step>
+</步骤>
 
-  <Step title="Get your API key">
-    Get your API key from <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-openclaw" rel="nofollow">app.mem0.ai</a>.
-  </Step>
+  <Step title="获取您的 API 密钥">
+    从 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-openclaw" rel="nofollow">app.mem0.ai</a> 获取您的 API 密钥。
+  </步骤>
 
-  <Step title="Select the plugin as your memory backend in `openclaw.json`">
-    Add the full config to your `openclaw.json`:
-
-    ```json5
+  <Step title="在 `openclaw.json` 中选择插件作为内存后端">
+    将完整配置添加到“openclaw.json”中：    ```json5
     {
       "plugins": {
         "slots": {
@@ -151,47 +141,42 @@ That's it. No API key, no config file editing, no environment variables. The plu
       }
     }
     ```
-  </Step>
-</Steps>
+</步骤>
+</步骤>
 
-<Warning>
-OpenClaw treats memory plugins as an exclusive slot. Installing the plugin alone does **not** activate it — you must also set `plugins.slots.memory` as shown above.
-</Warning>
+<警告>
+OpenClaw 将内存插件视为独占插槽。单独安装插件并**不会**激活它 - 您还必须设置“plugins.slots.memory”，如上所示。
+</警告>
 
-### Open-Source Mode (Self-hosted)
+### 开源模式（自托管）
 
-No Mem0 key needed. Defaults use OpenAI (`gpt-5-mini` for LLM, `text-embedding-3-small` for embeddings) — requires `OPENAI_API_KEY`. For a fully local setup, use Ollama for both.
+不需要 Mem0 键。默认使用 OpenAI（LLM 为“gpt-5-mini”，嵌入为“text-embedding-3-small”）——需要“OPENAI_API_KEY”。对于完全本地设置，请使用 Ollama。
 
-#### Option 1: Interactive Wizard (Recommended)
+#### 选项 1：交互式向导（推荐）
 
-Run the guided 4-step wizard:
-
-```bash
+运行 4 步向导：```bash
 openclaw mem0 init --mode open-source
 ```
+向导将引导您完成：
 
-The wizard walks you through:
+<步骤>
+  <步骤标题=“法学硕士提供商”>
+    选择 OpenAI (`gpt-5-mini`)、Ollama (`llama3.1:8b`，完全本地化) 或 Anthropic (`claude-sonnet-4-5-20250514`)。根据需要提供 API 密钥或基本 URL。
+  </步骤>
+  <Step title="嵌入提供商">
+    选择 OpenAI（“text-embedding-3-small”）或 Ollama（“nomic-embed-text”，本地）。如果为 LLM 选择相同的提供商，API 密钥和 URL 将自动重复使用。
+  </步骤>
+  <步骤标题=“矢量存储”>
+    选择 Qdrant (`http://localhost:6333`) 或 PGVector (PostgreSQL)。在继续之前先验证连接性。
+  </步骤>
+  <步骤标题=“用户ID”>
+    设置您的内存命名空间标识符。
+  </步骤>
+</步骤>
 
-<Steps>
-  <Step title="LLM provider">
-    Choose OpenAI (`gpt-5-mini`), Ollama (`llama3.1:8b`, fully local), or Anthropic (`claude-sonnet-4-5-20250514`). Provide an API key or base URL as needed.
-  </Step>
-  <Step title="Embedding provider">
-    Choose OpenAI (`text-embedding-3-small`) or Ollama (`nomic-embed-text`, local). If the same provider was chosen for LLM, the API key and URL are reused automatically.
-  </Step>
-  <Step title="Vector store">
-    Choose Qdrant (`http://localhost:6333`) or PGVector (PostgreSQL). Connectivity is verified before proceeding.
-  </Step>
-  <Step title="User ID">
-    Set your memory namespace identifier.
-  </Step>
-</Steps>
+#### 选项 2：非交互式设置
 
-#### Option 2: Non-Interactive Setup
-
-For CI/CD, scripts, or agent-driven setup — pass all options as flags:
-
-```bash
+对于 CI/CD、脚本或代理驱动的设置 - 将所有选项作为标志传递：```bash
 # Fully local with Ollama + Qdrant
 openclaw mem0 init --mode open-source \
   --oss-llm ollama --oss-embedder ollama --oss-vector qdrant
@@ -208,35 +193,30 @@ openclaw mem0 init --mode open-source \
   --oss-embedder openai --oss-embedder-key <key> \
   --oss-vector pgvector --oss-vector-user postgres --oss-vector-password secret
 ```
-
-Add `--json` for machine-readable output (useful when an LLM agent is driving the setup).
-
-<Accordion title="All --oss-* flags">
-| Flag | Description |
+添加“--json”以获取机器可读的输出（当 LLM 代理驱动设置时很有用）。<Accordion title="所有 --oss-* flags">
+|旗帜|描述 |
 |------|-------------|
-| `--oss-llm <provider>` | `openai`, `ollama`, or `anthropic` |
-| `--oss-llm-key <key>` | API key for LLM provider |
-| `--oss-llm-model <model>` | Override default LLM model |
-| `--oss-llm-url <url>` | Base URL (Ollama only) |
-| `--oss-embedder <provider>` | `openai` or `ollama` |
-| `--oss-embedder-key <key>` | API key for embedder |
-| `--oss-embedder-model <model>` | Override default embedder model |
-| `--oss-embedder-url <url>` | Base URL (Ollama only) |
-| `--oss-vector <provider>` | `qdrant` or `pgvector` |
-| `--oss-vector-url <url>` | Qdrant server URL (default: `http://localhost:6333`) |
-| `--oss-vector-host <host>` | PGVector host |
-| `--oss-vector-port <port>` | PGVector port |
-| `--oss-vector-user <user>` | PGVector user |
-| `--oss-vector-password <pw>` | PGVector password |
-| `--oss-vector-dbname <db>` | PGVector database name |
-| `--oss-vector-dims <n>` | Override embedding dimensions |
-</Accordion>
+| `--oss-llm <提供商>` | `openai`、`ollama` 或 `anthropic` |
+| `--oss-llm-key <密钥>` | LLM 提供商的 API 密钥 |
+| `--oss-llm-model <模型>` |覆盖默认的LLM模型|
+| `--oss-llm-url <url>` |基本 URL（仅限 Olama）|
+| `--oss-embedder <提供者>` | `openai` 或 `ollama` |
+| `--oss-embedder-key <key>` |嵌入器的 API 密钥 |
+| `--oss-embedder-model <模型>` |覆盖默认嵌入器模型 |
+| `--oss-embedder-url <url>` |基本 URL（仅限 Olama）|
+| `--oss-vector <提供商>` | `qdrant` 或 `pgvector` |
+| `--oss-vector-url <url>` | Qdrant 服务器 URL（默认：`http://localhost:6333`）|
+| `--oss-vector-host <主机>` | PGVector主机|
+| `--oss-vector-port <端口>` | PGVector 端口 |
+| `--oss-vector-user <用户>` | PGVector 用户 |
+| `--oss-vector-password <pw>` | PGVector 密码 |
+| `--oss-vector-dbname <db>` | PGVector 数据库名称 |
+| `--oss-vector-dims <n>` |覆盖嵌入尺寸 |
+</手风琴>
 
-#### Option 3: Manual Config
+#### 选项 3：手动配置
 
-Minimal config — uses OpenAI defaults:
-
-```json5
+最小配置 — 使用 OpenAI 默认值：```json5
 {
   "plugins": {
     "slots": {
@@ -254,10 +234,7 @@ Minimal config — uses OpenAI defaults:
   }
 }
 ```
-
-To customize providers:
-
-```json5
+自定义提供程序：```json5
 {
   "plugins": {
     "slots": {
@@ -280,41 +257,34 @@ To customize providers:
   }
 }
 ```
+所有“oss”字段都是可选的。请参阅 [Mem0 OSS 文档](/open-source/node-quickstart) 了解可用的提供程序。
 
-All `oss` fields are optional. See [Mem0 OSS docs](/open-source/node-quickstart) for available providers.
+## 短期记忆与长期记忆
 
-## Short-term vs Long-term Memory
+记忆分为两个范围：
 
-Memories are organized into two scopes:
+- **会话（短期）** — 自动捕获通过 Mem0 的 `run_id` / `runId` 参数存储当前会话范围内的内存。这些与正在进行的对话相关。
 
-- **Session (short-term)** — Auto-capture stores memories scoped to the current session via Mem0's `run_id` / `runId` parameter. These are contextual to the ongoing conversation.
+- **用户（长期）** - 代理可以使用“memory_add”工具显式存储长期记忆（默认为“longTerm：true”）。这些在用户的所有会话中持续存在。
 
-- **User (long-term)** — The agent can explicitly store long-term memories using the `memory_add` tool (with `longTerm: true`, the default). These persist across all sessions for the user.
+在**自动回忆**期间，插件会搜索两个范围并分别呈现它们——首先是长期记忆，然后是会话记忆——因此代理拥有完整的上下文。
 
-During **auto-recall**, the plugin searches both scopes and presents them separately — long-term memories first, then session memories — so the agent has full context.
+## 代理工具
 
-## Agent Tools
-
-The agent gets eight tools it can call during conversations:
-
-| Tool | Description |
+代理获得八种可以在对话期间调用的工具：|工具|描述 |
 |------|-------------|
-| `memory_search` | Search memories by natural language query. Supports `scope`, `categories`, `filters`. |
-| `memory_add` | Store facts. Accepts `text` or `facts` array, `category`, `importance`, `metadata`. |
-| `memory_get` | Retrieve a single memory by ID |
-| `memory_list` | List all memories. Filter by `userId`, `agentId`, `scope`. |
-| `memory_update` | Update a memory's text in place. Preserves history. |
-| `memory_delete` | Delete by `memoryId`, `query` (search-and-delete), or `all: true`. |
-| `memory_event_list` | List recent background processing events (platform mode only). |
-| `memory_event_status` | Get status of a specific event by ID (platform mode only). |
+| `内存搜索` |通过自然语言查询来搜索记忆。支持“范围”、“类别”、“过滤器”。 |
+| `内存添加` |存储事实。接受“文本”或“事实”数组、“类别”、“重要性”、“元数据”。 |
+| `内存获取` |通过ID检索单个内存 |
+| `内存列表` |列出所有的回忆。按“userId”、“agentId”、“scope”过滤。 |
+| `内存更新` |就地更新内存的文本。保留历史。 |
+| `内存删除` |通过“memoryId”、“query”（搜索并删除）或“all: true”删除。 |
+| `内存事件列表` |列出最近的后台处理事件（仅限平台模式）。 |
+| `内存事件状态` |通过 ID 获取特定事件的状态（仅限平台模式）。 |
 
-The `memory_search` and `memory_list` tools accept a `scope` parameter (`"session"`, `"long-term"`, or `"all"`) to control which memories are queried.
+“memory_search”和“memory_list”工具接受“scope”参数（“session”、“long-term”或“all”）来控制查询哪些内存。## CLI 命令
 
-## CLI Commands
-
-All commands support `--json` for machine-readable output — useful when an LLM agent drives the CLI programmatically. Run `openclaw mem0 help --json` to discover every command and flag.
-
-```bash
+所有命令都支持“--json”以实现机器可读的输出——当 LLM 代理以编程方式驱动 CLI 时非常有用。运行“openclaw mem0 help --json”来发现每个命令和标志。```bash
 # Search all memories (long-term + session)
 openclaw mem0 search "what languages does the user know"
 
@@ -332,74 +302,60 @@ openclaw mem0 list --user-id alice --top-k 20
 openclaw mem0 search "preferences" --json
 openclaw mem0 status --json
 ```
+## 配置选项
 
-## Configuration Options
+### 一般选项
 
-### General Options
-
-| Key | Type | Default | Description |
+|关键|类型 |默认|描述 |
 |-----|------|---------|-------------|
-| `mode` | `"platform"` \| `"open-source"` | `"platform"` | Which backend to use |
-| `userId` | `string` | OS username | Scope memories per user |
-| `autoRecall` | `boolean` | `true` | Inject memories before each turn. Ignored when `skills` is configured. |
-| `autoCapture` | `boolean` | `true` | Store facts after each turn. Ignored when `skills` is configured. |
-| `topK` | `number` | `5` | Max memories per recall |
-| `searchThreshold` | `number` | `0.3` | Min similarity (0–1) |
+| `模式` | `“平台”` \| `“开源”` | `“平台”` |使用哪个后端 |
+| `用户 ID` | `字符串` |操作系统用户名|每个用户的范围内存|
+| `自动调用` | `布尔值` | `真实` |每回合前注入记忆。配置“技能”时将被忽略。 |
+| `自动捕获` | `布尔值` | `真实` |每回合后存储事实。配置“技能”时将被忽略。 |
+| `topK` | `数字` | `5` |每次回忆的最大记忆量|
+| `搜索阈值` | `数字` | `0.3` |最小相似度 (0–1) |
 
-### Platform Mode Options
+### 平台模式选项
 
-| Key | Type | Default | Description |
+|关键|类型 |默认|描述 |
 |-----|------|---------|-------------|
-| `apiKey` | `string` | — | **Required.** Mem0 API key (supports `${MEM0_API_KEY}`) |
-| `customInstructions` | `string` | *(built-in)* | Extraction rules — what to store, how to format |
-| `customCategories` | `object` | *(12 defaults)* | Category name → description map for tagging |
+| `apiKey` | `字符串` | — | **必需的。** Mem0 API 密钥（支持 `${MEM0_API_KEY}`）|
+| `自定义说明` | `字符串` | *（内置）* |提取规则——存储什么，如何格式化|
+| `自定义类别` | `对象` | *（默认 12 个）* |类别名称→标签描述图|
 
-### Open-Source Mode Options
-
-| Key | Type | Default | Description |
+### 开源模式选项|关键|类型 |默认|描述 |
 |-----|------|---------|-------------|
-| `customInstructions` | `string` | *(built-in)* | Extraction prompt for memory processing |
-| `oss.embedder.provider` | `string` | `"openai"` | Embedding provider (`"openai"`, `"ollama"`, etc.) |
-| `oss.embedder.config` | `object` | — | Provider config: `apiKey`, `model`, `baseURL` |
-| `oss.vectorStore.provider` | `string` | `"memory"` | Vector store (`"memory"`, `"qdrant"`, `"chroma"`, etc.) |
-| `oss.vectorStore.config` | `object` | — | Provider config: `host`, `port`, `collectionName`, `dimension` |
-| `oss.llm.provider` | `string` | `"openai"` | LLM provider (`"openai"`, `"anthropic"`, `"ollama"`, etc.) |
-| `oss.llm.config` | `object` | — | Provider config: `apiKey`, `model`, `baseURL`, `temperature` |
-| `oss.historyDbPath` | `string` | — | SQLite path for memory edit history |
-| `oss.disableHistory` | `boolean` | `false` | Disable memory edit history tracking |
+| `自定义说明` | `字符串` | *（内置）* |内存处理的提取提示 |
+| `oss.embedder.provider` | `字符串` | `"openai"` |嵌入提供程序（“openai”、“ollama”等）|
+| `oss.embedder.config` | `对象` | — |提供者配置：`apiKey`、`model`、`baseURL` |
+| `oss.vectorStore.provider` | `字符串` | `“记忆”` |矢量存储（“内存”、“qdrant”、“色度”等）|
+| `oss.vectorStore.config` | `对象` | — |提供者配置：`host`、`port`、`collectionName`、`dimension` |
+| `oss.llm.provider` | `字符串` | `"openai"` | LLM 提供者（“openai”、“anthropic”、“ollama”等）|
+| `oss.llm.config` | `对象` | — |提供者配置：`apiKey`、`model`、`baseURL`、`温度` |
+| `oss.historyDbPath` | `字符串` | — |内存编辑历史记录的 SQLite 路径 |
+| `oss。禁用历史记录` | `布尔值` | `假` |禁用内存编辑历史记录跟踪 |
 
-Everything inside `oss` is optional — defaults use OpenAI embeddings (`text-embedding-3-small`), in-memory vector store, and OpenAI LLM (`gpt-5-mini`).
+`oss` 中的所有内容都是可选的 — 默认使用 OpenAI 嵌入（`text-embedding-3-small`）、内存向量存储和 OpenAI LLM (`gpt-5-mini`)。
 
-## Plugin Management
+## 插件管理
 
-### Updating the Plugin
-
-```bash
+### 更新插件```bash
 openclaw plugins update openclaw-mem0
 ```
-
-### Checking Plugin Status
-
-```bash
+### 检查插件状态```bash
 openclaw plugins list
 openclaw plugins inspect openclaw-mem0
 ```
+## 故障排除
 
-## Troubleshooting
+###“plugins.allow 排除 mem0”错误
 
-### "plugins.allow excludes mem0" Error
-
-If you see an error like:
-
-```
+如果您看到类似以下的错误：```
 [openclaw] Failed to start CLI: Error: The `openclaw mem0` command is unavailable
 because `plugins.allow` excludes "mem0". Add "mem0" to `plugins.allow` if you want
 that bundled plugin CLI surface.
 ```
-
-Add `mem0` to your `plugins.allow` list in `openclaw.json`:
-
-```json5
+将“mem0”添加到“openclaw.json”中的“plugins.allow”列表中：```json5
 {
   "plugins": {
     "allow": ["mem0"],
@@ -409,43 +365,38 @@ Add `mem0` to your `plugins.allow` list in `openclaw.json`:
   }
 }
 ```
+### 插件未激活
 
-### Plugin Not Activating
+如果插件安装但不起作用：
 
-If the plugin installs but doesn't work:
+1. 验证`plugins.slots.memory`设置为`"openclaw-mem0"`（不是npm包名称）
+2.检查`openclaw plugins list --enabled`以确认插件已加载
+3.运行`openclaw mem0 status`来验证配置
 
-1. Verify `plugins.slots.memory` is set to `"openclaw-mem0"` (not the npm package name)
-2. Check `openclaw plugins list --enabled` to confirm the plugin is loaded
-3. Run `openclaw mem0 status` to verify configuration
+### 插件更新不起作用
 
-### Plugin Update Not Working
+如果`openclaw插件更新`失败：
 
-If `openclaw plugins update` fails:
-
-1. Use the plugin ID: `openclaw plugins update openclaw-mem0`
-2. Update all plugins at once: `openclaw plugins update --all`
-3. If that fails, uninstall and reinstall:
-   ```bash
+1.使用插件ID：`openclaw plugins update openclaw-mem0`
+2. 一次性更新所有插件：`openclaw plugins update --all`
+3. 如果失败，请卸载并重新安装：   ```bash
    openclaw plugins uninstall openclaw-mem0
    openclaw plugins install @mem0/openclaw-mem0
    ```
+## 隐私与安全
 
-## Privacy & Security
+### 数据流
 
-### Data Flow
-
-| Mode | Where data goes | Storage |
+|模式|数据去向 |存储|
 |------|----------------|---------|
-| **Platform** | Conversations sent to `api.mem0.ai` for extraction and storage | Mem0 cloud |
-| **Open-source** | Embeddings generated via configured provider (default: OpenAI API). Vectors stored locally. | `~/.mem0/vector_store.db` (SQLite) |
+| **平台** |对话发送到“api.mem0.ai”进行提取和存储 | Mem0云|
+| **开源** |通过配置的提供程序生成嵌入（默认：OpenAI API）。本地存储的向量。 | `~/.mem0/vector_store.db` (SQLite) |
 
-### Auto-Capture and Auto-Recall
+### 自动捕获和自动调用
 
-Auto-capture and auto-recall are **enabled by default**. When skills mode is configured (the default after `openclaw mem0 init`), these are ignored in favor of the skills-based triage/recall/dream protocol.
+自动捕获和自动调用**默认启用**。配置技能模式时（“openclaw mem0 init”后的默认设置），这些将被忽略，以支持基于技能的分类/召回/梦想协议。
 
-To disable either:
-
-```json5
+要禁用其中一个：```json5
 {
   "plugins": {
     "entries": {
@@ -459,42 +410,36 @@ To disable either:
   }
 }
 ```
+无论这些设置如何，代理始终可以显式地使用内存工具（“memory_add”、“memory_search”等）。
 
-The agent can always use memory tools (`memory_add`, `memory_search`, etc.) explicitly regardless of these settings.
+### 凭证保护
 
-### Credential Protection
+该插件从不将 API 密钥、令牌或秘密存储为内存。五个独立层强制执行此操作：
 
-The plugin never stores API keys, tokens, or secrets as memories. Five independent layers enforce this:
+1. **分类门** — 提取提示拒绝与已知凭证模式匹配的值（`sk-`、`m0-`、`ghp_`、`AKIA`、`Bearer`、`password=`、`token=`、`secret=`）
+2. **梦境清理** — 定期内存整合会删除任何包含凭证模式的记忆
+3. **提取说明** - 默认提取规则明确指示模型仅存储配置的凭证，而不存储值
+4. **可配置模式** — 通过 `skills.triage.credentialPatterns` 添加自定义凭证模式
+5. **CLI 修订** — `openclaw mem0 config show` 修订敏感字段（`apiKey`、`oss.*.config.apiKey`)
 
-1. **Triage gate** — The extraction prompt rejects values matching known credential patterns (`sk-`, `m0-`, `ghp_`, `AKIA`, `Bearer`, `password=`, `token=`, `secret=`)
-2. **Dream cleanup** — Periodic memory consolidation deletes any memories that slipped through containing credential patterns
-3. **Extraction instructions** — Default extraction rules explicitly instruct the model to store only that a credential was configured, never the value
-4. **Configurable patterns** — Add custom credential patterns via `skills.triage.credentialPatterns`
-5. **CLI redaction** — `openclaw mem0 config show` redacts sensitive fields (`apiKey`, `oss.*.config.apiKey`)
+### API 密钥存储
 
-### API Key Storage
+插件配置存储在“~/.openclaw/openclaw.json”中，文件权限为“0o600”（所有者只读）。对于生产部署，请使用环境变量引用 (`${MEM0_API_KEY}`) 或 SecretRef 对象而不是纯文本密钥。
 
-Plugin config is stored in `~/.openclaw/openclaw.json` with file permissions `0o600` (owner-read-only). For production deployments, use environment variable references (`${MEM0_API_KEY}`) or SecretRef objects instead of plaintext keys.
+### 遥测默认情况下启用匿名使用遥测 (PostHog) 以帮助改进插件。不包含对话内容或内存值 - 仅包含事件计数（回忆、捕获、工具使用、CLI 命令）。
 
-### Telemetry
-
-Anonymous usage telemetry (PostHog) is enabled by default to help improve the plugin. No conversation content or memory values are included — only event counts (recall, capture, tool usage, CLI commands).
-
-To opt out, set the environment variable:
-
-```bash
+要选择退出，请设置环境变量：```bash
 export MEM0_TELEMETRY=false
 ```
+### 系统提示上下文
 
-### System Prompt Context
+该插件通过 OpenClaw 的“prependSystemContext”机制将内存相关指令注入到代理的系统上下文中。这包括记忆分类协议和回忆记忆。这是内存后端的标准 OpenClaw 插件 SDK 模式 - 不会修改面向用户的提示。
 
-The plugin injects memory-related instructions into the agent's system context via OpenClaw's `prependSystemContext` mechanism. This includes the memory triage protocol and recalled memories. This is the standard OpenClaw plugin SDK pattern for memory backends — no user-facing prompts are modified.
-
-<CardGroup cols={2}>
+<卡组列={2}>
   <Card title="OpenAI Agents SDK" icon="robot" href="/integrations/openai-agents-sdk">
-    Build agents with OpenAI's SDK and Mem0
-  </Card>
+    使用 OpenAI 的 SDK 和 Mem0 构建代理
+  </卡>
   <Card title="LangGraph Integration" icon="diagram-project" href="/integrations/langgraph">
-    Create stateful agent workflows with memory
-  </Card>
-</CardGroup>
+    使用内存创建有状态代理工作流程
+  </卡>
+</卡组>

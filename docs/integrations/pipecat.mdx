@@ -3,31 +3,27 @@ title: 'Pipecat'
 description: 'Integrate Mem0 with Pipecat for conversational memory in AI agents'
 ---
 
-# Pipecat Integration
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0 seamlessly integrates with [Pipecat](https://pipecat.ai), providing long-term memory capabilities for conversational AI agents. This integration allows your Pipecat-powered applications to remember past conversations and provide personalized responses based on user history.
 
-## Installation
 
-To use Mem0 with Pipecat, install the required dependencies:
+# Pipecat 集成
 
-```bash
+Mem0 与 [Pipecat](https://pipecat.ai) 无缝集成，为对话式 AI 代理提供长期记忆功能。这种集成允许您的 Pipecat 支持的应用程序记住过去的对话并根据用户历史记录提供个性化响应。
+
+## 安装
+
+要将 Mem0 与 Pipecat 一起使用，请安装所需的依赖项：```bash
 pip install "pipecat-ai[mem0]"
 ```
-
-You'll also need to set up your Mem0 API key as an environment variable:
-
-```bash
+您还需要将 Mem0 API 密钥设置为环境变量：```bash
 export MEM0_API_KEY=your_mem0_api_key
 ```
+您可以通过在 [mem0.ai](https://mem0.ai) 注册来获取 Mem0 API 密钥。
 
-You can obtain a Mem0 API key by signing up at [mem0.ai](https://mem0.ai).
+## 配置
 
-## Configuration
-
-Mem0 integration is provided through the `Mem0MemoryService` class in Pipecat. Here's how to configure it:
-
-```python
+Mem0 集成是通过 Pipecat 中的“Mem0MemoryService”类提供的。配置方法如下：```python
 from pipecat.services.mem0 import Mem0MemoryService
 
 memory = Mem0MemoryService(
@@ -44,12 +40,9 @@ memory = Mem0MemoryService(
     }
 )
 ```
+## 管道集成
 
-## Pipeline Integration
-
-The `Mem0MemoryService` should be positioned between your context aggregator and LLM service in the Pipecat pipeline:
-
-```python
+`Mem0MemoryService` 应位于 Pipecat 管道中的上下文聚合器和 LLM 服务之间：```python
 pipeline = Pipeline([
     transport.input(),
     stt,                # Speech-to-text for audio input
@@ -61,12 +54,9 @@ pipeline = Pipeline([
     assistant_context   # Assistant context aggregator
 ])
 ```
+## 示例：带记忆的语音代理
 
-## Example: Voice Agent with Memory
-
-Here's a complete example of a Pipecat voice agent with Mem0 memory integration:
-
-```python
+以下是具有 Mem0 内存集成的 Pipecat 语音代理的完整示例：```python
 import asyncio
 import os
 from fastapi import FastAPI, WebSocket
@@ -157,33 +147,30 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
 ```
+## 它是如何工作的
 
-## How It Works
+与 Pipecat 集成时，Mem0 提供两个关键功能：
 
-When integrated with Pipecat, Mem0 provides two key functionalities:
+### 1.消息存储
 
-### 1. Message Storage
+所有对话消息都会自动存储在 Mem0 中以供将来参考：
+- 从上下文框架中捕获完整的消息历史记录
+- 将消息与指定的用户、代理和运行 ID 关联
+- 存储元数据以实现高效检索
 
-All conversation messages are automatically stored in Mem0 for future reference:
-- Captures the full message history from context frames
-- Associates messages with the specified user, agent, and run IDs
-- Stores metadata to enable efficient retrieval
+### 2. 记忆检索
 
-### 2. Memory Retrieval
+当检测到新的用户消息时：
+1. 该消息用作搜索查询来查找相关的过去记忆
+2.从Mem0的数据库中检索相关内存
+3. 记忆被格式化并添加到对话上下文中
+4. 增强的上下文被传递给LLM以生成响应
 
-When a new user message is detected:
-1. The message is used as a search query to find relevant past memories
-2. Relevant memories are retrieved from Mem0's database
-3. Memories are formatted and added to the conversation context
-4. The enhanced context is passed to the LLM for response generation
+## 附加配置选项
 
-## Additional Configuration Options
+### 内存搜索参数
 
-### Memory Search Parameters
-
-You can customize how memories are retrieved and used:
-
-```python
+您可以自定义检索和使用记忆的方式：```python
 memory = Mem0MemoryService(
     api_key=os.getenv("MEM0_API_KEY"),
     user_id="user123",
@@ -193,12 +180,9 @@ memory = Mem0MemoryService(
     }
 )
 ```
+### 内存呈现选项
 
-### Memory Presentation Options
-
-Control how memories are presented to the LLM:
-
-```python
+控制向法学硕士呈现记忆的方式：```python
 memory = Mem0MemoryService(
     api_key=os.getenv("MEM0_API_KEY"),
     user_id="user123",
@@ -209,12 +193,11 @@ memory = Mem0MemoryService(
     }
 )
 ```
-
-<CardGroup cols={2}>
+<卡组列={2}>
   <Card title="LiveKit Integration" icon="video" href="/integrations/livekit">
-    Build real-time voice and video agents
-  </Card>
+    构建实时语音和视频代理
+  </卡>
   <Card title="ElevenLabs Integration" icon="volume" href="/integrations/elevenlabs">
-    Create conversational voice agents
-  </Card>
-</CardGroup>
+    创建对话式语音代理
+  </卡>
+</卡组>

@@ -2,11 +2,14 @@
 title: "FAISS"
 description: "Use Facebook FAISS as a high-performance vector store in Mem0, optimized for memory usage and fast similarity search."
 ---
-[FAISS](https://github.com/facebookresearch/faiss) is a library for efficient similarity search and clustering of dense vectors. It is designed to work with large-scale datasets and provides a high-performance search engine for vector data. FAISS is optimized for memory usage and search speed, making it an excellent choice for production environments.
 
-### Usage
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-```python
+
+
+[FAISS](https://github.com/facebookresearch/faiss) 是一个用于高效相似性搜索和密集向量聚类的库。它旨在处理大规模数据集，并为矢量数据提供高性能搜索引擎。 FAISS 针对内存使用和搜索速度进行了优化，使其成为生产环境的绝佳选择。
+
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -32,45 +35,39 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+### 安装
 
-### Installation
-
-To use FAISS in your mem0 project, you need to install the appropriate FAISS package for your environment:
-
-```bash
+要在 mem0 项目中使用 FAISS，您需要为您的环境安装适当的 FAISS 软件包：```bash
 # For CPU version
 pip install faiss-cpu
 
 # For GPU version (requires CUDA)
 pip install faiss-gpu
 ```
+### 配置
 
-### Config
+以下是可用于配置 FAISS 的参数：
 
-Here are the parameters available for configuring FAISS:
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |作品集名称| `mem0` |
+| `路径` | FAISS索引和元数据的存储路径| `/tmp/faiss/<集合名称>` |
+| `距离策略` |使用的距离度量策略（选项：'euclidean'、'inner_product'、'cosine'）| `欧几里得` |
+| `normalize_L2` |是否对L2向量进行归一化（仅适用于欧氏距离） | ‘假’|
 
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collection_name` | The name of the collection | `mem0` |
-| `path` | Path to store FAISS index and metadata | `/tmp/faiss/<collection_name>` |
-| `distance_strategy` | Distance metric strategy to use (options: 'euclidean', 'inner_product', 'cosine') | `euclidean` |
-| `normalize_L2` | Whether to normalize L2 vectors (only applicable for euclidean distance) | `False` |
+### 性能考虑因素
 
-### Performance Considerations
+FAISS 为矢量搜索提供了几个优势：
 
-FAISS offers several advantages for vector search:
+1. **效率**：FAISS针对内存使用和速度进行了优化，使其适合大规模应用。
+2. **离线支持**：FAISS完全在本地工作，无需外部服务器或API调用。
+3.**存储选项**：向量可以存储在内存中以获得最大速度或持久保存到磁盘。
+4. **多种索引类型**：FAISS 支持针对各种用例优化的不同索引类型（尽管 mem0 目前使用基本平面索引）。
 
-1. **Efficiency**: FAISS is optimized for memory usage and speed, making it suitable for large-scale applications.
-2. **Offline Support**: FAISS works entirely locally, with no need for external servers or API calls.
-3. **Storage Options**: Vectors can be stored in-memory for maximum speed or persisted to disk.
-4. **Multiple Index Types**: FAISS supports different index types optimized for various use cases (though mem0 currently uses the basic flat index).
+### 距离策略
 
-### Distance Strategies
+mem0 中的 FAISS 支持三种距离策略：- **euclidean**：L2距离，适合大多数嵌入模型
+- **inner_product**：点积相似度，对于一些专门的嵌入很有用
+- **余弦**：余弦相似度，最适合比较语义相似度，无论向量大小如何
 
-FAISS in mem0 supports three distance strategies:
-
-- **euclidean**: L2 distance, suitable for most embedding models
-- **inner_product**: Dot product similarity, useful for some specialized embeddings
-- **cosine**: Cosine similarity, best for comparing semantic similarity regardless of vector magnitude
-
-When using `cosine` or `inner_product` with normalized vectors, you may want to set `normalize_L2=True` for better results.
+当将“cosine”或“inner_product”与归一化向量一起使用时，您可能需要设置“normalize_L2=True”以获得更好的结果。

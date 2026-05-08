@@ -3,42 +3,42 @@ title: Custom Categories
 description: "Replace default memory tags with custom category labels that match your product terminology at the project level."
 ---
 
-# Custom Categories
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0 automatically tags every memory, but the default labels (travel, sports, music, etc.) may not match the names your app uses. Custom categories let you replace that list so the tags line up with your own wording.
 
-<Info>
-  **Use custom categories when…**
-  - You need Mem0 to tag memories with names your product team already uses.
-  - You want clean reports or automations that rely on those tags.
-  - You’re moving from the open-source version and want the same labels here.
-</Info>
 
-<Warning>
-  Per-request overrides (`custom_categories=...` on `client.add`) are not supported on the managed API yet. Set categories at the project level, then ingest memories as usual.
-</Warning>
+# 自定义类别
 
-## Configure access
+Mem0 自动标记每个记忆，但默认标签（旅行、运动、音乐等）可能与您的应用使用的名称不匹配。自定义类别允许您替换该列表，以便标签与您自己的措辞对齐。
 
-- Ensure `MEM0_API_KEY` is set in your environment or pass it to the SDK constructor.
-- If you scope work to a specific organization/project, initialize the client with those identifiers.
+<信息>
+  **当……时使用自定义类别**
+  - 您需要 Mem0 用您的产品团队已经使用的名称来标记内存。
+  - 您想要依赖这些标签的干净报告或自动化。
+  - 您正在从开源版本迁移并希望在这里使用相同的标签。
+</信息>
 
-## How it works
+<警告>
+  托管 API 尚不支持按请求覆盖（“client.add”上的“custom_categories=...”）。在项目级别设置类别，然后像往常一样摄取记忆。
+</警告>
 
-- **Default list** — Each project starts with 15 broad categories like `travel`, `sports`, and `music`.
-- **Project override** — When you call `project.update(custom_categories=[...])`, that list replaces the defaults for future memories.
-- **Automatic tags** — As new memories come in, Mem0 picks the closest matches from your list and saves them in the `categories` field.
+## 配置访问
 
-<Note>
-  Default catalog: `personal_details`, `family`, `professional_details`, `sports`, `travel`, `food`, `music`, `health`, `technology`, `hobbies`, `fashion`, `entertainment`, `milestones`, `user_preferences`, `misc`.
-</Note>
+- 确保在您的环境中设置了“MEM0_API_KEY”或将其传递给 SDK 构造函数。- 如果您将工作范围限定为特定组织/项目，请使用这些标识符初始化客户端。
 
-## Configure it
+## 它是如何工作的- **默认列表** — 每个项目都以 15 个大类开始，例如“旅行”、“运动”和“音乐”。
+- **项目覆盖** — 当您调用 `project.update(custom_categories=[...])` 时，该列表将替换未来记忆的默认值。
+- **自动标签** — 当新的记忆进入时，Mem0 会从列表中挑选最接近的匹配项并将它们保存在“类别”字段中。
 
-### 1. Set custom categories at the project level
+<注意>
+  默认目录：`个人详细信息`、`家庭`、`专业详细信息`、`运动`、`旅行`、`食物`、`音乐`、`健康`、`技术`、`爱好`、`时尚`、`娱乐`、`里程碑`、`用户偏好`、`杂项`。
+</注>
 
-<CodeGroup>
-```python Code
+## 配置它
+
+### 1. 在项目级别设置自定义类别
+
+<代码组>```python Code
 import os
 from mem0 import MemoryClient
 
@@ -62,12 +62,11 @@ print(response)
     "message": "Updated custom categories"
 }
 ```
-</CodeGroup>
+</代码组>
 
-### 2. Confirm the active catalog
+### 2.确认活动目录
 
-<CodeGroup>
-```python Code
+<代码组>```python Code
 # Get current custom categories
 categories = client.project.get(fields=["custom_categories"])
 print(categories)
@@ -82,14 +81,13 @@ print(categories)
   ]
 }
 ```
-</CodeGroup>
+</代码组>
 
-## See it in action
+## 查看实际效果
 
-### Add a memory (uses the project catalog automatically)
+### 添加内存（自动使用项目目录）
 
-<CodeGroup>
-```python Code
+<代码组>```python Code
 messages = [
     {"role": "user", "content": "My name is Alice. I need help organizing my daily schedule better. I feel overwhelmed trying to balance work, exercise, and social life."},
     {"role": "assistant", "content": "I understand how overwhelming that can feel. Let's break this down together. What specific areas of your schedule feel most challenging to manage?"},
@@ -100,23 +98,21 @@ messages = [
 # Add memories with project-level custom categories
 client.add(messages, user_id="alice")
 ```
-</CodeGroup>
+</代码组>
 
-### Retrieve memories and inspect categories
+### 检索记忆并检查类别
 
-<CodeGroup>
-```python Code
+<代码组>```python Code
 memories = client.get_all(filters={"user_id": "alice"})
 ```
 
 ```json Output
 ["lifestyle_management_concerns", "seeking_structure"]
 ```
-</CodeGroup>
+</代码组>
 
-<Info>
-  **Sample memory payload**
-  ```json
+<信息>
+  **内存有效负载示例**  ```json
   {
     "id": "33d2***",
     "memory": "Trying to balance work and workouts",
@@ -140,17 +136,15 @@ memories = client.get_all(filters={"user_id": "alice"})
     }
   }
   ```
-</Info>
+</信息>
 
-<Note>
-  Need ad-hoc labels for a single call? Store them in `metadata` until per-request overrides become available.
-</Note>
+<注意>
+  需要为单个调用添加临时标签吗？将它们存储在“元数据”中，直到每个请求的覆盖变得可用。
+</注>
 
-## Default categories (fallback)
+## 默认类别（后备）
 
-If you do nothing, memories are tagged with the built-in set below.
-
-```
+如果您不执行任何操作，内存将使用下面的内置集进行标记。```
 - personal_details
 - family
 - professional_details
@@ -167,9 +161,7 @@ If you do nothing, memories are tagged with the built-in set below.
 - user_preferences
 - misc
 ```
-
-<CodeGroup>
-```python Code
+<代码组>```python Code
 import os
 from mem0 import MemoryClient
 
@@ -197,12 +189,11 @@ Is quite athletic (sports)
 Loves playing badminton, football, and basketball (sports)
 Name is Alice (personal_details)
 ```
-</CodeGroup>
+</代码组>
 
-You can verify the defaults are active by checking:
+您可以通过检查以下内容来验证默认设置是否处于活动状态：
 
-<CodeGroup>
-```python Code
+<代码组>```python Code
 client.project.get(["custom_categories"])
 ```
 
@@ -211,25 +202,24 @@ client.project.get(["custom_categories"])
     "custom_categories": None
 }
 ```
-</CodeGroup>
+</代码组>
 
-## Verify the feature is working
+## 验证该功能是否正常工作
 
-- `client.project.get(["custom_categories"])` returns the category list you set.
-- `client.get_all(filters={"user_id": ...})` shows populated `categories` lists on new memories.
-- The Mem0 dashboard (Project → Memories) displays the custom labels in the Category column.
+- `client.project.get(["custom_categories"])` 返回您设置的类别列表。
+- `client.get_all(filters={"user_id": ...})` 显示新内存中填充的`categories` 列表。
+- Mem0 仪表板（项目→内存）在类别列中显示自定义标签。
 
-## Best practices
+## 最佳实践
 
-- Keep category descriptions concise but specific; the classifier uses them to disambiguate.
-- Review memories with empty `categories` to see where you might extend or rename your list.
-- Stick with project-level overrides until per-request support is released; mixing approaches causes confusion.
+- 保持类别描述简洁但具体；分类器使用它们来消除歧义。
+- 使用空“类别”查看记忆，看看可以在哪里扩展或重命名您的列表。
+- 坚持项目级别的覆盖，直到发布每个请求的支持；混合方法会导致混乱。
 
-<CardGroup cols={2}>
-  <Card title="Advanced Memory Operations" icon="wand-magic-sparkles" href="/platform/advanced-memory-operations">
-    Explore other ingestion tunables like custom prompts and selective writes.
-  </Card>
-  <Card title="Travel Assistant Cookbook" icon="plane-up" href="/cookbooks/companions/travel-assistant">
-    See custom tagging drive personalization in a full agent workflow.
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="高级内存操作" icon="wand-magic-sparkles" href="/platform/advanced-memory-operations">
+    探索其他摄取可调参数，例如自定义提示和选择性写入。</卡>
+  <Card title="旅行助理食谱" icon="plane-up" href="/cookbooks/companions/travel-assistant">
+    查看自定义标记在完整的代理工作流程中推动个性化。
+  </卡>
+</卡组>

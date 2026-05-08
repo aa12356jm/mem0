@@ -3,42 +3,35 @@ title: Memory as OpenAI Tool
 description: "Wire Mem0 memories into OpenAI's inbuilt function-calling flow."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Integrate Mem0’s memory capabilities with OpenAI’s Inbuilt Tools to create AI agents with persistent memory.
 
-## Getting Started
 
-### Installation
+将 Mem0 的内存功能与 OpenAI 的内置工具集成，以创建具有持久内存的 AI 代理。
 
-```bash
+## 开始使用
+
+### 安装```bash
 npm install mem0ai openai zod
 ```
+## 环境设置
 
-## Environment Setup
-
-Save your Mem0 and OpenAI API keys in a `.env` file:
-
-```
+将 Mem0 和 OpenAI API 密钥保存在 `.env` 文件中：```
 MEM0_API_KEY=your_mem0_api_key
 OPENAI_API_KEY=your_openai_api_key
 ```
+从 <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=cookbook-openai-tool-calls" rel="nofollow">Mem0 仪表板</a>获取 Mem0 API 密钥。
 
-Get your Mem0 API key from the <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=cookbook-openai-tool-calls" rel="nofollow">Mem0 Dashboard</a>.
-
-### Configuration
-
-```javascript
+＃＃＃ 配置```javascript
 const USER_ID = "sample-user";
 
 const openAIClient = new OpenAI();
 const mem0Client = new MemoryClient({ apiKey: process.env.MEM0_API_KEY });
 ```
+## 添加记忆
 
-## Adding Memories
-
-Store user preferences, past interactions, or any relevant information:
-<CodeGroup>
-```javascript JavaScript
+存储用户偏好、过去的交互或任何相关信息：
+<代码组>```javascript JavaScript
 async function addUserPreferences() {
     const mem0Client = new MemoryClient({ apiKey: process.env.MEM0_API_KEY });
     
@@ -82,20 +75,15 @@ await addUserPreferences();
   }
 ]
 ```
-</CodeGroup>
-## Retrieving Memories
+</代码组>
+## 检索记忆
 
-Search for relevant memories based on the current user input:
-
-```javascript
+根据当前用户输入搜索相关记忆：```javascript
 const relevantMemories = await mem0Client.search(userInput, { userId: USER_ID });
 ```
+## 使用 Zod 进行结构化响应
 
-## Structured Responses with Zod
-
-Define structured response schemas to get consistent output formats:
-
-```javascript
+定义结构化响应模式以获得一致的输出格式：```javascript
 // Define the schema for a car recommendation
 const CarSchema = z.object({
   car_name: z.string(),
@@ -123,24 +111,18 @@ const response = await openAIClient.responses.create({
     input: `${getMemoryString(relevantMemories)}\n${userInput}`,
 });
 ```
+## 使用网络搜索
 
-## Using Web Search
-
-Combine memory with web search for up-to-date recommendations:
-
-```javascript
+将记忆与网络搜索相结合以获得最新的推荐：```javascript
 const response = await openAIClient.responses.create({
     model: "gpt-5-mini",
     tools: [{ type: "web_search_preview" }, carRecommendationTool],
     input: `${getMemoryString(relevantMemories)}\n${userInput}`,
 });
 ```
+## 示例
 
-## Examples
-
-## Complete Car Recommendation System
-
-```javascript
+## 完整的汽车推荐系统```javascript
 import MemoryClient from "mem0ai";
 import { OpenAI } from "openai";
 import { zodResponsesFunction } from "openai/helpers/zod";
@@ -225,11 +207,9 @@ const getMemoryString = (memories) => {
 
 run().catch(console.error);
 ```
+## 回应
 
-## Responses
-
-<CodeGroup>
-    ```json Without Memories
+<代码组>    ```json Without Memories
     {
       "cars": [
         {
@@ -298,22 +278,22 @@ run().catch(console.error);
       ]
     }
     ```
-</CodeGroup>
+</代码组>
 
-## Resources
+## 资源
 
-- [Mem0 Documentation](https://docs.mem0.ai/introduction)
-- <a href="https://app.mem0.ai/dashboard?utm_source=oss&utm_medium=cookbook-openai-tool-calls" rel="nofollow">Mem0 Dashboard</a>
-- [API Reference](https://docs.mem0.ai/api-reference)
-- [OpenAI Documentation](https://platform.openai.com/docs)
+- [Mem0 文档](https://docs.mem0.ai/introduction)
+- <a href="https://app.mem0.ai/dashboard?utm_source=oss&utm_medium=cookbook-openai-tool-calls" rel="nofollow">Mem0 仪表板</a>
+- [API参考](https://docs.mem0.ai/api-reference)
+- [OpenAI 文档](https://platform.openai.com/docs)
 
 ---
 
-<CardGroup cols={2}>
+<卡组列={2}>
   <Card title="Agents SDK Tool with Mem0" icon="robot" href="/cookbooks/integrations/agents-sdk-tool">
-    Extend the OpenAI Agents SDK with Mem0 integration capabilities.
-  </Card>
-  <Card title="Control Memory Ingestion" icon="filter" href="/cookbooks/essentials/controlling-memory-ingestion">
-    Fine-tune what memories get stored during tool calls.
-  </Card>
-</CardGroup>
+    使用 Mem0 集成功能扩展 OpenAI Agents SDK。
+  </卡>
+  <Card title="控制内存摄入" icon="filter" href="/cookbooks/essentials/controlling-memory-ingestion">
+    微调工具调用期间存储的内存内容。
+  </卡>
+</卡组>

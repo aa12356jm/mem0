@@ -3,16 +3,19 @@ title: LangChain
 description: "Use LangChain as a unified vector store provider in Mem0 to access multiple vector databases through one interface."
 ---
 
-Mem0 supports LangChain as a provider for vector store integration. LangChain provides a unified interface to various vector databases, making it easy to integrate different vector store providers through a consistent API.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Note>
-  When using LangChain as your vector store provider, you must set the collection name to "mem0". This is a required configuration for proper integration with Mem0.
-</Note>
 
-## Usage
 
-<CodeGroup>
-```python Python
+Mem0 支持 LangChain 作为矢量存储集成的提供者。 LangChain为各种矢量数据库提供了统一的接口，可以通过一致的API轻松集成不同的矢量存储提供商。
+
+<注意>
+  当使用 LangChain 作为矢量存储提供商时，您必须将集合名称设置为“mem0”。这是与 Mem0 正确集成所需的配置。
+</注>
+
+## 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 from langchain_chroma import Chroma
@@ -72,42 +75,40 @@ const messages = [
 
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-## Supported LangChain Vector Stores
+## 支持的 LangChain 矢量存储
 
-LangChain supports a wide range of vector store providers, including:
+LangChain支持广泛的矢量商店提供商，包括：
 
-- Chroma
-- FAISS
-- Pinecone
-- Weaviate
-- Milvus
-- Qdrant
-- And many more
+- 色度
+- 费斯
+- 松果
+- 维维特
+- 米尔乌斯
+-Qdrant
+- 还有更多
 
-You can use any of these vector store instances directly in your configuration. For a complete and up-to-date list of available providers, refer to the [LangChain Vector Stores documentation](https://python.langchain.com/docs/integrations/vectorstores).
+您可以直接在配置中使用这些矢量存储实例中的任何一个。有关可用提供程序的完整最新列表，请参阅 [LangChain Vector Stores 文档](https://python.langchain.com/docs/integrations/vectorstores)。
 
-## Limitations
+## 限制
 
-When using LangChain as a vector store provider, there are some limitations to be aware of:
+当使用 LangChain 作为矢量存储提供商时，需要注意一些限制：
 
-1. **Bulk Operations**: The `get_all` and `delete_all` operations are not supported when using LangChain as the vector store provider. This is because LangChain's vector store interface doesn't provide standardized methods for these bulk operations across all providers.
+1. **批量操作**：使用 LangChain 作为向量存储提供者时，不支持 `get_all` 和 `delete_all` 操作。这是因为 LangChain 的向量存储接口没有为所有提供商的这些批量操作提供标准化方法。
 
-2. **Provider-Specific Features**: Some advanced features may not be available depending on the specific vector store implementation you're using through LangChain.
+2.**特定于提供商的功能**：根据您通过 LangChain 使用的特定矢量存储实现，某些高级功能可能不可用。
 
-## Provider-Specific Configuration
+## 特定于提供商的配置
 
-When using LangChain as a vector store provider, you'll need to:
+当使用 LangChain 作为矢量存储提供商时，您需要：1. 为您选择的矢量存储提供商设置适当的环境变量
+2. 导入并初始化您要使用的特定向量存储类
+3. 将初始化的向量存储实例传递给配置
 
-1. Set the appropriate environment variables for your chosen vector store provider
-2. Import and initialize the specific vector store class you want to use
-3. Pass the initialized vector store instance to the config
+<注意>
+  确保安装必要的 LangChain 软件包和任何特定于提供商的依赖项。
+</注>
 
-<Note>
-  Make sure to install the necessary LangChain packages and any provider-specific dependencies.
-</Note>
+## 配置
 
-## Config
-
-All available parameters for the `langchain` vector store config are present in [Master List of All Params in Config](../config).
+“langchain”向量存储配置的所有可用参数都存在于[配置中所有参数的主列表](../config)中。

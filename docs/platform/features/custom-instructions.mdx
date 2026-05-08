@@ -3,12 +3,15 @@ title: Custom Instructions
 description: 'Control how Mem0 extracts and stores memories using natural language guidelines'
 ---
 
-## What are Custom Instructions?
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Custom instructions are natural language guidelines that let you define exactly what Mem0 should include or exclude when creating memories from conversations. This gives you precise control over what information is extracted, acting as smart filters so your AI application only remembers what matters for your use case.
 
-<CodeGroup>
-```python Python
+
+## 什么是自定义指令？
+
+自定义指令是自然语言指南，可让您在从对话创建记忆时准确定义 Mem0 应包含或排除的内容。这使您可以精确控制提取的信息，充当智能过滤器，以便您的人工智能应用程序只记住对您的用例重要的内容。
+
+<代码组>```python Python
 # Simple example: Health app focusing on wellness
 prompt = """
 Extract only health and wellness information:
@@ -35,21 +38,20 @@ Exclude: Personal identifiers, financial data
 
 await client.project.update({ customInstructions: prompt });
 ```
-</CodeGroup>
+</代码组>
 
-## Why Use Custom Instructions?
+## 为什么要使用自定义指令？
 
-- **Focus on What Matters**: Only capture information relevant to your application
-- **Maintain Privacy**: Explicitly exclude sensitive data like passwords or personal identifiers
-- **Ensure Consistency**: All memories follow the same extraction rules across your project
-- **Improve Quality**: Filter out noise and irrelevant conversations
+- **专注于重要的事情**：仅捕获与您的应用程序相关的信息
+- **维护隐私**：明确排除密码或个人标识符等敏感数据
+- **确保一致性**：整个项目中的所有记忆都遵循相同的提取规则
+- **提高质量**：过滤掉噪音和不相关的对话
 
-## How to Set Custom Instructions
+## 如何设置自定义指令
 
-### Basic Setup
+### 基本设置
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 # Set instructions for your project
 client.project.update(custom_instructions="Your guidelines here...")
 
@@ -66,13 +68,11 @@ await client.project.update({ customInstructions: "Your guidelines here..." });
 const response = await client.project.get({ fields: ["customInstructions"] });
 console.log(response.customInstructions);
 ```
-</CodeGroup>
+</代码组>
 
-### Best Practice Template
+### 最佳实践模板
 
-Structure your instructions using this proven template:
-
-```
+使用这个经过验证的模板构建您的说明：```
 Your Task: [Brief description of what to extract]
 
 Information to Extract:
@@ -92,13 +92,11 @@ Exclude:
 - [Sensitive data to avoid]
 - [Irrelevant information]
 ```
+## 现实世界的例子
 
-## Real-World Examples
-
-<Tabs>
-  <Tab title="E-commerce Customer Support">
-<CodeGroup>
-```python Python
+<标签>
+  <Tab title="电子商务客户支持">
+<代码组>```python Python
 instructions = """
 Extract customer service information for better support:
 
@@ -147,11 +145,10 @@ Exclude: Payment card numbers, passwords, personal identifiers.
 
 await client.project.update({ customInstructions: instructions });
 ```
-</CodeGroup>
-  </Tab>
-  <Tab title="Personalized Learning Platform">
-<CodeGroup>
-```python Python
+</代码组>
+  </标签>
+  <Tab title="个性化学习平台">
+<代码组>```python Python
 education_prompt = """
 Extract learning-related information for personalized education:
 
@@ -200,11 +197,10 @@ Exclude: Specific grades, personal identifiers, financial information.
 
 await client.project.update({ customInstructions: educationPrompt });
 ```
-</CodeGroup>
-  </Tab>
-  <Tab title="AI Financial Advisor">
-<CodeGroup>
-```python Python
+</代码组>
+  </标签>
+  <Tab title="AI 财务顾问">
+<代码组>```python Python
 finance_prompt = """
 Extract financial planning information for advisory services:
 
@@ -253,18 +249,17 @@ Exclude: Account numbers, SSNs, passwords, specific financial amounts.
 
 await client.project.update({ customInstructions: financePrompt });
 ```
-</CodeGroup>
-  </Tab>
-</Tabs>
+</代码组>
+  </标签>
+</标签>
 
-## Advanced Techniques
+## 先进技术
 
-### Conditional Processing
+### 条件处理
 
-Handle different conversation types with conditional logic:
+使用条件逻辑处理不同的对话类型：
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 advanced_prompt = """
 Extract information based on conversation context:
 
@@ -285,14 +280,13 @@ Always exclude personal identifiers and maintain professional context.
 
 client.project.update(custom_instructions=advanced_prompt)
 ```
-</CodeGroup>
+</代码组>
 
-### Testing Your Instructions
+### 测试你的指令
 
-Always test your custom instructions with real message examples:
+始终使用真实的消息示例来测试您的自定义指令：
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 # Test with sample messages
 messages = [
     {"role": "user", "content": "I'm having billing issues with my subscription"},
@@ -308,29 +302,29 @@ memories = client.get_all(filters={"AND": [{"user_id": "test_user"}]})
 for memory in memories:
     print(f"Extracted: {memory['memory']}")
 ```
-</CodeGroup>
+</代码组>
 
-## Best Practices
+## 最佳实践
 
-### ✅ Do
-- **Be specific** about what information to extract
-- **Use clear categories** to organize your instructions
-- **Test with real conversations** before deploying
-- **Explicitly state exclusions** for privacy and compliance
-- **Start simple** and iterate based on results
+### ✅ 做
+- **具体**要提取哪些信息
+- **使用清晰的类别**来组织您的说明
+- **部署前使用真实对话进行测试**
+- **为了隐私和合规性明确说明排除情况**
+- **从简单开始**并根据结果进行迭代
 
-### ❌ Don't
-- Make instructions too long or complex
-- Create conflicting rules within your guidelines
-- Be overly restrictive (balance specificity with flexibility)
-- Forget to exclude sensitive information
-- Skip testing with diverse conversation examples
+### ❌不要
+- 说明太长或太复杂
+- 在你的指导方针中创建相互冲突的规则
+- 限制过多（平衡特异性与灵活性）
+- 忘记排除敏感信息
+- 跳过使用不同对话示例的测试
 
-## Common Issues and Solutions
+## 常见问题及解决方案
 
-| Issue | Solution |
-|-------|----------|
-| **Instructions too long** | Break into focused categories, keep concise |
-| **Missing important data** | Add specific examples of what to capture |
-| **Capturing irrelevant info** | Strengthen exclusion rules and be more specific |
-| **Inconsistent results** | Clarify guidelines and test with more examples |
+|问题 |解决方案 |
+|--------|----------|
+| **说明太长** |划分重点类别，保持简洁 |
+| **缺少重要数据** |添加要捕获内容的具体示例 |
+| **捕获不相关的信息** |加强排除规则并更加具体 |
+| **结果不一致** |阐明准则并使用更多示例进行测试 |

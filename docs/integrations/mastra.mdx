@@ -3,38 +3,34 @@ title: Mastra
 description: "Use Mastra agents with Mem0 as the memory backend for cross-conversation storage and retrieval."
 ---
 
-The [**Mastra**](https://mastra.ai/) integration demonstrates how to use Mastra's agent system with Mem0 as the memory backend through custom tools. This enables agents to remember and recall information across conversations.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-In this guide, we'll create a Mastra agent that:
-1. Uses Mem0 to store information using a memory tool
-2. Retrieves relevant memories using a search tool
-3. Provides personalized responses based on past interactions
-4. Maintains context across conversations and sessions
 
-## Setup and Configuration
+[**Mastra**](https://mastra.ai/) 集成演示了如何通过自定义工具使用 Mastra 的代理系统和 Mem0 作为内存后端。这使得代理能够记住和回忆对话中的信息。
 
-Install the required libraries:
+## 概述
 
-```bash
+在本指南中，我们将创建一个 Mastra 代理：
+1.使用Mem0使用内存工具来存储信息
+2.使用搜索工具检索相关记忆
+3. 根据过去的互动提供个性化响应
+4. 维护对话和会话的上下文
+
+## 设置和配置
+
+安装所需的库：```bash
 npm install @mastra/core @mastra/mem0 @ai-sdk/openai zod
 ```
+设置您的环境变量：
 
-Set up your environment variables:
-
-<Note>Remember to get the Mem0 API key from <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-mastra" rel="nofollow">Mem0 Platform</a>.</Note>
-
-```bash
+<Note>记得从<a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-mastra" rel="nofollow">Mem0 Platform</a>获取Mem0 API密钥。</Note>```bash
 MEM0_API_KEY=your-mem0-api-key
 OPENAI_API_KEY=your-openai-api-key
 ```
+## 初始化 Mem0 集成
 
-## Initialize Mem0 Integration
-
-Import required modules and set up the Mem0 integration:
-
-```typescript
+导入所需的模块并设置 Mem0 集成：```typescript
 import { Mem0Integration } from '@mastra/mem0';
 import { createTool } from '@mastra/core/tools';
 import { Agent } from '@mastra/core/agent';
@@ -49,12 +45,9 @@ const mem0 = new Mem0Integration({
   },
 });
 ```
+## 创建记忆工具
 
-## Create Memory Tools
-
-Set up tools for memorizing and remembering information:
-
-```typescript
+设置记忆和记忆信息的工具：```typescript
 // Tool for remembering saved memories
 const mem0RememberTool = createTool({
   id: 'Mem0-remember',
@@ -93,12 +86,9 @@ const mem0MemorizeTool = createTool({
   },
 });
 ```
+## 创建 Mastra 代理
 
-## Create Mastra Agent
-
-Initialize an agent with memory tools and clear instructions:
-
-```typescript
+使用记忆工具和清晰的指令初始化代理：```typescript
 // Create an agent with memory tools
 const mem0Agent = new Agent({
   name: 'Mem0 Agent',
@@ -111,27 +101,22 @@ const mem0Agent = new Agent({
   tools: { mem0RememberTool, mem0MemorizeTool },
 });
 ```
+## 主要特点
 
+1. **基于工具的内存控制**：代理决定何时使用特定工具保存和检索信息
+2. **语义搜索**：Mem0根据语义相似性查找相关记忆，而不仅仅是精确匹配
+3. **用户特定的内存空间**：每个user_id维护单独的内存上下文
+4. **异步保存**：在后台保存内存，减少响应延迟
+5. **跨对话持久性**：记忆在不同的对话线程中持续存在
+6. **透明操作**：内存操作通过工具使用可见
 
-## Key Features
+## 结论
 
-1. **Tool-based Memory Control**: The agent decides when to save and retrieve information using specific tools
-2. **Semantic Search**: Mem0 finds relevant memories based on semantic similarity, not just exact matches
-3. **User-specific Memory Spaces**: Each user_id maintains separate memory contexts
-4. **Asynchronous Saving**: Memories are saved in the background to reduce response latency
-5. **Cross-conversation Persistence**: Memories persist across different conversation threads
-6. **Transparent Operations**: Memory operations are visible through tool usage
-
-## Conclusion
-
-By integrating Mastra with Mem0, you can build intelligent agents that learn and remember information across conversations. The tool-based approach provides transparency and control over memory operations, making it easy to create personalized and context-aware AI experiences.
-
-<CardGroup cols={2}>
+通过将 Mastra 与 Mem0 集成，您可以构建能够在对话中学习和记住信息的智能代理。基于工具的方法提供了对内存操作的透明度和控制，从而可以轻松创建个性化和上下文感知的人工智能体验。<卡组列={2}>
   <Card title="Mastra Agent Cookbook" icon="star" href="/cookbooks/integrations/mastra-agent">
-    Build a complete Mastra agent with persistent memory
-  </Card>
-  <Card title="Vercel AI SDK Integration" icon="triangle" href="/integrations/vercel-ai-sdk">
-    Create web applications with Vercel AI SDK
-  </Card>
-</CardGroup>
-
+    构建具有持久内存的完整 Mastra 代理
+  </卡>
+  <Card title="Vercel AI SDK 集成" icon="triangle" href="/integrations/vercel-ai-sdk">
+    使用 Vercel AI SDK 创建 Web 应用程序
+  </卡>
+</卡组>

@@ -3,37 +3,36 @@ title: Vercel AI SDK
 description: "Use the Mem0 AI SDK Provider with Vercel AI SDK for persistent memory in conversational AI applications."
 ---
 
-The [**Mem0 AI SDK Provider**](https://www.npmjs.com/package/@mem0/vercel-ai-provider) is a library developed by **Mem0** to integrate with the Vercel AI SDK. This library brings enhanced AI interaction capabilities to your applications by introducing persistent memory functionality.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Note type="info">
-  Mem0 AI SDK now supports <strong>Vercel AI SDK V5</strong>.
-</Note>
 
-## Overview
 
-1. Offers persistent memory storage for conversational AI
-2. Enables smooth integration with the Vercel AI SDK
-3. Ensures compatibility with multiple LLM providers
-4. Supports structured message formats for clarity
-5. Facilitates streaming response capabilities
+[**Mem0 AI SDK Provider**](https://www.npmjs.com/package/@mem0/vercel-ai-provider) 是由 **Mem0** 开发的用于与 Vercel AI SDK 集成的库。该库通过引入持久内存功能，为您的应用程序带来增强的 AI 交互功能。
 
-## Setup and Configuration
+<注释类型=“信息”>
+  Mem0 AI SDK 现在支持 <strong>Vercel AI SDK V5</strong>。
+</注>
 
-Install the SDK provider using npm:
+## 概述
 
-```bash
+1. 为对话式人工智能提供持久内存存储
+2. 与Vercel AI SDK平滑集成
+3. 确保与多个LLM提供商的兼容性
+4. 支持结构化消息格式，清晰可见
+5. 促进流响应能力
+
+## 设置和配置
+
+使用 npm 安装 SDK 提供程序：```bash
 npm install @mem0/vercel-ai-provider
 ```
+## 开始使用
 
-## Getting Started
+### 设置 Mem0
 
-### Setting Up Mem0
+1. 从 <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-vercel-ai-sdk" rel="nofollow">Mem0 仪表板</a>获取您的 **Mem0 API 密钥**。
 
-1. Get your **Mem0 API Key** from the <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-vercel-ai-sdk" rel="nofollow">Mem0 Dashboard</a>.
-
-2. Initialize the Mem0 Client in your application:
-
-    ```typescript
+2. 在您的应用程序中初始化 Mem0 客户端：    ```typescript
     import { createMem0 } from "@mem0/vercel-ai-provider";
 
     const mem0 = createMem0({
@@ -49,14 +48,11 @@ npm install @mem0/vercel-ai-provider
       },
     });
     ```
+> **注意**：`openai` 提供程序设置为默认值。考虑使用“MEM0_API_KEY”和“OPENAI_API_KEY”作为安全环境变量。
 
-    > **Note**: The `openai` provider is set as default. Consider using `MEM0_API_KEY` and `OPENAI_API_KEY` as environment variables for security.
+    > **注意**： `mem0Config` 是可选的。它用于设置 Mem0 客户端的全局配置（例如“user_id”、“agent_id”、“app_id”、“run_id”等）。
 
-    > **Note**: The `mem0Config` is optional. It is used to set the global config for the Mem0 Client (eg. `user_id`, `agent_id`, `app_id`, `run_id` etc).
-
-3. Add Memories to Enhance Context:
-
-    ```typescript
+3. 添加记忆以增强背景：    ```typescript
     import { LanguageModelV2Prompt } from "@ai-sdk/provider";
     import { addMemories } from "@mem0/vercel-ai-provider";
 
@@ -66,23 +62,18 @@ npm install @mem0/vercel-ai-provider
 
     await addMemories(messages, { user_id: "borat" });
     ```
-
-### Standalone Features:
-
-    ```typescript
+### 独立功能：    ```typescript
     await addMemories(messages, { user_id: "borat", mem0ApiKey: "m0-xxx" });
     await retrieveMemories(prompt, { user_id: "borat", mem0ApiKey: "m0-xxx" });
     await getMemories(prompt, { user_id: "borat", mem0ApiKey: "m0-xxx" });
     ```
-     > For standalone features, such as `addMemories`, `retrieveMemories`, and `getMemories`, you must either set `MEM0_API_KEY` as an environment variable or pass it directly in the function call.
+> 对于独立功能，例如“addMemories”、“retrieveMemories”和“getMemories”，您必须将“MEM0_API_KEY”设置为环境变量或直接在函数调用中传递它。
 
-     > `getMemories` will return raw memories in the form of an array of objects, while `retrieveMemories` will return a response in string format with a system prompt ingested with the retrieved memories.
+     > `getMemories` 将以对象数组的形式返回原始记忆，而 `retrieveMemories` 将以字符串格式返回响应，并显示包含检索到的记忆的系统提示符。
 
-     > `getMemories` returns an array of memory objects.
+     > `getMemories` 返回内存对象数组。
 
-### 1. Basic Text Generation with Memory Context
-
-    ```typescript
+### 1. 使用内存上下文生成基本文本    ```typescript
     import { generateText } from "ai";
     import { createMem0 } from "@mem0/vercel-ai-provider";
 
@@ -93,10 +84,7 @@ npm install @mem0/vercel-ai-provider
       prompt: "Suggest me a good car to buy!",
     });
     ```
-
-### 2. Combining OpenAI Provider with Memory Utils
-
-    ```typescript
+### 2. 将 OpenAI Provider 与 Memory Utils 相结合    ```typescript
     import { generateText } from "ai";
     import { openai } from "@ai-sdk/openai";
     import { retrieveMemories } from "@mem0/vercel-ai-provider";
@@ -110,10 +98,7 @@ npm install @mem0/vercel-ai-provider
       system: memories,
     });
     ```
-
-### 3. Structured Message Format with Memory
-
-    ```typescript
+### 3. 带内存的结构化消息格式    ```typescript
     import { generateText } from "ai";
     import { createMem0 } from "@mem0/vercel-ai-provider";
 
@@ -132,10 +117,7 @@ npm install @mem0/vercel-ai-provider
       ],
     });
     ```
-
-### 3. Streaming Responses with Memory Context
-
-    ```typescript
+### 3. 带有内存上下文的流式响应    ```typescript
     import { streamText } from "ai";
     import { createMem0 } from "@mem0/vercel-ai-provider";
 
@@ -152,10 +134,7 @@ npm install @mem0/vercel-ai-provider
         process.stdout.write(textPart);
     }
     ```
-
-### 4. Generate Responses with Tools Call
-
-    ```typescript
+### 4. 使用工具调用生成响应    ```typescript
     import { generateText } from "ai";
     import { createMem0 } from "@mem0/vercel-ai-provider";
     import { z } from "zod";
@@ -190,10 +169,7 @@ npm install @mem0/vercel-ai-provider
 
     console.log(result);
     ```
-
-### 5. Get sources from memory
-
-```typescript
+### 5. 从内存中获取资源```typescript
 const { text, sources } = await generateText({
     model: mem0("gpt-4-turbo"),
     prompt: "Suggest me a good car to buy!",
@@ -201,14 +177,11 @@ const { text, sources } = await generateText({
 
 console.log(sources);
 ```
+对于“streamText”也可以做同样的事情。
 
-The same can be done for `streamText` as well.
+### 6. 带内存上下文的文件支持
 
-### 6. File Support with Memory Context
-
-Mem0 AI SDK supports file processing with memory context. Here's an example of analyzing a PDF file:
-
-```typescript
+Mem0 AI SDK 支持使用内存上下文进行文件处理。以下是分析 PDF 文件的示例：```typescript
 import { streamText } from "ai";
 import { createMem0 } from "@mem0/vercel-ai-provider";
 import { readFileSync } from 'fs';
@@ -267,44 +240,40 @@ async function main() {
 
 main();
 ```
+> **注意**：支持多模式功能（例如 Google 的 Gemini 模型）的提供商提供文件支持。该示例展示了如何处理 PDF 文件，但您也可以处理图像、文本文件和其他支持的格式。
 
-> **Note**: File support is available with providers that support multimodal capabilities like Google's Gemini models. The example shows how to process PDF files, but you can also work with images, text files, and other supported formats.
+## 支持的法学硕士提供商
 
-## Supported LLM Providers
+|供应商|配置值|
+|----------|--------------------|
+|开放人工智能 |开放 |
+|人择 |人类 |
+|谷歌 |谷歌 |
+|格罗克 |格罗克 |
 
-| Provider | Configuration Value |
-|----------|-------------------|
-| OpenAI | openai |
-| Anthropic | anthropic |
-| Google | google |
-| Groq | groq |
+> **注意**：您可以使用“google”作为 Gemini (Google) 模型的提供程序。它们是相同的，并且在内部使用“@ai-sdk/google”包。
 
-> **Note**: You can use `google` as provider for Gemini (Google) models. They are same and internally they use `@ai-sdk/google` package.
+## 主要特点
 
-## Key Features
+- `createMem0()`：初始化一个新的 Mem0 提供程序实例。
+- `retrieveMemories()`：检索提示的内存上下文。
+- `getMemories()`：以数组格式从您的个人资料中获取记忆。
+- `addMemories()`：添加用户记忆以增强上下文响应。
 
-- `createMem0()`: Initializes a new Mem0 provider instance.
-- `retrieveMemories()`: Retrieves memory context for prompts.
-- `getMemories()`: Get memories from your profile in array format.
-- `addMemories()`: Adds user memories to enhance contextual responses.
+## 最佳实践
 
-## Best Practices
+1.**用户标识**：使用唯一的“user_id”来实现一致的内存检索。
+2. **内存清理**：定期清理未使用的内存数据。
 
-1. **User Identification**: Use a unique `user_id` for consistent memory retrieval.
-2. **Memory Cleanup**: Regularly clean up unused memory data.
+    > **注意**：我们还支持 `agent_id`、`app_id` 和 `run_id`。请参阅[文档](/api-reference/memory/add-memories)。
 
-    > **Note**: We also have support for `agent_id`, `app_id`, and `run_id`. Refer [Docs](/api-reference/memory/add-memories).
+＃＃ 结论Mem0 的 Vercel AI SDK 支持创建具有持久内存和无缝集成的智能、上下文感知应用程序。
 
-## Conclusion
-
-Mem0's Vercel AI SDK enables the creation of intelligent, context-aware applications with persistent memory and seamless integration.
-
-<CardGroup cols={2}>
+<卡组列={2}>
   <Card title="OpenAI Agents SDK" icon="cube" href="/integrations/openai-agents-sdk">
-    Build agents with OpenAI SDK and Mem0
-  </Card>
+    使用 OpenAI SDK 和 Mem0 构建代理
+  </卡>
   <Card title="Mastra Integration" icon="star" href="/integrations/mastra">
-    Create intelligent agents with Mastra framework
-  </Card>
-</CardGroup>
-
+    使用 Mastra 框架创建智能代理
+  </卡>
+</卡组>

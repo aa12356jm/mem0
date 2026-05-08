@@ -3,29 +3,27 @@ title: Export Stored Memories
 description: "Retrieve, review, and migrate user memories with structured exports."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0 is a dynamic memory store that gives you full control over your data. Along with storing memories, it gives you the ability to retrieve, export, and migrate your data whenever you need.
 
-This cookbook shows you how to retrieve and export your data for inspection, migration, or compliance.
 
----
+Mem0 是一个动态内存存储，可让您完全控制数据。除了存储内存之外，它还使您能够在需要时检索、导出和迁移数据。
 
-## Setup
+本指南向您展示如何检索和导出数据以进行检查、迁移或合规性。
 
-```python
+ - -
+
+＃＃ 设置```python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your-api-key")
 
 ```
+<注意>
+您的 API 密钥需要导出权限才能下载内存数据。如果导出操作因身份验证错误而失败，请检查<a href="https://app.mem0.ai?utm_source=oss&utm_medium=cookbook-exporting-memories" rel="nofollow">仪表板</a>上的项目设置。
+</注>
 
-<Note>
-Your API key needs export permissions to download memory data. Check your project settings on the <a href="https://app.mem0.ai?utm_source=oss&utm_medium=cookbook-exporting-memories" rel="nofollow">dashboard</a> if export operations fail with authentication errors.
-</Note>
-
-Let's add some sample memories to work with:
-
-```python
+让我们添加一些示例内存来使用：```python
 # Dev's work history
 client.add(
     "Dev works at TechCorp as a senior engineer",
@@ -48,14 +46,11 @@ client.add(
 )
 
 ```
-
 ---
 
-## Getting All Memories
+## 获取所有记忆
 
-Use `get_all()` with filters to retrieve everything for a specific user:
-
-```python
+使用带有过滤器的 get_all() 来检索特定用户的所有内容：```python
 dev_memories = client.get_all(
     filters={"user_id": "dev"},
     page_size=50
@@ -65,22 +60,16 @@ print(f"Total memories: {dev_memories['count']}")
 print(f"First memory: {dev_memories['results'][0]['memory']}")
 
 ```
-
-**Output:**
-
-```
+**输出：**```
 Total memories: 1
 First memory: Dev works at TechCorp as a senior engineer
 
 ```
+<信息>
+**预期输出：** `get_all()` 检索了 Dev 的完整内存记录。此方法返回与您的过滤器匹配的所有内容 - 没有语义搜索，没有排名，只是原始检索。非常适合出口和审核。
+</信息>
 
-<Info>
-**Expected output:** `get_all()` retrieved Dev's complete memory record. This method returns everything matching your filters—no semantic search, no ranking, just raw retrieval. Perfect for exports and audits.
-</Info>
-
-You can filter by metadata to get specific types:
-
-```python
+您可以按元数据过滤以获取特定类型：```python
 carl_projects = client.get_all(
     filters={
         "AND": [
@@ -94,21 +83,15 @@ for memory in carl_projects['results']:
     print(memory['memory'])
 
 ```
-
-**Output:**
-
-```
+**输出：**```
 Carl is leading the API redesign project, targeting Q2 launch
 
 ```
-
 ---
 
-## Searching Memories
+## 寻找记忆
 
-When you need semantic search instead of retrieving everything, use `search()`:
-
-```python
+当您需要语义搜索而不是检索所有内容时，请使用“search()”：```python
 results = client.search(
     query="What does Dev do for work?",
     filters={"user_id": "dev"},
@@ -119,25 +102,19 @@ for result in results['results']:
     print(f"{result['memory']} (score: {result['score']:.2f})")
 
 ```
-
-**Output:**
-
-```
+**输出：**```
 Dev works at TechCorp as a senior engineer (score: 0.89)
 
 ```
-
-Search works across all memory fields and ranks by relevance. Use it when you have a specific question, use `get_all()` when you need everything.
+搜索适用于所有记忆领域，并按相关性排名。当您有特定问题时使用它，当您需要所有内容时使用“get_all()”。
 
 ---
 
-## Exporting to Structured Format
+## 导出为结构化格式
 
-For migrations or compliance, you can export memories into a structured schema using Pydantic-style JSON schemas.
+为了迁移或合规性，您可以使用 Pydantic 风格的 JSON 模式将内存导出到结构化模式中。
 
-### Step 1: Define the schema
-
-```python
+### 第 1 步：定义架构```python
 professional_profile_schema = {
     "properties": {
         "full_name": {
@@ -158,10 +135,7 @@ professional_profile_schema = {
 }
 
 ```
-
-### Step 2: Create export job
-
-```python
+### 第 2 步：创建导出作业```python
 export_job = client.create_memory_export(
     schema=professional_profile_schema,
     filters={"user_id": "dev"}
@@ -171,22 +145,16 @@ print(f"Export ID: {export_job['id']}")
 print(f"Status: {export_job['status']}")
 
 ```
-
-**Output:**
-
-```
+**输出：**```
 Export ID: exp_abc123
 Status: processing
 
 ```
+<信息>
+**导出已启动：** 状态为“正在处理”。大量导出可能需要几秒钟。在下载数据之前，使用 get_memory_export() 进行轮询，直到状态更改为“已完成”。
+</信息>
 
-<Info>
-**Export initiated:** Status is "processing". Large exports may take a few seconds. Poll with `get_memory_export()` until status changes to "completed" before downloading data.
-</Info>
-
-### Step 3: Download the export
-
-```python
+### 第 3 步：下载导出文件```python
 # Get by ID
 export_data = client.get_memory_export(
     memory_export_id=export_job['id']
@@ -195,10 +163,7 @@ export_data = client.get_memory_export(
 print(export_data['data'])
 
 ```
-
-**Output:**
-
-```json
+**输出：**```json
 {
   "full_name": "Dev",
   "current_role": "senior engineer",
@@ -206,10 +171,7 @@ print(export_data['data'])
 }
 
 ```
-
-You can also retrieve exports by filters:
-
-```python
+您还可以通过过滤器检索导出：```python
 # Get latest export matching filters
 export_by_filters = client.get_memory_export(
     filters={"user_id": "dev"}
@@ -218,14 +180,11 @@ export_by_filters = client.get_memory_export(
 print(export_by_filters['data'])
 
 ```
-
 ---
 
-## Adding Export Instructions
+## 添加导出指令
 
-Guide how Mem0 resolves conflicts or formats the export:
-
-```python
+指导 Mem0 如何解决冲突或格式化导出：```python
 export_with_instructions = client.create_memory_export(
     schema=professional_profile_schema,
     filters={"user_id": "arjun"},
@@ -237,53 +196,49 @@ export_with_instructions = client.create_memory_export(
 )
 
 ```
-
-<Tip>
-Always check export status before downloading. Call `get_memory_export()` in a loop with a short delay until `status == "completed"`. Attempting to download while still processing returns incomplete data.
-</Tip>
-
----
-
-## Platform Export
-
-You can also export memories directly from the Mem0 platform UI:
-
-1. Navigate to **Memory Exports** in your project dashboard
-2. Click **Create Export**
-3. Select your filters and schema
-4. Download the completed export as JSON
-
-This is useful for one-off exports or manual data reviews.
-
-<Warning>
-Exported data expires after 7 days. Download and store exports locally if you need long-term archives. After expiration, you'll need to recreate the export job.
-</Warning>
+<提示>
+下载前务必检查导出状态。在循环中短暂延迟调用“get_memory_export()”，直到“status == “completed””。在处理过程中尝试下载会返回不完整的数据。
+</提示>
 
 ---
 
-## What You Built
+## 平台导出
 
-A complete memory export system with multiple retrieval methods:
+您还可以直接从 Mem0 平台 UI 导出内存：
 
-- **Bulk retrieval (get_all)** - Fetch all memories matching filters for comprehensive audits
-- **Semantic search** - Query-based lookups with relevance scoring
-- **Structured exports** - Pydantic-schema exports for migrations and compliance
-- **Export instructions** - Guide conflict resolution and data formatting
-- **Platform UI exports** - One-off manual downloads via dashboard
+1. 导航至项目仪表板中的 **Memory Exports**
+2. 单击**创建导出**
+3. 选择您的过滤器和架构
+4. 下载完成的导出为 JSON
 
-This covers data portability, GDPR compliance, system migrations, and manual reviews.
+这对于一次性导出或手动数据审核非常有用。
+
+<警告>
+导出的数据将在 7 天后过期。如果您需要长期存档，请在本地下载并存储导出内容。过期后，您需要重新创建导出作业。</警告>
 
 ---
 
-## Summary
+## 你构建了什么
 
-Use **`get_all()`** for bulk retrieval, **`search()`** for specific questions, and **`create_memory_export()`** for structured data exports with custom schemas. Remember exports expire after 7 days—download them locally for long-term archives.
+完整的内存导出系统，多种检索方式：
 
-<CardGroup cols={2}>
-  <Card title="Build a Mem0 Companion" icon="users" href="/cookbooks/essentials/building-ai-companion">
-    Learn core memory patterns including temporary vs permanent data handling.
-  </Card>
-  <Card title="Control Memory Ingestion" icon="filter" href="/cookbooks/essentials/controlling-memory-ingestion">
-    Ensure only verified insights make it into your export pipeline.
-  </Card>
-</CardGroup>
+- **批量检索（get_all）** - 获取所有匹配过滤器的内存以进行全面审核
+- **语义搜索** - 基于查询的查找和相关性评分
+- **结构化导出** - 用于迁移和合规性的 Pydantic 模式导出
+- **导出说明** - 指导冲突解决和数据格式化
+- **平台 UI 导出** - 通过仪表板一次性手动下载这涵盖数据可移植性、GDPR 合规性、系统迁移和手动审核。
+
+---
+
+## 总结
+
+使用 **`get_all()`** 进行批量检索，使用 **`search()`** 解决特定问题，使用 **`create_memory_export()`** 进行自定义架构的结构化数据导出。请记住，导出将在 7 天后过期 - 将其下载到本地以进行长期存档。
+
+<卡组列={2}>
+  <Card title="构建 Mem0 伴侣" icon="users" href="/cookbooks/essentials/building-ai-companion">
+    了解核心内存模式，包括临时与永久数据处理。
+  </卡>
+  <Card title="控制内存摄入" icon="filter" href="/cookbooks/essentials/controlling-memory-ingestion">
+    确保只有经过验证的见解才会进入您的导出管道。
+  </卡>
+</卡组>

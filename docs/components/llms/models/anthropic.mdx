@@ -3,13 +3,15 @@ title: Anthropic
 description: "Configure Anthropic Claude models as the LLM provider in Mem0 with API key setup and usage examples."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-To use Anthropic's models, please set the `ANTHROPIC_API_KEY` which you find on their [Account Settings Page](https://console.anthropic.com/account/keys).
 
-## Usage
 
-<CodeGroup>
-```python Python
+要使用 Anthropic 的模型，请设置您在其[帐户设置页面](https://console.anthropic.com/account/keys)上找到的“ANTHROPIC_API_KEY”。
+
+## 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -61,8 +63,8 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-## Config
+## 配置
 
-All available parameters for the `anthropic` config are present in [Master List of All Params in Config](../config).
+`anthropic` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

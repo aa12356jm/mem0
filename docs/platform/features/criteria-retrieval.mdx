@@ -3,52 +3,47 @@ title: Criteria Retrieval
 description: "Rank and retrieve memories based on custom-defined criteria like emotional tone, intent, and behavioral signals."
 ---
 
-Mem0's Criteria Retrieval feature allows you to retrieve memories based on your defined criteria. It goes beyond generic semantic relevance and ranks memories based on what matters to your application: emotional tone, intent, behavioral signals, or other custom traits.
-
-Instead of just searching for "how similar a memory is to this query," you can define what relevance truly means for your project. For example:
-
-- Prioritize joyful memories when building a wellness assistant
-- Downrank negative memories in a productivity-focused agent
-- Highlight curiosity in a tutoring agent
-
-You define criteria: custom attributes like "joy", "negativity", "confidence", or "urgency", and assign weights to control how they influence scoring. When you search, Mem0 uses these to re-rank semantically relevant memories, favoring those that better match your intent.
-
-This gives you nuanced, intent-aware memory search that adapts to your use case.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
 
 
-## When to Use Criteria Retrieval
+Mem0 的标准检索功能允许您根据定义的标准检索记忆。它超越了一般的语义相关性，并根据对您的应用程序重要的内容对记忆进行排名：情绪基调、意图、行为信号或其他自定义特征。
 
-Use Criteria Retrieval if:
+您可以定义相关性对您的项目真正意味着什么，而不是仅仅搜索“内存与此查询有多相似”。例如：
 
-- You’re building an agent that should react to **emotions** or **behavioral signals**
-- You want to guide memory selection based on **context**, not just content
-- You have domain-specific signals like "risk", "positivity", "confidence", etc. that shape recall
+- 打造健康助手时优先考虑快乐的回忆
+- 降低注重生产力的座席的负面记忆
+- 强调辅导机构的好奇心
+
+您可以定义标准：自定义属性，例如“快乐”、“消极”、“信心”或“紧迫性”，并分配权重来控制它们如何影响评分。当您搜索时，Mem0 使用这些来重新排列语义相关的记忆，偏向那些更符合您意图的记忆。这为您提供了细致入微、意图感知的内存搜索，适合您的用例。
 
 
 
-## Setting Up Criteria Retrieval
+## 何时使用标准检索
 
-Let’s walk through how to configure and use Criteria Retrieval step by step.
+如果出现以下情况，请使用标准检索：- 您正在构建一个应该对**情绪**或**行为信号**做出反应的代理
+- 您想要根据**上下文**来指导记忆选择，而不仅仅是内容
+- 你有特定领域的信号，如“风险”、“积极性”、“信心”等，这些信号会影响回忆
 
-### Initialize the Client
 
-Before defining any criteria, make sure to initialize the `MemoryClient` with your credentials and project ID:
 
-```python
+## 设置标准检索
+
+让我们逐步了解如何配置和使用 Criteria Retrieval。
+
+### 初始化客户端
+
+在定义任何条件之前，请确保使用您的凭据和项目 ID 初始化“MemoryClient”：```python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your_mem0_api_key")
 ```
+### 定义你的标准
 
-### Define Your Criteria
-
-Each criterion includes:
-- A `name` (used in scoring)
-- A `description` (interpreted by the LLM)
-- A `weight` (how much it influences the final score)
-
-```python
+每个标准包括：
+- 一个“名字”（用于评分）
+- “描述”（由法学硕士解释）
+- “权重”（对最终得分的影响程度）```python
 retrieval_criteria = [
     {
         "name": "joy",
@@ -67,25 +62,19 @@ retrieval_criteria = [
     }
 ]
 ```
+### 将标准应用于您的项目
 
-### Apply Criteria to Your Project
-
-Once defined, register the criteria to your project:
-
-```python
+定义后，将标准注册到您的项目中：```python
 client.project.update(retrieval_criteria=retrieval_criteria)
 ```
+标准适用于整个项目。一旦设置，它们就会自动影响所有搜索。
 
-Criteria apply project-wide. Once set, they affect all searches automatically.
 
+## 示例演练
 
-## Example Walkthrough
+设置标准后，您可以使用它们来过滤和检索记忆。这是一个例子：
 
-After setting up your criteria, you can use them to filter and retrieve memories. Here's an example:
-
-### Add Memories
-
-```python
+### 添加回忆```python
 messages = [
     {"role": "user", "content": "What a beautiful sunny day! I feel so refreshed and ready to take on anything!"},
     {"role": "user", "content": "I've always wondered how storms form—what triggers them in the atmosphere?"},
@@ -95,10 +84,7 @@ messages = [
 
 client.add(messages, user_id="alice")
 ```
-
-### Run Standard vs. Criteria-Based Search
-
-```python
+### 运行标准搜索与基于条件的搜索```python
 # Search with criteria enabled
 filters = {"user_id": "alice"}
 results_with_criteria = client.search(
@@ -113,11 +99,9 @@ results_without_criteria = client.search(
     use_criteria=False  # Disable criteria-based scoring
 )
 ```
+### 比较结果
 
-### Compare Results
-
-### Search Results (with Criteria)
-```python
+### 搜索结果（带条件）```python
 [
     {"memory": "User feels refreshed and ready to take on anything on a beautiful sunny day", "score": 0.666, ...},
     {"memory": "User finally has time to draw something after a long time", "score": 0.616, ...},
@@ -126,9 +110,7 @@ results_without_criteria = client.search(
     {"memory": "It has been raining for days, making everything feel heavier.", "score": 0.116, ...}
 ]
 ```
-
-### Search Results (without Criteria)
-```python
+### 搜索结果（无条件）```python
 [
     {"memory": "User is happy today", "score": 0.607, ...},
     {"memory": "User feels refreshed and ready to take on anything on a beautiful sunny day", "score": 0.512, ...},
@@ -137,65 +119,54 @@ results_without_criteria = client.search(
     {"memory": "User finally has time to draw something after a long time", "score": 0.336, ...},
 ]
 ```
+## 搜索结果比较
 
-## Search Results Comparison
-
-1. **Memory Ordering**: With criteria, memories with high joy scores (like feeling refreshed and drawing) are ranked higher. Without criteria, the most relevant memory ("User is happy today") comes first.
-2. **Score Distribution**: With criteria, scores are more spread out (0.116 to 0.666) and reflect the criteria weights. Without criteria, scores are more clustered (0.336 to 0.607) and based purely on relevance.
-3. **Trait Sensitivity**: "Rainy day" content is penalized due to negative tone, while "Storm curiosity" is recognized and scored accordingly.
-
-
-
-## Key Differences vs. Standard Search
-
-| Aspect                  | Standard Search                      | Criteria Retrieval                              |
-|-------------------------|--------------------------------------|-------------------------------------------------|
-| Ranking Logic           | Semantic similarity only             | Semantic + LLM-based criteria scoring           |
-| Control Over Relevance  | None                                 | Fully customizable with weighted criteria       |
-| Memory Reordering       | Static based on similarity           | Dynamically re-ranked by intent alignment       |
-| Emotional Sensitivity   | No tone or trait awareness           | Incorporates emotion, tone, or custom behaviors |
-| Activation              | Default (no criteria defined)        | Enabled when criteria are defined in project    |
-
-<Note>
-If no criteria are defined for a project, search behaves normally based on semantic similarity only.
-</Note>
+1. **记忆排序**：根据标准，快乐分数高的记忆（例如感觉神清气爽和绘画）排名较高。如果没有标准，最相关的记忆（“用户今天很高兴”）就会排在第一位。
+2. **分数分布**：有了标准，分数会更加分散（0.116 到 0.666）并反映标准权重。如果没有标准，分数会更加聚集（0.336 到 0.607）并且纯粹基于相关性。
+3. **特质敏感度**：“雨天”内容因负面语气而受到惩罚，而“风暴好奇心”则被识别并相应评分。
 
 
 
-## Best Practices
+## 与标准搜索的主要区别|方面|标准搜索|标准检索 |
+|----------------------------------|----------------------------------------------------------------|------------------------------------------------|
+|排名逻辑 |仅语义相似性 |语义 + 基于 LLM 的标准评分 |
+|控制相关性|无 |通过加权标准完全可定制|
+|内存重新排序 |基于相似度的静态 |通过意图对齐动态重新排名 |
+|情绪敏感性 |没有语气或特质意识|融入情感、语气或习惯行为 |
+|激活 |默认（未定义条件）|在项目 | 中定义条件时启用
 
-- Choose 3-5 criteria that reflect your application's intent
-- Make descriptions clear and distinct; these are interpreted by an LLM
-- Use stronger weights to amplify the impact of important traits
-- Avoid redundant or ambiguous criteria (e.g., "positivity" and "joy")
-- Always handle empty result sets in your application logic
-
-
-
-## How It Works
-
-1. **Criteria Definition**: Define custom criteria with a name, description, and weight. These describe what matters in a memory (e.g., joy, urgency, empathy).
-2. **Project Configuration**: Register these criteria using `project.update()`. They apply at the project level and automatically influence all searches.
-3. **Memory Retrieval**: When you perform a search, Mem0 first retrieves relevant memories based on the query.
-4. **Weighted Scoring**: Each retrieved memory is evaluated and scored against your defined criteria and weights.
-
-This lets you prioritize memories that align with your agent's goals and not just those that look similar to the query.
-
-<Note>
-Criteria retrieval is automatically enabled when criteria are defined in your project. Use `use_criteria=False` in search to temporarily disable it for a specific query.
-</Note>
+<注意>
+如果没有为项目定义标准，搜索通常仅基于语义相似性。
+</注>
 
 
 
-## Summary
+## 最佳实践- 选择 3-5 个反映您申请意图的标准
+- 使描述清晰明确；这些由法学硕士解释
+- 使用更强的权重来放大重要特征的影响
+- 避免冗余或模糊的标准（例如“积极性”和“快乐”）
+- 始终在应用程序逻辑中处理空结果集
 
-- Define what "relevant" means using criteria
-- Apply them per project via `project.update()`
-- Criteria-aware search activates automatically when criteria are configured
-- Build agents that reason not just with relevance, but **contextual importance**
+
+
+## 它是如何工作的
+
+1. **标准定义**：使用名称、描述和权重定义自定义标准。这些描述了记忆中重要的事情（例如快乐、紧迫感、同理心）。
+2. **项目配置**：使用“project.update()”注册这些条件。它们应用于项目级别并自动影响所有搜索。
+3. **内存检索**：当您执行搜索时，Mem0 首先根据查询检索相关内存。
+4. **加权评分**：根据您定义的标准和权重对每个检索到的记忆进行评估和评分。这使您可以优先考虑与代理目标一致的记忆，而不仅仅是那些看起来与查询相似的记忆。
+
+<注意>
+在项目中定义条件时，会自动启用条件检索。在搜索中使用 use_criteria=False 可以暂时禁用特定查询。
+</注>## 总结
+
+- 使用标准定义“相关”的含义
+- 通过“project.update()”将它们应用到每个项目
+- 配置条件后，条件感知搜索会自动激活
+- 构建不仅具有相关性而且具有**上下文重要性**的智能体
 
 ---
 
-Need help designing or tuning your criteria?
+需要帮助设计或调整您的标准吗？
 
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

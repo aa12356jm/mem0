@@ -2,13 +2,16 @@
 title: "Chroma"
 description: "Use Chroma as a vector database in Mem0 for local or cloud-hosted vector storage with built-in embedding support."
 ---
-[Chroma](https://www.trychroma.com/) is an AI-native open-source vector database that simplifies building LLM apps by providing tools for storing, embedding, and searching embeddings with a focus on simplicity and speed. It supports both local deployment and cloud hosting through ChromaDB Cloud.
 
-### Usage
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-#### Local Installation
 
-```python
+
+[Chroma](https://www.trychroma.com/) 是一个 AI 原生开源矢量数据库，通过提供存储、嵌入和搜索嵌入的工具来简化 LLM 应用程序的构建，重点是简单性和速度。它支持本地部署和通过 ChromaDB Cloud 进行云托管。
+
+### 用法
+
+#### 本地安装```python
 import os
 from mem0 import Memory
 
@@ -36,17 +39,16 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+### 配置
 
-### Config
+以下是可用于配置 Chroma 的参数：
 
-Here are the parameters available for configuring Chroma:
-
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collection_name` | The name of the collection | `mem0` |
-| `client` | Custom client for Chroma | `None` |
-| `path` | Path for the Chroma database | `db` |
-| `host` | The host where the Chroma server is running | `None` |
-| `port` | The port where the Chroma server is running | `None` |
-| `api_key` | ChromaDB Cloud API key (for cloud usage) | `None` |
-| `tenant` | ChromaDB Cloud tenant ID (for cloud usage) | `None` |
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |作品集名称| `mem0` |
+| `客户` | Chroma 定制客户端 | `无` |
+| `路径` | Chroma 数据库的路径 | `db` |
+| `主机` |运行 Chroma 服务器的主机 | `无` |
+| `端口` | Chroma 服务器运行的端口 | `无` |
+| `api_key` | ChromaDB Cloud API 密钥（用于云使用）| `无` |
+| `租户` | ChromaDB 云租户 ID（用于云使用）| `无` |

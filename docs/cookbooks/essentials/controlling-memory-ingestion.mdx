@@ -3,51 +3,47 @@ title: Control Memory Ingestion
 description: "Filter speculation, enforce formats, and gate low-confidence data before it persists."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-AI assistants plugged with memory systems face a problem - they often store everything. Not every conversation needs to be remembered, and not every detail should go to the memory store. Without proper controls, memory systems accumulate unreliable data.
 
-Mem0 lets you control your memory ingestion pipeline. In this cookbook, we'll demonstrate these controls using a medical assistant example - showing how to filter unwanted data, enforce data formats, and implement confidence-based storage.
 
----
+插入记忆系统的人工智能助手面临一个问题——它们通常会存储所有内容。并不是每一次谈话都需要被记住，也不是每一个细节都应该进入记忆库。如果没有适当的控制，存储系统就会积累不可靠的数据。
 
-## Overview
-
-Without controls, everything gets stored - speculation, low-confidence data, and information that shouldn't persist. This uncontrolled ingestion leads to cluttered memory and retrieval failures.
-
-Mem0 provides **three tools to control** what gets stored:
-
-1. **Custom instructions** define what to remember and what to ignore.
-2. **Confidence thresholds** ensure only verified facts persist.
-3. **Memory updates** let you change information without creating duplicates.
-
-In this tutorial, we will:
-
-- Filter speculative statements with custom instructions
-- Configure confidence thresholds for fact verification
-- Update stored information without duplication
-- Build a complete ingestion pipeline
+Mem0 可让您控制内存摄取管道。在本食谱中，我们将使用医疗助理示例演示这些控件 - 展示如何过滤不需要的数据、强制执行数据格式以及实现基于置信度的存储。
 
 ---
 
-## Setup
+## 概述
 
-```python
+如果没有控制，一切都会被存储——猜测、低可信度数据和不应保留的信息。这种不受控制的摄取会导致记忆混乱和检索失败。
+
+Mem0 提供**三个工具来控制**存储的内容：
+
+1. **自定义指令** 定义要记住的内容和要忽略的内容。
+2.**置信阈值**确保只有经过验证的事实才持续存在。
+3. **内存更新**让您可以更改信息而无需创建重复项。
+
+在本教程中，我们将：- 使用自定义指令过滤推测性陈述
+- 配置事实验证的置信度阈值
+- 更新存储的信息而不重复
+- 构建完整的摄取管道
+
+---
+
+## 设置```python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your-api-key")
 ```
-
-<Note>
-Replace `your-api-key` with your actual Mem0 API key from the <a href="https://app.mem0.ai?utm_source=oss&utm_medium=cookbook-memory-ingestion" rel="nofollow">dashboard</a>. Without proper API authentication, memory operations will fail.
-</Note>
+<注意>
+将 `your-api-key` 替换为 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=cookbook-memory-ingestion" rel="nofollow">仪表板</a> 中的实际 Mem0 API 密钥。如果没有正确的 API 身份验证，内存操作将会失败。
+</注>
 
 ---
 
-## The Problem
+## 问题
 
-Uncontrolled ingestion stores everything, including speculation:
-
-```python
+不受控制的摄取会存储所有内容，包括推测：```python
 # Patient mentions speculation
 messages = [{"role": "user", "content": "I think I might be allergic to penicillin"}]
 client.add(messages, user_id="patient_123")
@@ -57,26 +53,20 @@ results = client.search("patient allergies", filters={"user_id": "patient_123"})
 print(results['results'][0]['memory'])
 
 ```
-
-**Output:**
-
-```
+**输出：**```
 Patient is allergic to penicillin
 ```
+<警告>
+如果没有自定义指令，人工智能助手会将猜测视为已确认的事实。 “我想我可能过敏”变成了“病人过敏”——这在医疗保健、法律或金融服务等敏感领域是一种危险的转变。
+</警告>
 
-<Warning>
-Without custom instructions, AI assistants treat speculation as confirmed facts. "I think I might be allergic" becomes "Patient is allergic"—a dangerous transformation in sensitive domains like healthcare, legal, or financial services.
-</Warning>
-
-The speculation became a confirmed fact. Let's add controls.
+这个猜测成为了事实。让我们添加控件。
 
 ---
 
-## Custom Instructions
+## 自定义说明
 
-Custom instructions tell Mem0 what to store and what to ignore.
-
-```python
+自定义指令告诉 Mem0 要存储什么以及要忽略什么。```python
 instructions = """
 Only store CONFIRMED medical facts.
 
@@ -102,28 +92,22 @@ results = client.get_all(filters={"user_id": "patient_123"})
 print(f"Memories stored: {len(results['results'])}")
 
 ```
-
-**Output:**
-
-```
+**输出：**```
 Memories stored: 0
 ```
+<信息>
+**预期输出：** 存储零内存。 “我想我可能过敏”的推测性陈述在到达存储之前就被过滤掉了。自定义指令会主动阻止不可靠的数据。
+</信息>
 
-<Info>
-**Expected output:** Zero memories stored. The speculative statement "I think I might be allergic" was filtered out before reaching storage. Custom instructions are actively blocking unreliable data.
-</Info>
-
-The speculation was filtered out.
+猜测被过滤掉了。
 
 ---
 
-## Designing Custom Instructions
+## 设计自定义指令
 
-When designing instructions, consider the trade-off between precision and recall:
+设计指令时，请考虑精确度和召回率之间的权衡：
 
-**Too restrictive:** You'll miss important information (false negatives)
-
-```python
+**限制太多：**您会错过重要信息（漏报）```python
 # Too strict - filters out useful context
 """
 Only store information if explicitly stated by a doctor with full name,
@@ -131,20 +115,14 @@ date, time, and medical license number.
 """
 
 ```
-
-**Too permissive:** You'll store unreliable data (false positives)
-
-```python
+**过于宽容：** 您将存储不可靠的数据（误报）```python
 # Too loose - stores speculation as fact
 """
 Store any health-related information mentioned.
 """
 
 ```
-
-**Balanced approach:**
-
-```python
+**平衡的方法：**```python
 # Clear categories with examples
 """
 Store CONFIRMED facts:
@@ -159,30 +137,27 @@ Ignore SPECULATION:
 """
 
 ```
+<提示>
+从严格的说明开始（仅存储已确认的事实），然后根据您的用例放松它们。允许更多数据比清理污染的内存更容易。在部署到生产之前使用示例对话进行测试。
+</提示>
 
-<Tip>
-Start with strict instructions (only store confirmed facts), then relax them based on your use case. It's easier to allow more data than to clean up polluted memory. Test with sample conversations before deploying to production.
-</Tip>
-
-Start with clear categories and iterate based on retrieval quality.
+从明确的类别开始，并根据检索质量进行迭代。
 
 ---
 
-## Confidence Thresholds
+## 置信阈值
 
-Mem0 assigns confidence scores to extracted memories. Use these to filter low-quality data.
+Mem0 为提取的记忆分配置信度分数。使用它们来过滤低质量数据。
 
-### Setting Thresholds
+### 设置阈值
 
-Setting the right confidence threshold depends on your application:
+设置正确的置信阈值取决于您的应用：
 
-- **High-stakes domains** (medical, legal): Require 0.8+ confidence
-- **General assistants**: 0.6+ confidence is often sufficient
-- **Exploratory systems**: Lower thresholds (0.4+) capture more data
+- **高风险领域**（医疗、法律）：需要 0.8+ 置信度
+- **总助理**：0.6+ 的置信度通常就足够了
+- **探索性系统**：较低的阈值（0.4+）捕获更多数据
 
-Test your pipeline with multiple input examples and threshold combinations to find what works for your use case.
-
-```python
+使用多个输入示例和阈值组合测试您的管道，以找到适合您的用例的方法。```python
 # Configure stricter instructions
 client.project.update(
     custom_instructions="""
@@ -204,27 +179,21 @@ print("Vague statement stored:", len(result1['results']) > 0)
 print("Confirmed fact stored:", len(result2['results']) > 0)
 
 ```
-
-**Output:**
-
-```
+**输出：**```
 Vague statement stored: False
 Confirmed fact stored: True
 ```
+<信息图标=“检查”>
+**预期行为：** 现在会自动过滤掉低置信度提取。只有经过验证的事实和具体细节（名称、日期、剂量）才会保留在记忆中。置信阈值正在发挥作用。
+</信息>
 
-<Info icon="check">
-**Expected behavior:** Low-confidence extractions are now filtered out automatically. Only verified facts with specific details (names, dates, dosages) persist in memory. The confidence threshold is working.
-</Info>
-
-The vague statement was filtered for low confidence. The confirmed fact with specific details was stored.
+这一模糊的声明因可信度较低而被过滤掉。已确认的事实和具体细节已被存储。
 
 ---
 
-## Filtering Sensitive Information
+## 过滤敏感信息
 
-Custom instructions can prevent storing personal identifiers:
-
-```python
+自定义指令可以防止存储个人标识符：```python
 client.project.update(
     custom_instructions="""
 Medical memory rules:
@@ -257,22 +226,16 @@ for result in results['results']:
     print(result['memory'])
 
 ```
-
-**Output:**
-
-```
+**输出：**```
 Patient is allergic to penicillin
 ```
-
-The SSN was filtered out, but the allergy was stored.
+SSN 被过滤掉，但过敏信息被存储。
 
 ---
 
-## Updating Memories
+## 更新记忆
 
-When information changes, update existing memories instead of creating duplicates.
-
-```python
+当信息发生变化时，更新现有的记忆而不是创建重复的记忆。```python
 # Initial allergy stored
 result = client.add(
     [{"role": "user", "content": "Patient confirmed allergy to penicillin with documented hives reaction"}],
@@ -295,62 +258,52 @@ print(f"\\nUpdated memory: {updated['memory']}")
 print(f"Metadata: {updated['metadata']}")
 
 ```
-
-**Output:**
-
-```
+**输出：**```
 Stored memory: mem_abc123
 
 Updated memory: Patient tested negative for penicillin allergy on April 2nd, 2025. Previous allergy was false positive.
 Metadata: {'verified': True, 'updated_date': '2025-04-02'}
 
 ```
+### 更新的好处
 
-### Benefits of Updating
+**保留历史：**
 
-**Preserves history:**
+- `created_at` 显示内存首次存储的时间
+- `updated_at` 显示修改时间
+- 合规性审计跟踪
 
-- `created_at` shows when the memory was first stored
-- `updated_at` shows when it was modified
-- Audit trail for compliance
+**避免冲突：**
 
-**Avoids conflicts:**
+- 没有重复或矛盾的记忆
+- 每个事实的单一事实来源
 
-- No duplicate or contradicting memories
-- Single source of truth for each fact
+<警告>
+“不重复”的承诺来自推理管道。当您依赖自动更新时，请保留“infer=True”。原始导入（`infer=False`）会跳过冲突检查，因此针对同一事实混合两种模式将创建重复项。
+</警告>
 
-<Warning>
-That “no duplicates” promise comes from the inference pipeline. Keep `infer=True` when you rely on automatic updates. Raw imports (`infer=False`) skip conflict checks, so mixing the two modes for the same fact will create duplicates.
-</Warning>
+**维持关系：**
 
-**Maintains relationships:**
+- 如果使用图形内存，与其他实体的连接仍然存在
 
-- If using graph memory, connections to other entities persist
+### 选择正确的推理模式|模式|它有什么作用 |最适合 |留意|
+| ---| ---| ---| ---|
+| `infer=True` *（默认）* |运行 LLM 管道，以便 Mem0 提取结构化事实并自动解决冲突。 |日常对话、偏好跟踪，以及您想要删除的任何内容。 |稍微慢一些，因为每次写入都会运行推理。 |
+| `推断=假` |完全按原样存储您的有效负载 — 无推理，无重复数据删除。 |批量导入、合规性快照、您已经信任的精选事实。 |稍后对同一事实的“infer=True”调用将创建重复项，您必须手动清理。 |
 
-### Pick the right inference mode
-
-| Mode | What it does | Best for | Watch out for |
-| --- | --- | --- | --- |
-| `infer=True` *(default)* | Runs the LLM pipeline so Mem0 extracts structured facts and resolves conflicts automatically. | Daily conversations, preference tracking, anything you want deduped. | Slightly slower because inference runs on every write. |
-| `infer=False` | Stores your payload exactly as-is—no inference, no dedupe. | Bulk imports, compliance snapshots, curated facts you already trust. | Later `infer=True` calls for the same fact will create duplicates you must clean manually. |
-
-<Tip>
-Stay consistent per data source. If you need both behaviors, keep them in separate scopes (e.g., different `app_id` or `run_id`) so you always know which memories are inferred vs direct imports.
-</Tip>
+<提示>
+每个数据源保持一致。如果您需要这两种行为，请将它们保留在不同的范围内（例如，不同的“app_id”或“run_id”），以便您始终知道哪些内存是推断的，哪些是直接导入的。
+</提示>
 
 ---
 
-## Update vs Delete
+## 更新与删除
 
-When should you update vs delete?
+什么时候应该更新还是删除？### 更新时间：
 
-### Update when:
-
-- Information changes but remains relevant
-- You need audit history
-- The memory has relationships to other data
-
-```python
+- 信息发生变化但仍然相关
+- 您需要审核历史记录
+- 记忆与其他数据有关系```python
 # Medication dosage changed
 client.update(
     memory_id=med_id,
@@ -358,26 +311,20 @@ client.update(
 )
 
 ```
+### 删除时间：
 
-### Delete when:
-
-- Information was completely wrong
-- Memory is no longer relevant
-- Duplicate entry
-
-```python
+- 信息完全错误
+- 记忆不再相关
+- 重复输入```python
 # Duplicate entry
 client.delete(memory_id)
 
 ```
-
 ---
 
-## Putting It Together
+## 将其放在一起
 
-Here's a complete ingestion pipeline with all controls:
-
-```python
+这是包含所有控件的完整摄取管道：```python
 from mem0 import MemoryClient
 import os
 
@@ -438,10 +385,7 @@ for content in test_cases:
     print()
 
 ```
-
-**Output:**
-
-```
+**输出：**```
 Testing ingestion pipeline:
 
 ✗ Filtered: I think I might be allergic to penicillin
@@ -457,16 +401,13 @@ Testing ingestion pipeline:
 ✓ Stored: Patient diagnosed with Type 2 diabetes by Dr. Martinez on February 3rd, 2025
 
 ```
-
 ---
 
-## Per-Call Instructions
+## 每次调用说明
 
-You can override project-level instructions for specific conversations:
+您可以覆盖特定对话的项目级说明：
 
-First define custom instructions
-
-```python
+首先定义自定义指令```python
 custom_instructions="""Emergency intake mode:Store ALL symptoms and observations immediately.
 Flag for later review and verification."""
  
@@ -486,33 +427,32 @@ client.add(
 )
 
 ```
+这对于：
 
-This is useful for:
-
-- Different conversation types (emergency vs routine)
-- Channel-specific rules (phone vs in-person)
-- Temporary data collection that needs review
-
----
-
-## What You Built
-
-You now have a medical assistant with production-grade memory controls:
-
-- **Custom instructions** - Filter speculation and enforce confirmed facts only
-- **Confidence thresholds** - Gate extractions below 0.7 confidence score
-- **Memory updates** - Modify stored information without creating duplicates
-- **Per-call instructions** - Apply temporary rules for specific conversations
-- **PII filtering** - Block sensitive data (SSNs, insurance numbers) automatically
-
-These controls prevent retrieval failures and ensure your AI assistant works with reliable, verified information.
+- 不同的对话类型（紧急对话与日常对话）
+- 渠道特定规则（电话与面对面）
+- 需要审查的临时数据收集
 
 ---
 
-## Summary
+## 你构建了什么
 
-Start with conservative filters (only store confirmed facts) and iterate based on your application's needs. Combine custom instructions with confidence thresholds for the most reliable memory ingestion pipeline.
+您现在拥有一名具有生产级内存控制的医疗助理：
 
-<Card title="Build a Mem0 Companion" icon="users" href="/cookbooks/essentials/building-ai-companion">
-  Learn core memory patterns including temporary vs permanent data handling.
-</Card>
+- **自定义说明** - 过滤猜测并仅执行已确认的事实
+- **置信度阈值** - 门提取置信度分数低于 0.7
+- **内存更新** - 修改存储的信息而不创建重复项
+- **每次通话说明** - 对特定对话应用临时规则
+- **PII 过滤** - 自动阻止敏感数据（SSN、保险号码）
+
+这些控制措施可以防止检索失败，并确保您的人工智能助手使用可靠、经过验证的信息。
+
+---
+
+## 总结
+
+从保守的过滤器（仅存储已确认的事实）开始，然后根据应用程序的需求进行迭代。将自定义指令与置信阈值相结合，以实现最可靠的内存摄取管道。
+
+<Card title="构建 Mem0 伴侣" icon="users" href="/cookbooks/essentials/building-ai-companion">
+  了解核心内存模式，包括临时与永久数据处理。
+</卡>

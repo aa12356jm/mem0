@@ -3,11 +3,13 @@ title: Azure MySQL
 description: "Use Azure Database for MySQL as a vector store in Mem0 with JSON-based vector storage for semantic search."
 ---
 
-[Azure Database for MySQL](https://azure.microsoft.com/products/mysql) is a fully managed relational database service that provides enterprise-grade reliability and security. It supports JSON-based vector storage for semantic search capabilities in AI applications.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Usage
 
-```python
+
+[Azure Database for MySQL](https://azure.microsoft.com/products/mysql) 是一项完全托管的关系数据库服务，可提供企业级可靠性和安全性。它支持基于 JSON 的向量存储，以实现人工智能应用程序中的语义搜索功能。
+
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -36,12 +38,9 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+#### 使用 Azure 托管身份
 
-#### Using Azure Managed Identity
-
-For production deployments, use Azure Managed Identity instead of passwords:
-
-```python
+对于生产部署，请使用 Azure 托管标识而不是密码：```python
 config = {
     "vector_store": {
         "provider": "azure_mysql",
@@ -56,35 +55,32 @@ config = {
     }
 }
 ```
+<注意>
+启用“use_azure_credential”时，通过 Azure DefaultAzureCredential 获取密码（支持托管身份、Azure CLI 等）。）
+</注>
 
-<Note>
-When `use_azure_credential` is enabled, the password is obtained via Azure DefaultAzureCredential (supports Managed Identity, Azure CLI, etc.)
-</Note>
+### 配置
 
-### Config
+以下是可用于配置 Azure MySQL 的参数：
 
-Here are the parameters available for configuring Azure MySQL:
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `主机` | MySQL 服务器主机名 |必填 |
+| `端口` | MySQL服务器端口| `3306` |
+| `用户` |数据库用户|必填 |
+| `密码` |数据库密码（可选，可使用 Azure 凭据）| `无` |
+| `数据库` |数据库名称 |必填 |
+| `集合名称` |存储向量的表名 | `"mem0"` |
+| `embedding_model_dims` |嵌入向量的维度 | `1536` |
+| `use_azure_credential` |使用 Azure 默认AzureCredential | ‘假’|
+| `ssl_ca` | SSL CA 证书的路径 | `无` |
+| `ssl_disabled` |禁用 SSL（不推荐）| ‘假’|
+| `minconn` |池中的最小连接数 | `1` |
+| `最大连接` |池中的最大连接数 | `5` |
 
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `host` | MySQL server hostname | Required |
-| `port` | MySQL server port | `3306` |
-| `user` | Database user | Required |
-| `password` | Database password (optional with Azure credential) | `None` |
-| `database` | Database name | Required |
-| `collection_name` | Table name for storing vectors | `"mem0"` |
-| `embedding_model_dims` | Dimensions of embedding vectors | `1536` |
-| `use_azure_credential` | Use Azure DefaultAzureCredential | `False` |
-| `ssl_ca` | Path to SSL CA certificate | `None` |
-| `ssl_disabled` | Disable SSL (not recommended) | `False` |
-| `minconn` | Minimum connections in pool | `1` |
-| `maxconn` | Maximum connections in pool | `5` |
+### 设置
 
-### Setup
-
-#### Create MySQL Flexible Server using Azure CLI:
-
-```bash
+#### 使用 Azure CLI 创建 MySQL 灵活服务器：```bash
 # Create resource group
 az group create --name mem0-rg --location eastus
 
@@ -111,19 +107,15 @@ az mysql flexible-server firewall-rule create \
     --start-ip-address <YourIP> \
     --end-ip-address <YourIP>
 ```
+#### 启用 Azure AD 身份验证：
 
-#### Enable Azure AD Authentication:
-
-1. In Azure Portal, navigate to your MySQL Flexible Server
-2. Go to **Security** > **Authentication** and enable Azure AD
-3. Add your application's managed identity as a MySQL user:
-
-```sql
+1. 在 Azure 门户中，导航到 MySQL 灵活服务器
+2. 转到 **安全** > **身份验证** 并启用 Azure AD
+3. 将应用程序的托管身份添加为 MySQL 用户：```sql
 CREATE AADUSER 'your-app-identity' IDENTIFIED BY 'your-client-id';
 GRANT ALL PRIVILEGES ON mem0_db.* TO 'your-app-identity'@'%';
 FLUSH PRIVILEGES;
 ```
-
-<Tip>
-For production, use [Managed Identity](https://learn.microsoft.com/azure/active-directory/managed-identities-azure-resources/) to eliminate password management.
-</Tip>
+<提示>
+对于生产，请使用托管标识(https://learn.microsoft.com/azure/active-directory/driven-identities-azure-resources/)来消除密码管理。
+</提示>

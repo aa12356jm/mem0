@@ -3,23 +3,25 @@ title: Overview
 description: "Overview of all supported LLM providers in Mem0, including OpenAI, Anthropic, Groq, Ollama, and more."
 ---
 
-Mem0 includes built-in support for various popular large language models. Memory can utilize the LLM provided by the user, ensuring efficient use for specific needs.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Usage
 
-To use a llm, you must provide a configuration to customize its usage. If no configuration is supplied, a default configuration will be applied, and `OpenAI` will be used as the llm.
 
-For a comprehensive list of available parameters for llm configuration, please refer to [Config](./config).
+Mem0 包含对各种流行的大型语言模型的内置支持。内存可以利用用户提供的LLM，确保特定需求的高效使用。
 
-## Supported LLMs
+## 用法
 
-See the list of supported LLMs below.
+要使用 llm，您必须提供配置来自定义其用法。如果未提供配置，将应用默认配置，并使用“OpenAI”作为 llm。
 
-<Note>
-  All LLMs are supported in Python. The following LLMs are also supported in TypeScript: **OpenAI**, **Anthropic**, and **Groq**.
-</Note>
+有关 llm 配置的可用参数的完整列表，请参阅 [Config](./config)。
 
-<CardGroup cols={4}>
+## 支持的法学硕士
+
+请参阅下面支持的法学硕士列表。
+
+<注意>
+  Python 支持所有法学硕士。 TypeScript 还支持以下 LLM：**OpenAI**、**Anthropic** 和 **Groq**。
+</注><卡组 cols={4}>
   <Card title="OpenAI" href="/components/llms/models/openai" />
   <Card title="Ollama" href="/components/llms/models/ollama" />
   <Card title="Azure OpenAI" href="/components/llms/models/azure_openai" />
@@ -36,28 +38,26 @@ See the list of supported LLMs below.
   <Card title="Sarvam AI" href="/components/llms/models/sarvam" />
   <Card title="LM Studio" href="/components/llms/models/lmstudio" />
   <Card title="Langchain" href="/components/llms/models/langchain" />
-</CardGroup>
+</卡组>
 
-## Structured vs Unstructured Outputs
+## 结构化与非结构化输出Mem0 支持两种类型的 OpenAI LLM 格式，每种格式都有自己的优势和用例：
 
-Mem0 supports two types of OpenAI LLM formats, each with its own strengths and use cases:
+### 结构化输出
 
-### Structured Outputs
+结构化输出是与 OpenAI 结构化输出模型一致的法学硕士：
 
-Structured outputs are LLMs that align with OpenAI's structured outputs model:
+- **优化：** 返回结构化响应（例如 JSON 对象）
+- **优点：** 精确、易于解析的数据
+- **非常适合：** 数据提取、表单填写、API 响应
+- **了解更多：** [OpenAI 结构化输出指南](https://platform.openai.com/docs/guides/structed-outputs/introduction）
 
-- **Optimized for:** Returning structured responses (e.g., JSON objects)
-- **Benefits:** Precise, easily parseable data
-- **Ideal for:** Data extraction, form filling, API responses
-- **Learn more:** [OpenAI Structured Outputs Guide](https://platform.openai.com/docs/guides/structured-outputs/introduction)
+### 非结构化输出
 
-### Unstructured Outputs
+非结构化输出对应于 OpenAI 的标准、自由格式文本模型：
 
-Unstructured outputs correspond to OpenAI's standard, free-form text model:
+- **灵活性：** 返回开放式的自然语言响应
+- **定制：** 使用 `response_format` 参数来指导输出
+- **权衡：** 与满足特定数据需求的结构化输出相比，效率较低
+- **最适合：** 创意写作、解释、一般对话
 
-- **Flexibility:** Returns open-ended, natural language responses
-- **Customization:** Use the `response_format` parameter to guide output
-- **Trade-off:** Less efficient than structured outputs for specific data needs
-- **Best for:** Creative writing, explanations, general conversation
-
-Choose the format that best suits your application's requirements for optimal performance and usability.
+选择最适合您的应用程序要求的格式，以获得最佳性能和可用性。

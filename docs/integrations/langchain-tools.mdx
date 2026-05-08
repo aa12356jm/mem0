@@ -3,24 +3,23 @@ title: Langchain Tools
 description: 'Integrate Mem0 with LangChain tools to enable AI agents to store, search, and manage memories through structured interfaces'
 ---
 
-## Overview
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0 provides a suite of tools for storing, searching, and retrieving memories, enabling agents to maintain context and learn from past interactions. The tools are built as Langchain tools, making them easily integrable with any AI agent implementation.
 
-## Installation
 
-Install the required dependencies:
+## 概述
 
-```bash
+Mem0 提供了一套用于存储、搜索和检索记忆的工具，使代理能够维护上下文并从过去的交互中学习。这些工具被构建为 Langchain 工具，使其可以轻松地与任何 AI 代理实现集成。
+
+## 安装
+
+安装所需的依赖项：```bash
 pip install langchain_core
 pip install mem0ai
 ```
+## 身份验证
 
-## Authentication
-
-Import the necessary dependencies and initialize the client:
-
-```python
+导入必要的依赖项并初始化客户端：```python
 from langchain_core.tools import StructuredTool
 from mem0 import MemoryClient
 from pydantic import BaseModel, Field
@@ -31,18 +30,15 @@ os.environ["MEM0_API_KEY"] = "your-api-key"
 
 client = MemoryClient()
 ```
+## 可用工具
 
-## Available Tools
+Mem0 提供了三个主要的内存管理工具：
 
-Mem0 provides three main tools for memory management:
+### 1.添加内存工具
 
-### 1. ADD Memory Tool
+ADD 工具允许您存储带有关联元数据的新记忆。它对于保存对话历史记录和用户首选项特别有用。
 
-The ADD tool allows you to store new memories with associated metadata. It's particularly useful for saving conversation history and user preferences.
-
-#### Schema
-
-```python
+#### 架构```python
 class Message(BaseModel):
     role: str = Field(description="Role of the message sender (user or assistant)")
     content: str = Field(description="Content of the message")
@@ -64,10 +60,7 @@ class AddMemoryInput(BaseModel):
             }]
         }
 ```
-
-#### Implementation
-
-```python
+＃＃＃＃ 执行```python
 def add_memory(messages: List[Message], user_id: str, metadata: Optional[Dict[str, Any]] = None) -> Any:
     """Add messages to memory with associated user ID and metadata."""
     message_dicts = [msg.dict() for msg in messages]
@@ -80,11 +73,9 @@ add_tool = StructuredTool(
     args_schema=AddMemoryInput
 )
 ```
+#### 用法示例
 
-#### Example Usage
-
-<CodeGroup>
-```python Code
+<代码组>```python Code
 add_input = {
     "messages": [
         {"role": "user", "content": "Hi, I'm Alex. I'm a vegetarian and I'm allergic to nuts."},
@@ -114,15 +105,13 @@ add_result = add_tool.invoke(add_input)
   ]
 }
 ```
-</CodeGroup>
+</代码组>
 
-### 2. SEARCH Memory Tool
+### 2. 搜索记忆工具
 
-The SEARCH tool enables querying stored memories using natural language queries and advanced filtering options.
+搜索工具可以使用自然语言查询和高级过滤选项来查询存储的内存。
 
-#### Schema
-
-```python
+#### 架构```python
 class SearchMemoryInput(BaseModel):
     query: str = Field(description="The search query string")
     filters: Dict[str, Any] = Field(description="Filters to apply to the search")
@@ -140,10 +129,7 @@ class SearchMemoryInput(BaseModel):
             }]
         }
 ```
-
-#### Implementation
-
-```python
+＃＃＃＃ 执行```python
 def search_memory(query: str, filters: Dict[str, Any]) -> Any:
     """Search memory with the given query and filters."""
     return client.search(query=query, filters=filters)
@@ -155,11 +141,9 @@ search_tool = StructuredTool(
     args_schema=SearchMemoryInput
 )
 ```
+#### 用法示例
 
-#### Example Usage
-
-<CodeGroup>
-```python Code
+<代码组>```python Code
 search_input = {
     "query": "what is my name?",
     "filters": {
@@ -191,15 +175,13 @@ result = search_tool.invoke(search_input)
   }
 ]
 ```
-</CodeGroup>
+</代码组>
 
-### 3. GET_ALL Memory Tool
+### 3. GET_ALL 内存工具
 
-The GET_ALL tool retrieves all memories matching specified criteria, with support for pagination.
+GET_ALL 工具检索符合指定条件的所有内存，并支持分页。
 
-#### Schema
-
-```python
+#### 架构```python
 class GetAllMemoryInput(BaseModel):
     filters: Dict[str, Any] = Field(description="Filters to apply to the retrieval")
     page: Optional[int] = Field(description="Page number for pagination", default=1)
@@ -220,10 +202,7 @@ class GetAllMemoryInput(BaseModel):
             }]
         }
 ```
-
-#### Implementation
-
-```python
+＃＃＃＃ 执行```python
 def get_all_memory(filters: Dict[str, Any], page: int = 1, page_size: int = 50) -> Any:
     """Retrieve all memories matching the specified criteria."""
     return client.get_all(filters=filters, page=page, page_size=page_size)
@@ -235,11 +214,9 @@ get_all_tool = StructuredTool(
     args_schema=GetAllMemoryInput
 )
 ```
+#### 用法示例
 
-#### Example Usage
-
-<CodeGroup>
-```python Code
+<代码组>```python Code
 get_all_input = {
     "filters": {
         "AND": [
@@ -305,24 +282,23 @@ get_all_result = get_all_tool.invoke(get_all_input)
   ]
 }
 ```
-</CodeGroup>
+</代码组>
 
-## Integration with AI Agents
+## 与 AI 代理集成
 
-All tools are implemented as Langchain `StructuredTool` instances, making them compatible with any AI agent that supports the Langchain tools interface. To use these tools with your agent:
+所有工具均以 Langchain `StructuredTool` 实例的形式实现，使其与任何支持 Langchain 工具接口的 AI 代理兼容。要与您的代理一起使用这些工具：
 
-1. Initialize the tools as shown above
-2. Add the tools to your agent's toolset
-3. The agent can now use these tools to manage memories through natural language interactions
+1、初始化工具如上图
+2. 将工具添加到代理的工具集中
+3. 代理现在可以使用这些工具通过自然语言交互来管理记忆
 
-Each tool provides structured input validation through Pydantic models and returns consistent responses that can be processed by your agent.
+每个工具都通过 Pydantic 模型提供结构化输入验证，并返回可由代理处理的一致响应。
 
-<CardGroup cols={2}>
+<卡组列={2}>
   <Card title="LangChain Integration" icon="link" href="/integrations/langchain">
-    Build conversational agents with LangChain and Mem0
-  </Card>
+    使用 LangChain 和 Mem0 构建会话代理
+  </卡>
   <Card title="LangGraph Integration" icon="diagram-project" href="/integrations/langgraph">
-    Create stateful workflows with LangGraph
-  </Card>
-</CardGroup>
-
+    使用 LangGraph 创建有状态工作流程
+  </卡>
+</卡组>

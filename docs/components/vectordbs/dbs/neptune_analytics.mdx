@@ -2,20 +2,20 @@
 title: "Neptune Analytics"
 description: "Use AWS Neptune Analytics as a vector store in Mem0, combining graph analytics with vector search capabilities."
 ---
-# Neptune Analytics Vector Store
 
-[Neptune Analytics](https://docs.aws.amazon.com/neptune-analytics/latest/userguide/what-is-neptune-analytics.html/) is a memory-optimized graph database engine for analytics. With Neptune Analytics, you can get insights and find trends by processing large amounts of graph data in seconds, including vector search.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
 
-## Installation
 
-```bash
+# 海王星分析矢量存储
+
+[Neptune Analytics](https://docs.aws.amazon.com/neptune-analytics/latest/userguide/what-is-neptune-analytics.html/) 是一种用于分析的内存优化图形数据库引擎。借助 Neptune Analytics，您可以通过在几秒钟内处理大量图形数据（包括矢量搜索）来获得见解并发现趋势。
+
+
+＃＃ 安装```bash
 pip install mem0ai[vector_stores]
 ```
-
-## Usage
-
-```python
+＃＃ 用法```python
 config = {
     "vector_store": {
         "provider": "neptune",
@@ -35,12 +35,11 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+## 参数
 
-## Parameters
+让我们看看“neptune”配置的可用参数：
 
-Let's see the available parameters for the `neptune` config:
-
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collection_name` | The name of the collection to store the vectors | `mem0` |
-| `endpoint` | Connection URL for the Neptune Analytics service | `neptune-graph://my-graph-identifier` |
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |存储向量的集合的名称 | `mem0` |
+| `端点` | Neptune Analytics 服务的连接 URL | `neptune-graph://my-graph-identifier` |

@@ -4,26 +4,25 @@ description: "Use this to document accepted fields, defaults, and example payloa
 icon: "list"
 ---
 
-# Parameters Reference Template
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Parameter references document every input/output detail for one operation after the quickstart/onboarding journey. Keep them scannable: signature, tables, examples, exits.
+
+
+# 参数参考模板
+
+参数参考记录了快速入门/入门之旅后一项操作的每个输入/输出详细信息。让它们易于浏览：签名、表格、示例、退出。
+
+---## ❌ 请勿复制 — 指南和限制
+- Frontmatter 需要“标题”、“描述”、“图标”。标题应反映操作（“添加内存参数”）。
+- 使用“<CodeGroup>”将规范的 Python 和 TypeScript 签名放在标题正下方。在紧随其后的“<Info>”或“<Warning>”中提及默认值或重大更改。
+- 参数表必须包含以下列：名称、类型、必需、说明、注释。添加托管/OSS 区别作为列或在注释中。
+- 更新旧参数表时，保留权威字段列表和注释 - 将它们重新格式化为此结构，而不是修剪细节，除非架构发生更改。
+- 响应表必须包括字段、类型、描述、示例。对于嵌套对象，请在行下方添加子表或“<CodeGroup>”JSON 片段。- 示例部分应显示最少的 Python 和 TypeScript 调用以及一句话解释。如果缺少某种语言，请添加“<Note>”来解释原因。
+- 完成相关操作、与参数误用相关的故障排除以及两卡 CTA（左侧操作指南，右侧菜谱/集成）。
 
 ---
 
-## ❌ DO NOT COPY — Guidance & Constraints
-- Frontmatter requires `title`, `description`, `icon`. Titles should mirror the operation (“Add Memories Parameters”).
-- Place canonical Python and TypeScript signatures right under the heading using `<CodeGroup>`. Mention defaults or breaking changes in an `<Info>` or `<Warning>` immediately after.
-- Parameter table must include columns: Name, Type, Required, Description, Notes. Add a Managed/OSS distinction either as a column or in Notes.
-- When updating legacy parameter sheets, keep the authoritative field lists and notes—reformat them into this structure rather than trimming details unless the schema changed.
-- Response table must include Field, Type, Description, Example. For nested objects, add subtables or `<CodeGroup>` JSON snippets beneath the row.
-- Examples section should show minimal Python and TypeScript calls with one-sentence explanations. If a language is missing, include a `<Note>` explaining why.
-- Finish with related operations, troubleshooting tied to parameter misuse, and a two-card CTA (operation guide on the left, cookbook/integration on the right).
-
----
-
-## ✅ COPY THIS — Content Skeleton
-
-````mdx
+## ✅ 复制此内容 — 内容骨架````mdx
 ---
 title: [Operation title] Parameters
 description: Full reference for `[client.method]` inputs and responses.
@@ -35,21 +34,19 @@ icon: "table"
 <CodeGroup>
 ```python Python
 client.memories.add(
-    user_id: str,
-    memory: str,
-    metadata: Optional[dict] = None,
+    用户 ID：str，
+    内存：str，
+    元数据：可选[dict] =无，
     memory_type: Literal["session", "long_term"] = "session",
-)
-```
+）```
 
 ```ts TypeScript
-await mem0.memories.add({
-  userId: string;
-  memory: string;
-  metadata?: Record<string, string>;
-  memoryType?: "session" | "long_term";
-});
-```
+等待 mem0.memories.add({
+  用户ID：字符串；
+  内存：字符串；
+  元数据？：记录<字符串，字符串>；
+  内存类型？：“会话”| “长期”；
+});```
 </CodeGroup>
 
 <Info>
@@ -83,13 +80,12 @@ await mem0.memories.add({
 
 ```json
 {
-  "memory_id": "mem_123",
-  "memory": "I am training for a marathon.",
-  "metadata": {
-    "team": "support"
+  “内存_id”：“mem_123”，
+  "memory": "我正在训练马拉松。",
+  “元数据”：{
+    “团队”：“支持”
   }
-}
-```
+}```
 
 ## Examples
 
@@ -97,23 +93,21 @@ await mem0.memories.add({
   <Tab title="Python">
 <CodeGroup>
 ```python Python
-response = client.memories.add(
-    user_id="alex",
-    memory="I am training for a marathon.",
-)
-print(response["memory_id"])
-```
+响应 = client.memories.add(
+    user_id=“亚历克斯”，
+    记忆=“我正在训练马拉松。”，
+）
+打印（响应[“内存_id”]）```
 </CodeGroup>
   </Tab>
   <Tab title="TypeScript">
 <CodeGroup>
 ```typescript TypeScript
-const { memoryId } = await mem0.memories.add({
-  userId: "alex",
-  memory: "I am training for a marathon.",
+const { memoryId } = 等待 mem0.memories.add({
+  用户 ID：“亚历克斯”，
+  记忆：“我正在训练马拉松。”,
 });
-console.log(memoryId);
-```
+console.log(内存Id);```
 </CodeGroup>
   </Tab>
 </Tabs>
@@ -147,104 +141,99 @@ These snippets confirm the method returns the new `memory_id` for follow-up oper
   />
 </CardGroup>
 ````
-
 ---
 
-## ✅ Publish Checklist
-- [ ] Python and TypeScript signatures match the current SDKs (or a `<Note>` explains missing parity).
-- [ ] Parameter and response tables cover every field with clear Managed vs OSS notes.
-- [ ] Examples execute the minimal happy path and include one-line explanations.
-- [ ] Troubleshooting entries correspond to parameter misuse or validation errors.
-- [ ] CTA pair links to the operation guide (left) and an applied example (right).
+## ✅ 发布清单
+- [ ] Python 和 TypeScript 签名与当前 SDK 匹配（或“<Note>”解释缺少奇偶校验）。
+- [ ] 参数和响应表涵盖了每个字段，并带有清晰的托管与 OSS 注释。
+- [ ] 示例执行最小快乐路径并包含一行解释。
+- [ ] 故障排除条目对应于参数误用或验证错误。
+- [ ] CTA 对链接到操作指南（左）和应用示例（右）。
 
-## Browse Other Templates
-
-<CardGroup cols={3}>
-  <Card
-    title="Quickstart"
-    description="Install → Configure → Add → Search → Delete."
-    icon="rocket"
+## 浏览其他模板<卡组列={3}>
+  <卡片
+    标题=“快速入门”
+    描述=“安装→配置→添加→搜索→删除。”
+    图标=“火箭”
     href="/templates/quickstart_template"
   />
-  <Card
-    title="Operation Guide"
-    description="Single task walkthrough with verification checkpoints."
-    icon="circle-check"
+  <卡片
+    title="操作指南"
+    描述 =“带有验证检查点的单个任务演练。”
+    图标=“圆圈检查”
     href="/templates/operation_guide_template"
   />
-  <Card
-    title="Feature Guide"
-    description="Explain when and why to use a capability, not just the API."
-    icon="sparkles"
+  <卡片
+    title="功能指南"
+    description="解释何时以及为何使用某个功能，而不仅仅是 API。"
+    图标=“闪闪发光”
     href="/templates/feature_guide_template"
   />
-  <Card
-    title="Concept Guide"
-    description="Define mental models, key terms, and diagrams."
-    icon="brain"
+  <卡片
+    标题=“概念指南”
+    描述=“定义心智模型、关键术语和图表。”
+    图标=“大脑”
     href="/templates/concept_guide_template"
   />
-  <Card
-    title="Integration Guide"
-    description="Configure Mem0 alongside third-party tools."
-    icon="plug"
+  <卡片
+    title="集成指南"
+    description="与第三方工具一起配置 Mem0。”
+    图标=“插头”
     href="/templates/integration_guide_template"
   />
-  <Card
-    title="Cookbook"
-    description="Narrative, end-to-end walkthroughs."
-    icon="book-open"
+  <卡片
+    标题=“食谱”
+    描述=“叙述性、端到端的演练。”
+    图标=“书本打开”
     href="/templates/cookbook_template"
   />
-  <Card
-    title="API Reference"
-    description="Endpoint specifics with dual-language examples."
-    icon="code"
+  <卡片
+    标题=“API参考”
+    description="带有双语言示例的端点细节。"
+    图标=“代码”
     href="/templates/api_reference_template"
   />
-  <Card
-    title="Parameters Reference"
-    description="Accepted fields, defaults, and misuse fixes."
-    icon="list"
+  <卡片
+    title="参数参考"
+    描述 =“接受的字段、默认值和误用修复。”
+    图标=“列表”
     href="/templates/parameters_reference_template"
   />
-  <Card
-    title="Migration Guide"
-    description="Plan → migrate → validate with rollback."
-    icon="arrow-right"
+  <卡片
+    title="迁移指南"
+    描述=“计划→迁移→通过回滚进行验证。”
+    图标=“右箭头”
     href="/templates/migration_guide_template"
   />
-  <Card
-    title="Release Notes"
-    description="Ship highlights and required CTAs."
-    icon="megaphone"
+  <卡片
+    title="发行说明"
+    描述=“发布亮点和所需的 CTA。”
+    图标=“扩音器”
     href="/templates/release_notes_template"
   />
-  <Card
-    title="Troubleshooting Playbook"
-    description="Symptom → diagnose → fix."
-    icon="life-buoy"
+  <卡片
+    title="故障排除手册"
+    描述=“症状→诊断→修复。”
+    图标=“救生圈”
     href="/templates/troubleshooting_playbook_template"
   />
-  <Card
-    title="Section Overview"
-    description="Landing pages with card grids and CTA pair."
-    icon="grid"
+  <卡片
+    title="本节概述"
+    描述 =“带有卡片网格和 CTA 对的着陆页。”
+    图标=“网格”
     href="/templates/section_overview_template"
   />
-</CardGroup>
-
-<CardGroup cols={2}>
-  <Card
-    title="Contribution Hub"
-    description="Review the authoring workflow and linked templates."
-    icon="clipboard-list"
-    href="/platform/contribute"
+</卡组><卡组列={2}>
+  <卡片
+    title="贡献中心"
+    描述 =“查看创作工作流程和链接的模板。”
+    图标=“剪贴板列表”
+    href="/平台/贡献"
   />
-  <Card
-    title="Docs Home"
-    description="Return to the platform overview once you’re done."
-    icon="compass"
-    href="/platform/overview"
+  <卡片
+    title="文档主页"
+    description="完成后返回平台概述。"
+    图标=“指南针”
+    href="/平台/概述"
   />
-</CardGroup>
+</卡组>

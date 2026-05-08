@@ -3,29 +3,25 @@ title: vLLM
 description: "Configure vLLM as an LLM provider in Mem0 for high-performance local inference with GPU-optimized serving."
 ---
 
-[vLLM](https://docs.vllm.ai/) is a high-performance inference engine for large language models that provides significant performance improvements for local inference. It's designed to maximize throughput and memory efficiency for serving LLMs.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Prerequisites
 
-1. **Install vLLM**:
 
-   ```bash
+[vLLM](https://docs.vllm.ai/) 是一种适用于大型语言模型的高性能推理引擎，可为本地推理提供显着的性能改进。它旨在最大限度地提高服务法学硕士的吞吐量和内存效率。
+
+## 先决条件
+
+1. **安装vLLM**：   ```bash
    pip install vllm
    ```
-
-2. **Start vLLM server**:
-
-   ```bash
+2. **启动 vLLM 服务器**：   ```bash
    # For testing with a small model
    vllm serve microsoft/DialoGPT-medium --port 8000
 
    # For production with a larger model (requires GPU)
    vllm serve Qwen/Qwen2.5-32B-Instruct --port 8000
    ```
-
-## Usage
-
-```python
+＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -52,57 +48,44 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+## 配置参数
 
-## Configuration Parameters
+|参数|描述 |默认 |环境变量 |
+| ---------------- | --------------------------------- | -------------------------------------- | -------------------- |
+| `模型` |在 vLLM 服务器上运行的模型名称 | `"Qwen/Qwen2.5-32B-指令"` | - |
+| `vllm_base_url` | vLLM 服务器 URL | `"http://localhost:8000/v1"` | `VLLM_BASE_URL` |
+| `api_key` | API 密钥（本地虚拟）| `"vllm-api-key"` | `VLLM_API_KEY` |
+| `温度` |取样温度| `0。1`| - |
+| `max_tokens` |生成的最大代币 | `2000` | - |
 
-| Parameter       | Description                       | Default                       | Environment Variable |
-| --------------- | --------------------------------- | ----------------------------- | -------------------- |
-| `model`         | Model name running on vLLM server | `"Qwen/Qwen2.5-32B-Instruct"` | -                    |
-| `vllm_base_url` | vLLM server URL                   | `"http://localhost:8000/v1"`  | `VLLM_BASE_URL`      |
-| `api_key`       | API key (dummy for local)         | `"vllm-api-key"`              | `VLLM_API_KEY`       |
-| `temperature`   | Sampling temperature              | `0.1`                         | -                    |
-| `max_tokens`    | Maximum tokens to generate        | `2000`                        | -                    |
+## 环境变量
 
-## Environment Variables
-
-You can set these environment variables instead of specifying them in config:
-
-```bash
+您可以设置这些环境变量，而不是在配置中指定它们：```bash
 export VLLM_BASE_URL="http://localhost:8000/v1"
 export VLLM_API_KEY="your-vllm-api-key"
 export OPENAI_API_KEY="your-openai-api-key"  # for embeddings
 ```
+## 好处
 
-## Benefits
+- **高性能**：推理速度比标准实现快 2-24 倍
+- **内存高效**：通过 PagedAttention 优化内存使用
+- **本地部署**：保持数据私密性并降低 API 成本
+- **轻松集成**：直接替代其他 LLM 提供商
+- **灵活**：适用于 vLLM 支持的任何模型
 
-- **High Performance**: 2-24x faster inference than standard implementations
-- **Memory Efficient**: Optimized memory usage with PagedAttention
-- **Local Deployment**: Keep your data private and reduce API costs
-- **Easy Integration**: Drop-in replacement for other LLM providers
-- **Flexible**: Works with any model supported by vLLM
+## 故障排除
 
-## Troubleshooting
-
-1. **Server not responding**: Make sure vLLM server is running
-
-   ```bash
+1. **服务器没有响应**：确保 vLLM 服务器正在运行   ```bash
    curl http://localhost:8000/health
    ```
-
-2. **404 errors**: Ensure correct base URL format
-
-   ```python
+2. **404错误**：确保基本URL格式正确   ```python
    "vllm_base_url": "http://localhost:8000/v1"  # Note the /v1
    ```
+3. **未找到模型**：检查模型名称是否与服务器匹配
 
-3. **Model not found**: Check model name matches server
-
-4. **Out of memory**: Try smaller models or reduce `max_model_len`
-
-   ```bash
+4. **内存不足**：尝试较小的模型或减少“max_model_len”   ```bash
    vllm serve Qwen/Qwen2.5-32B-Instruct --max-model-len 4096
    ```
+## 配置
 
-## Config
-
-All available parameters for the `vllm` config are present in [Master List of All Params in Config](../config).
+`vllm` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

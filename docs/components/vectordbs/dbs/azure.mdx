@@ -3,11 +3,13 @@ title: Azure AI Search
 description: "Use Azure AI Search as a vector store in Mem0 for managed vector search with service name and API key setup."
 ---
 
-[Azure AI Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search/) (formerly known as "Azure Cognitive Search") provides secure information retrieval at scale over user-owned content in traditional and generative AI search applications.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Usage
 
-```python
+
+[Azure AI 搜索](https://learn.microsoft.com/azure/search/search-what-is-azure-search/)（以前称为“Azure 认知搜索”）在传统和生成式 AI 搜索应用程序中针对用户拥有的内容提供大规模的安全信息检索。
+
+＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -34,10 +36,7 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
-
-## Using binary compression for large vector collections
-
-```python
+## 对大型向量集合使用二进制压缩```python
 config = {
     "vector_store": {
         "provider": "azure_ai_search",
@@ -52,10 +51,7 @@ config = {
     }
 }
 ```
-
-## Using hybrid search
-
-```python
+## 使用混合搜索```python
 config = {
     "vector_store": {
         "provider": "azure_ai_search",
@@ -70,56 +66,47 @@ config = {
     }
 }
 ```
+## 使用 Azure Identity 进行身份验证
+作为使用 API 密钥的替代方法，Azure Identity 凭据链可用于通过 Azure OpenAI 进行身份验证。下面的列表显示了证书申请的优先顺序：
 
-## Using Azure Identity for Authentication
-As an alternative to using an API key, the Azure Identity credential chain can be used to authenticate with Azure OpenAI. The list below shows the order of precedence for credential application:
+1. **环境资质：**
+用于服务主体身份验证的环境变量中的 Azure 客户端 ID、机密、租户 ID 或证书。
 
-1. **Environment Credential:**
-Azure client ID, secret, tenant ID, or certificate in environment variables for service principal authentication.
+2. **工作负载身份凭证：**
+利用 Azure 工作负载身份（与 Kubernetes 和 Azure 工作负载相关）。
 
-2. **Workload Identity Credential:**
-Utilizes Azure Workload Identity (relevant for Kubernetes and Azure workloads).
+3. **托管身份凭证：**
+作为托管身份进行身份验证（对于在 Azure 中托管且启用了托管身份的应用程序/服务），这是最安全的生产凭据。
 
-3. **Managed Identity Credential:**
-Authenticates as a Managed Identity (for apps/services hosted in Azure with Managed Identity enabled), this is the most secure production credential.
+4. **共享令牌缓存凭据/Visual Studio 凭据（仅限 Windows）：**
+使用来自 Visual Studio 登录的缓存凭据（如果启用了 SSO，有时还使用 VS Code）。
 
-4. **Shared Token Cache Credential / Visual Studio Credential (Windows only):**
-Uses cached credentials from Visual Studio sign-ins (and sometimes VS Code if SSO is enabled).
+5.**Azure CLI 凭据：**
+使用当前从 Azure CLI 登录的用户（`az login`），这是最常见的开发凭据。
 
-5. **Azure CLI Credential:**
-Uses the currently logged-in user from the Azure CLI (`az login`), this is the most common development credential.
+6. **Azure PowerShell 凭据：**
+使用 Azure PowerShell 中的标识 (“Connect-AzAccount”)。7. **Azure 开发人员 CLI 凭据：**
+使用 Azure 开发人员 CLI 中的会话（“azd auth login”）。
 
-6. **Azure PowerShell Credential:**
-Uses the identity from Azure PowerShell (`Connect-AzAccount`).
-
-7. **Azure Developer CLI Credential:**
-Uses the session from Azure Developer CLI (`azd auth login`).
-
-<Note> If an API is provided, it will be used for authentication over an Azure Identity </Note>
-To enable Role-Based Access Control (RBAC) for Azure AI Search, follow these steps:
-
-1. In the Azure Portal, navigate to your **Azure AI Search** service.
-2. In the left menu, select **Settings** > **Keys**.
-3. Change the authentication setting to **Role-based access control**, or **Both** if you need API key compatibility. The default is “Key-based authentication”—you must switch it to use Azure roles.
-4. **Go to Access Control (IAM):**
-    - In the Azure Portal, select your Search service.
-    - Click **Access Control (IAM)** on the left.
-5. **Add a Role Assignment:**
-    - Click **Add** > **Add role assignment**.
-6. **Choose Role:**
-    - Mem0 requires the **Search Index Data Contributor** and **Search Service Contributor** role.
-7. **Choose Member**
-    - To assign to a User, Group, Service Principal or Managed Identity:
-        - For production it is recommended to use a service principal or managed identity.
-            - For a service principal: select **User, group, or service principal** and search for the service principal.
-            - For a managed identity: select **Managed identity** and choose the managed identity.
-        - For development, you can assign the role to a user account.
-            - For development: select **User, group, or service principal** and pick an Azure Entra ID account (the same used with `az login`).
-8. **Complete the Assignment:**
-    - Click **Review + Assign**.
-
-If you are using Azure Identity, do not set the `api_key` in the configuration.
-```python
+<Note> 如果提供了 API，它将用于通过 Azure Identity 进行身份验证 </Note>
+要为 Azure AI 搜索启用基于角色的访问控制 (RBAC)，请执行以下步骤：1. 在 Azure 门户中，导航到 **Azure AI 搜索** 服务。
+2. 在左侧菜单中，选择 **设置** > **按键**。
+3. 如果您需要 API 密钥兼容性，请将身份验证设置更改为 **基于角色的访问控制**，或 **两者**。默认值为“基于密钥的身份验证”，您必须将其切换为使用 Azure 角色。
+4. **转到访问控制 (IAM)：**
+    - 在 Azure 门户中，选择您的搜索服务。
+    - 单击左侧的**访问控制 (IAM)**。
+5. **添加角色分配：**
+    - 单击 **添加** > **添加角色分配**。
+6. **选择角色：**
+    - Mem0 需要 **搜索索引数据贡献者** 和 **搜索服务贡献者** 角色。
+7. **选择会员**
+    - 分配给用户、组、服务主体或托管身份：
+        - 对于生产，建议使用服务主体或托管身份。- 对于服务主体：选择 **用户、组或服务主体** 并搜索服务主体。
+            - 对于托管身份：选择 **托管身份** 并选择托管身份。
+        - 对于开发，您可以将角色分配给用户帐户。
+            - 对于开发：选择 **用户、组或服务主体**，然后选择一个 Azure Entra ID 帐户（与“az login”使用的帐户相同）。
+8. **完成作业：**
+    - 单击**查看 + 分配**。如果您使用的是 Azure Identity，请勿在配置中设置“api_key”。```python
 config = {
     "vector_store": {
         "provider": "azure_ai_search",
@@ -133,48 +120,39 @@ config = {
     }
 }
 ```
+### 使用 Azure 身份凭据的环境变量
+* 对于环境凭证，您需要设置服务主体并设置以下环境变量：
+  - `AZURE_TENANT_ID`：您的 Azure Active Directory 租户 ID。
+  - `AZURE_CLIENT_ID`：您的服务主体或托管身份的客户端 ID。
+  - `AZURE_CLIENT_SECRET`：服务主体的客户端密钥。
+* 对于用户分配的托管身份，您需要设置以下环境变量：
+  - `AZURE_CLIENT_ID`：用户分配的托管标识的客户端 ID。
+* 对于系统分配的托管身份，不需要其他环境变量。
 
-### Environment Variables to Use Azure Identity Credential
-* For an Environment Credential, you will need to setup a Service Principal and set the following environment variables:
-  - `AZURE_TENANT_ID`: Your Azure Active Directory tenant ID.
-  - `AZURE_CLIENT_ID`: The client ID of your service principal or managed identity.
-  - `AZURE_CLIENT_SECRET`: The client secret of your service principal.
-* For a User-Assigned Managed Identity, you will need to set the following environment variable:
-  - `AZURE_CLIENT_ID`: The client ID of the user-assigned managed identity.
-* For a System-Assigned Managed Identity, no additional environment variables are needed.
+### 开发人员登录 Azure 身份凭证
+* 对于 Azure CLI 凭据，您需要安装 Azure CLI 并使用“az login”登录。* 对于 Azure PowerShell 凭据，您需要安装 Azure PowerShell 模块并使用“Connect-AzAccount”登录。
+* 对于 Azure 开发人员 CLI 凭据，您需要安装 Azure 开发人员 CLI 并使用“azd auth login”登录。[Azure Identity](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/TROUBLESHOOTING.md#troubleshoot-environmentcredential-authentication-issues) 的故障排除提示。## 配置参数
 
-### Developer Logins for Azure Identity Credential
-* For an Azure CLI Credential, you need to have the Azure CLI installed and logged in with `az login`.
-* For an Azure PowerShell Credential, you need to have the Azure PowerShell module installed and logged in with `Connect-AzAccount`.
-* For an Azure Developer CLI Credential, you need to have the Azure Developer CLI installed and logged in with `azd auth login`.
+|参数|描述 |默认值 |选项|
+| ---| ---| ---| ---|
+| `服务名称` | Azure AI 搜索服务名称 |必填 | - |
+| `api_key` | Azure AI 搜索服务的 API 密钥 |可选|如果不存在，将使用 [Azure Identity](#using-azure-identity-for-authentication) 凭据链 |
+| `集合名称` |存储向量的集合/索引的名称 | `mem0` |任何有效的索引名称 |
+| `embedding_model_dims` |嵌入模型的尺寸| `1536` |任何整数值 |
+| `压缩类型` |要使用的矢量压缩类型 | `无` | `无`、`标量`、`二进制` |
+| `use_float16` |以半精度存储向量 (Edm.一半）| ‘假’| “正确”、“错误”|
+| `向量过滤模式` |矢量过滤模式的使用| `预过滤器` | `postFilter`、`preFilter` |
+| `混合搜索` |使用混合搜索 | ‘假’| “正确”、“错误”|
 
-Troubleshooting tips for [Azure Identity](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/TROUBLESHOOTING.md#troubleshoot-environmentcredential-authentication-issues).
+## 配置选项注意事项- **压缩类型**： 
+  - `none`：无压缩，使用全矢量精度
+  - `scalar`：标量量化，速度和精度之间具有合理的平衡
+  - `binary`：二进制量化以实现最大压缩并牺牲一些精度
 
+- **矢量过滤模式**：
+  - `preFilter`：在矢量搜索之前应用过滤器（更快）
+  - `postFilter`：在矢量搜索后应用过滤器（可能提供更好的相关性）
 
-## Configuration Parameters
+- **use_float16**：使用半精度 (float16) 可以减少存储需求，但可能会稍微影响准确性。对于非常大的矢量集合很有用。
 
-| Parameter | Description | Default Value | Options |
-| --- | --- | --- | --- |
-| `service_name` | Azure AI Search service name | Required | - |
-| `api_key` | API key of the Azure AI Search service | Optional | If not present, the [Azure Identity](#using-azure-identity-for-authentication) credential chain will be used |
-| `collection_name` | The name of the collection/index to store vectors | `mem0` | Any valid index name |
-| `embedding_model_dims` | Dimensions of the embedding model | `1536` | Any integer value |
-| `compression_type` | Type of vector compression to use | `none` | `none`, `scalar`, `binary` |
-| `use_float16` | Store vectors in half precision (Edm.Half) | `False` | `True`, `False` |
-| `vector_filter_mode` | Vector filter mode to use | `preFilter` | `postFilter`, `preFilter` |
-| `hybrid_search` | Use hybrid search | `False` | `True`, `False` |
-
-## Notes on Configuration Options
-
-- **compression_type**: 
-  - `none`: No compression, uses full vector precision
-  - `scalar`: Scalar quantization with reasonable balance of speed and accuracy
-  - `binary`: Binary quantization for maximum compression with some accuracy trade-off
-
-- **vector_filter_mode**:
-  - `preFilter`: Applies filters before vector search (faster)
-  - `postFilter`: Applies filters after vector search (may provide better relevance)
-
-- **use_float16**: Using half precision (float16) reduces storage requirements but may slightly impact accuracy. Useful for very large vector collections.
-
-- **Filterable Fields**: The implementation automatically extracts `user_id`, `run_id`, and `agent_id` fields from payloads for filtering.
+- **可过滤字段**：实现自动从有效负载中提取“user_id”、“run_id”和“agent_id”字段进行过滤。

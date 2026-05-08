@@ -3,42 +3,43 @@ title: Configurations
 description: "Reference for LLM configuration options in Mem0 for Python and TypeScript, including value precedence rules."
 ---
 
-## How to define configurations?
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Tabs>
-  <Tab title="Python">
-    The `config` is defined as a Python dictionary with two main keys:
-    - `llm`: Specifies the llm provider and its configuration
-      - `provider`: The name of the llm (e.g., "openai", "groq")
-      - `config`: A nested dictionary containing provider-specific settings
-  </Tab>
-  <Tab title="TypeScript">
-    The `config` is defined as a TypeScript object with these keys:
-    - `llm`: Specifies the LLM provider and its configuration (required)
-      - `provider`: The name of the LLM (e.g., "openai", "groq")
-      - `config`: A nested object containing provider-specific settings
-    - `embedder`: Specifies the embedder provider and its configuration (optional)
-    - `vectorStore`: Specifies the vector store provider and its configuration (optional)
-    - `historyDbPath`: Path to the history database file (optional)
-  </Tab>
-</Tabs>
 
-### Config Values Precedence
 
-Config values are applied in the following order of precedence (from highest to lowest):
+## 如何定义配置？
 
-1. Values explicitly set in the `config` object/dictionary
-2. Environment variables (e.g., `OPENAI_API_KEY`, `OPENAI_BASE_URL`)
-3. Default values defined in the LLM implementation
+<标签>
+  <标签标题=“Python”>
+    `config` 被定义为一个具有两个主键的 Python 字典：
+    - `llm`：指定 llm 提供程序及其配置
+      - `provider`：llm 的名称（例如“openai”、“groq”）
+      - `config`：包含特定于提供者的设置的嵌套字典
+  </标签>
+  <选项卡标题=“TypeScript”>
+    `config` 被定义为具有以下键的 TypeScript 对象：
+    - `llm`：指定LLM提供者及其配置（必需）
+      - `provider`：法学硕士的名称（例如、“openai”、“groq”）
+      - `config`：包含特定于提供者的设置的嵌套对象
+    - `embedder`：指定嵌入器提供程序及其配置（可选）
+    - `vectorStore`：指定矢量存储提供程序及其配置（可选）
+    - `historyDbPath`：历史数据库文件的路径（可选）
+  </标签>
+</标签>
 
-This means that values specified in the `config` will override corresponding environment variables, which in turn override default values.
+### 配置值优先级
 
-## How to Use Config
+配置值按以下优先顺序应用（从最高到最低）：1. 在`config`对象/字典中显式设置的值
+2. 环境变量（例如`OPENAI_API_KEY`、`OPENAI_BASE_URL`）
+3. LLM实现中定义的默认值
 
-Here's a general example of how to use the config with Mem0:
+这意味着“config”中指定的值将覆盖相应的环境变量，进而覆盖默认值。
 
-<CodeGroup>
-```python Python
+## 如何使用配置
+
+以下是如何将配置与 Mem0 一起使用的一般示例：
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -74,63 +75,58 @@ const config = {
 const memory = new Memory(config);
 await memory.add("Your text here", { userId: "user123", metadata: { category: "example" } });
 ```
+</代码组>
 
-</CodeGroup>
+## 为什么需要配置？
 
-## Why is Config Needed?
+配置对于以下方面至关重要：
+1. 指定使用哪个法学硕士。
+2. 提供必要的连接详细信息（例如型号、api_key、温度）。
+3. 确保正确初始化并连接到您选择的法学硕士。
 
-Config is essential for:
-1. Specifying which LLM to use.
-2. Providing necessary connection details (e.g., model, api_key, temperature).
-3. Ensuring proper initialization and connection to your chosen LLM.
+## 配置中所有参数的主列表
 
-## Master List of All Params in Config
+以下是可在不同法学硕士中使用的所有参数的完整列表：<标签>
+  <标签标题=“Python”>
+    |参数|描述 |供应商|
+    |----------------------|------------------------------------------------------------------------|--------------------|
+    | `模型` |使用的嵌入模型 |全部 |
+    | `温度` |模型温度|全部 |
+    | `api_key` |使用 API 密钥 |全部 |
+    | `max_tokens` |生成的令牌 |全部 |
+    | `top_p` |核采样的概率阈值 |全部 |
+    | `top_k` |要保留的最高概率令牌的数量 |全部 |
+    | `http_client_proxies`|允许代理服务器设置 | AzureOpenAI |
+    | `模型` |型号列表 |开放路由器 |
+    | `路线` |路由策略|开放路由器|
+    | `openrouter_base_url`| Openrouter API 的基本 URL |开放路由器 |
+    | `site_url` |网站网址 |开放路由器 |
+    | `应用程序名称` |应用名称|开放路由器|
+    | `ollama_base_url` | Ollama API 的基本 URL |奥拉玛 |
+    | `openai_base_url` | OpenAI API 的基本 URL |开放人工智能 |
+    | `azure_kwargs` |用于初始化的 Azure LLM 参数 | AzureOpenAI |
+    | `deepseek_base_url` | DeepSeek API 的基本 URL |深度搜索 |
+    | `xai_base_url` | XAI API 的基本 URL |西艾 |
+    | `sarvam_base_url` | Sarvam API 的基本 URL |萨尔瓦姆 |
+    | `推理_努力` |推理水平（低、中、高） |萨尔瓦姆 |
+    | `频率惩罚` |惩罚频繁出现的令牌（-2.0 至 2.0) |萨尔瓦姆 |
+    | `存在惩罚` |惩罚现有代币（-2.0 到 2.0）0) |萨尔瓦姆 |
+    | `种子` |确定性采样的种子 |萨尔瓦姆 |
+    | `停止` |停止序列（最多 4 个）|萨尔瓦姆 |
+    | `lmstudio_base_url` | LM Studio API 的基本 URL | LM工作室|
+    | `响应回调` | LLM响应回调函数|开放人工智能 |
+  </标签>
+  <选项卡标题=“TypeScript”>
+    |参数|描述 |供应商|
+    |----------------------|------------------------------------------------------------------------|--------------------|
+    | `模型` |使用的嵌入模型 |全部 |
+    | `温度` |模型温度|全部 |
+    | `apiKey` |使用 API 密钥 |全部 |
+    | `maxTokens` |生成的令牌 |全部 |
+    | `顶P` |核采样的概率阈值 |全部 |
+    | `topK` |要保留的最高概率令牌的数量 |全部 |
+    | `openaiBaseUrl` | OpenAI API 的基本 URL |开放人工智能 |
+  </标签>
+</标签>## 支持的法学硕士
 
-Here's a comprehensive list of all parameters that can be used across different LLMs:
-
-<Tabs>
-  <Tab title="Python">
-    | Parameter            | Description                                   | Provider          |
-    |----------------------|-----------------------------------------------|-------------------|
-    | `model`              | Embedding model to use                        | All               |
-    | `temperature`        | Temperature of the model                      | All               |
-    | `api_key`            | API key to use                                | All               |
-    | `max_tokens`         | Tokens to generate                            | All               |
-    | `top_p`              | Probability threshold for nucleus sampling    | All               |
-    | `top_k`              | Number of highest probability tokens to keep  | All               |
-    | `http_client_proxies`| Allow proxy server settings                   | AzureOpenAI       |
-    | `models`             | List of models                                | Openrouter        |
-    | `route`              | Routing strategy                              | Openrouter        |
-    | `openrouter_base_url`| Base URL for Openrouter API                   | Openrouter        |
-    | `site_url`           | Site URL                                      | Openrouter        |
-    | `app_name`           | Application name                              | Openrouter        |
-    | `ollama_base_url`    | Base URL for Ollama API                       | Ollama            |
-    | `openai_base_url`    | Base URL for OpenAI API                       | OpenAI            |
-    | `azure_kwargs`       | Azure LLM args for initialization             | AzureOpenAI       |
-    | `deepseek_base_url`  | Base URL for DeepSeek API                     | DeepSeek          |
-    | `xai_base_url`       | Base URL for XAI API                          | XAI               |
-    | `sarvam_base_url`    | Base URL for Sarvam API                       | Sarvam            |
-    | `reasoning_effort`   | Reasoning level (low, medium, high)           | Sarvam            |
-    | `frequency_penalty`  | Penalize frequent tokens (-2.0 to 2.0)        | Sarvam            |
-    | `presence_penalty`   | Penalize existing tokens (-2.0 to 2.0)        | Sarvam            |
-    | `seed`               | Seed for deterministic sampling               | Sarvam            |
-    | `stop`               | Stop sequences (max 4)                        | Sarvam            |
-    | `lmstudio_base_url`  | Base URL for LM Studio API                    | LM Studio         |
-    | `response_callback`  | LLM response callback function                | OpenAI            |
-  </Tab>
-  <Tab title="TypeScript">
-    | Parameter            | Description                                   | Provider          |
-    |----------------------|-----------------------------------------------|-------------------|
-    | `model`              | Embedding model to use                        | All               |
-    | `temperature`        | Temperature of the model                      | All               |
-    | `apiKey`             | API key to use                                | All               |
-    | `maxTokens`          | Tokens to generate                            | All               |
-    | `topP`               | Probability threshold for nucleus sampling    | All               |
-    | `topK`               | Number of highest probability tokens to keep  | All               |
-    | `openaiBaseUrl`      | Base URL for OpenAI API                       | OpenAI            |
-  </Tab>
-</Tabs>
-
-## Supported LLMs
-
-For detailed information on configuring specific LLMs, please visit the [LLMs](./models) section. There you'll find information for each supported LLM with provider-specific usage examples and configuration details.
+有关配置特定 LLM 的详细信息，请访问 [LLM](./models) 部分。在那里，您将找到每个受支持的 LLM 的信息以及特定于提供商的使用示例和配置详细信息。

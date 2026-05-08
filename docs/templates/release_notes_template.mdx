@@ -4,26 +4,28 @@ description: "Format for concise launch summaries with clear CTAs."
 icon: "megaphone"
 ---
 
-# Release Notes Template
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Release notes are heartbeat updates. They tell readers what shipped, what needs attention, and where to go for the deep dive—fast.
 
----
 
-## ❌ DO NOT COPY — Guidance & Constraints
-- Frontmatter must include `title`, `description`, `icon`, `releaseDate`, and `version`. Add `tags` if you need filters (e.g., `["platform", "oss"]`).
-- Lead with a one-sentence headline plus a quick stats table (New features, Fixes, Required action). Keep the TL;DR in an `<Info>` block; use `<Warning>` only for breaking changes or deadlines.
-- Organize the body into Highlights, Improvements & fixes (grouped by product), and Known issues. Each bullet links to docs where appropriate.
-- When reshaping older release notes, retain the shipped items and shout-outs—map them to these sections instead of rewriting history.
-- Include an Upgrade checklist with concrete next steps. Optional “Community shout-outs” should remain short.
-- Two-card CTA at the end, as always: left = deeper reference, right = applied next step.
+# 发行说明模板
+
+发行说明是心跳更新。它们告诉读者哪些内容已发布、哪些内容需要关注以及去哪里快速深入了解。
 
 ---
 
-## ✅ COPY THIS — Content Skeleton
-Paste the snippet below, swap placeholders, and trim optional sections only once you know they’re unnecessary.
+## ❌ 请勿复制 — 指南和限制
+- Frontmatter 必须包含“标题”、“描述”、“图标”、“发布日期”和“版本”。如果您需要过滤器，请添加“标签”（例如“[“平台”，“oss”]”）。
+- 以一句话标题和快速统计表开头（新功能、修复、所需操作）。将 TL;DR 保留在 `<Info>` 块中；仅在重大更改或截止日期时使用“<警告>”。
+- 将正文分为亮点、改进和修复（按产品分组）以及已知问题。每个项目符号都链接到适当的文档。
+- 重塑旧版本说明时，保留已发布的项目和宣传内容 - 将它们映射到这些部分，而不是重写历史记录。
+- 包括包含具体后续步骤的升级清单。可选的“社区喊话”应保持简短。
+- 与往常一样，最后有两张 CTA：左 = 更深的参考，右 = 应用下一步。
 
-```mdx
+---
+
+## ✅ 复制此内容 — 内容骨架
+仅在您知道不必要的情况下才粘贴下面的代码片段、交换占位符并修剪可选部分。```mdx
 ---
 title: [Release title]
 description: [1 sentence summary of the release]
@@ -107,104 +109,99 @@ tags: ["platform", "oss"] # Optional filters
   />
 </CardGroup>
 ```
-
 ---
 
-## ✅ Publish Checklist
-- [ ] Headline sentence and stats table reflect the release accurately.
-- [ ] Every highlight, improvement, and issue links to supporting docs when available.
-- [ ] `<Warning>` only appears when a deadline or breaking change exists.
-- [ ] Upgrade checklist lists concrete steps (not vague reminders).
-- [ ] Exactly two CTA cards at the end with valid links.
+## ✅ 发布清单
+- [ ] 标题句子和统计表准确反映了发布情况。
+- [ ] 每个亮点、改进和问题都链接到可用的支持文档。
+- [ ] `<警告>` 仅在存在截止日期或重大更改时出现。
+- [ ]升级清单列出了具体步骤（不是含糊的提醒）。
+- [ ] 最后有两张带有有效链接的 CTA 卡。
 
-## Browse Other Templates
-
-<CardGroup cols={3}>
-  <Card
-    title="Quickstart"
-    description="Install → Configure → Add → Search → Delete."
-    icon="rocket"
+## 浏览其他模板<卡组列={3}>
+  <卡片
+    标题=“快速入门”
+    描述=“安装→配置→添加→搜索→删除。”
+    图标=“火箭”
     href="/templates/quickstart_template"
   />
-  <Card
-    title="Operation Guide"
-    description="Single task walkthrough with verification checkpoints."
-    icon="circle-check"
+  <卡片
+    title="操作指南"
+    描述 =“带有验证检查点的单个任务演练。”
+    图标=“圆圈检查”
     href="/templates/operation_guide_template"
   />
-  <Card
-    title="Feature Guide"
-    description="Explain when and why to use a capability, not just the API."
-    icon="sparkles"
+  <卡片
+    title="功能指南"
+    description="解释何时以及为何使用某个功能，而不仅仅是 API。"
+    图标=“闪闪发光”
     href="/templates/feature_guide_template"
   />
-  <Card
-    title="Concept Guide"
-    description="Define mental models, key terms, and diagrams."
-    icon="brain"
+  <卡片
+    标题=“概念指南”
+    描述=“定义心智模型、关键术语和图表。”
+    图标=“大脑”
     href="/templates/concept_guide_template"
   />
-  <Card
-    title="Integration Guide"
-    description="Configure Mem0 alongside third-party tools."
-    icon="plug"
+  <卡片
+    title="集成指南"
+    description="与第三方工具一起配置 Mem0。”
+    图标=“插头”
     href="/templates/integration_guide_template"
   />
-  <Card
-    title="Cookbook"
-    description="Narrative, end-to-end walkthroughs."
-    icon="book-open"
+  <卡片
+    标题=“食谱”
+    描述=“叙述性、端到端的演练。”
+    图标=“书本打开”
     href="/templates/cookbook_template"
   />
-  <Card
-    title="API Reference"
-    description="Endpoint specifics with dual-language examples."
-    icon="code"
+  <卡片
+    标题=“API参考”
+    description="带有双语言示例的端点细节。"
+    图标=“代码”
     href="/templates/api_reference_template"
   />
-  <Card
-    title="Parameters Reference"
-    description="Accepted fields, defaults, and misuse fixes."
-    icon="list"
+  <卡片
+    title="参数参考"
+    描述 =“接受的字段、默认值和误用修复。”
+    图标=“列表”
     href="/templates/parameters_reference_template"
   />
-  <Card
-    title="Migration Guide"
-    description="Plan → migrate → validate with rollback."
-    icon="arrow-right"
+  <卡片
+    title="迁移指南"
+    描述=“计划→迁移→通过回滚进行验证。”
+    图标=“右箭头”
     href="/templates/migration_guide_template"
   />
-  <Card
-    title="Release Notes"
-    description="Ship highlights and required CTAs."
-    icon="megaphone"
+  <卡片
+    title="发行说明"
+    描述=“发布亮点和所需的 CTA。”
+    图标=“扩音器”
     href="/templates/release_notes_template"
   />
-  <Card
-    title="Troubleshooting Playbook"
-    description="Symptom → diagnose → fix."
-    icon="life-buoy"
+  <卡片
+    title="故障排除手册"
+    描述=“症状→诊断→修复。”
+    图标=“救生圈”
     href="/templates/troubleshooting_playbook_template"
   />
-  <Card
-    title="Section Overview"
-    description="Landing pages with card grids and CTA pair."
-    icon="grid"
+  <卡片
+    title="本节概述"
+    描述 =“带有卡片网格和 CTA 对的着陆页。”
+    图标=“网格”
     href="/templates/section_overview_template"
   />
-</CardGroup>
-
-<CardGroup cols={2}>
-  <Card
-    title="Contribution Hub"
-    description="Review the authoring workflow and linked templates."
-    icon="clipboard-list"
-    href="/platform/contribute"
+</卡组><卡组列={2}>
+  <卡片
+    title="贡献中心"
+    描述 =“查看创作工作流程和链接的模板。”
+    图标=“剪贴板列表”
+    href="/平台/贡献"
   />
-  <Card
-    title="Docs Home"
-    description="Return to the platform overview once you’re done."
-    icon="compass"
-    href="/platform/overview"
+  <卡片
+    title="文档主页"
+    description="完成后返回平台概述。"
+    图标=“指南针”
+    href="/平台/概述"
   />
-</CardGroup>
+</卡组>

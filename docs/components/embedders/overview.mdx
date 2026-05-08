@@ -3,17 +3,20 @@ title: Overview
 description: "Overview of all supported embedding model providers in Mem0, including OpenAI, Azure, Ollama, and more."
 ---
 
-Mem0 offers support for various embedding models, allowing users to choose the one that best suits their needs.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Supported Embedders
 
-See the list of supported embedders below.
 
-<Note>
-  The following embedders are supported in the Python implementation. The TypeScript implementation currently only supports OpenAI.
-</Note>
+Mem0提供对各种嵌入模型的支持，允许用户选择最适合自己需求的一种。
 
-<CardGroup cols={4}>
+## 支持的嵌入器
+
+请参阅下面支持的嵌入器列表。
+
+<注意>
+  Python 实现支持以下嵌入器。 TypeScript 实现目前仅支持 OpenAI。</注>
+
+<卡组 cols={4}>
   <Card title="OpenAI" href="/components/embedders/models/openai"></Card>
   <Card title="Azure OpenAI" href="/components/embedders/models/azure_openai"></Card>
   <Card title="Ollama" href="/components/embedders/models/ollama"></Card>
@@ -24,10 +27,8 @@ See the list of supported embedders below.
   <Card title="LM Studio" href="/components/embedders/models/lmstudio"></Card>
   <Card title="Langchain" href="/components/embedders/models/langchain"></Card>
   <Card title="AWS Bedrock" href="/components/embedders/models/aws_bedrock"></Card>
-</CardGroup>
+</卡组>
 
-## Usage
+## 用法要利用嵌入模型，您必须提供配置来自定义其用法。如果未提供配置，则将应用默认配置，并使用“OpenAI”作为嵌入模型。
 
-To utilize an embedding model, you must provide a configuration to customize its usage. If no configuration is supplied, a default configuration will be applied, and `OpenAI` will be used as the embedding model.
-
-For a comprehensive list of available parameters for embedding model configuration, please refer to [Config](./config).
+有关嵌入模型配置的可用参数的完整列表，请参阅[Config](./config)。

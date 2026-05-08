@@ -3,47 +3,46 @@ title: Group Chat
 description: 'Enable multi-participant conversations with automatic memory attribution to individual speakers'
 ---
 
-## Overview
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-The Group Chat feature enables Mem0 to process conversations involving multiple participants and automatically attribute memories to individual speakers. This allows for precise tracking of each participant's preferences, characteristics, and contributions in collaborative discussions, team meetings, or multi-agent conversations.
 
-When you provide messages with participant names, Mem0 automatically:
-- Extracts memories from each participant's messages separately
-- Attributes each memory to the correct speaker using their name as the `user_id` or `agent_id`
-- Maintains individual memory profiles for each participant
 
-## How Group Chat Works
+## 概述
 
-Mem0 automatically detects group chat scenarios when messages contain a `name` field:
+群聊功能使 Mem0 能够处理涉及多个参与者的对话，并自动将记忆分配给各个发言者。这样可以精确跟踪每个参与者在协作讨论、团队会议或多代理对话中的偏好、特征和贡献。
 
-```json
+当您提供带有参与者姓名的消息时，Mem0 会自动：
+- 分别从每个参与者的消息中提取记忆
+- 使用其名称作为“user_id”或“agent_id”将每个记忆归因于正确的说话者
+- 维护每个参与者的个人记忆档案
+
+## 群聊如何运作
+
+当消息包含“name”字段时，Mem0 会自动检测群聊场景：```json
 {
   "role": "user",
   "name": "Alice",
   "content": "Hey team, I think we should use React for the frontend"
 }
 ```
+当名称存在时，Mem0：
+- 将消息格式化为“Alice（用户）：内容”以进行处理
+- 提取记忆并正确归因于每个说话者
+- 将发言者姓名存储为“user_id”（对于用户）或“agent_id”（对于助理/代理）
 
-When names are present, Mem0:
-- Formats messages as `"Alice (user): content"` for processing
-- Extracts memories with proper attribution to each speaker
-- Stores memories with the speaker's name as the `user_id` (for users) or `agent_id` (for assistants/agents)
+### 内存归属规则
 
-### Memory Attribution Rules
+- **用户消息**：“name”字段成为存储内存中的“user_id”
+- **助理/座席消息**：“name”字段成为存储内存中的“agent_id”
+- **没有名称的消息**：使用角色作为标识符回退到标准处理
 
-- **User Messages**: The `name` field becomes the `user_id` in stored memories
-- **Assistant/Agent Messages**: The `name` field becomes the `agent_id` in stored memories
-- **Messages without names**: Fall back to standard processing using role as identifier
+## 使用群聊
 
-## Using Group Chat
+### 基本群聊
 
-### Basic Group Chat
+添加多人对话的记忆：
 
-Add memories from a multi-participant conversation:
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your-api-key")
@@ -85,18 +84,15 @@ print(response)
   ]
 }
 ```
+</代码组>
 
-</CodeGroup>
+## 检索群聊记忆
 
-## Retrieving Group Chat Memories
+### 获取会话的所有记忆
 
-### Get All Memories for a Session
+检索特定群聊会话的所有记忆：
 
-Retrieve all memories from a specific group chat session:
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 # Get all memories for a specific run_id
 # Use wildcard "*" for user_id to match all participants
 filters = {
@@ -138,16 +134,13 @@ print(all_memories)
     }
 ]
 ```
+</代码组>
 
-</CodeGroup>
+### 获取特定参与者的记忆
 
-### Get Memories for a Specific Participant
+检索群聊中特定参与者的记忆：
 
-Retrieve memories from a specific participant in a group chat:
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 # Get memories for a specific participant
 filters = {
     "AND": [
@@ -173,16 +166,13 @@ print(charlie_memories)
     }
 ]
 ```
+</代码组>
 
-</CodeGroup>
+### 在群聊上下文中搜索
 
-### Search Within Group Chat Context
+在群聊会话中搜索特定信息：
 
-Search for specific information within a group chat session:
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 # Search within group chat context
 filters = {
     "AND": [
@@ -210,16 +200,13 @@ print(search_response)
     }
 ]
 ```
+</代码组>
 
-</CodeGroup>
+## 异步模式支持
 
-## Async Mode Support
+群聊支持异步处理以提高性能。默认情况下，内存添加是异步处理的。
 
-Group chat supports async processing for improved performance. Memory additions are processed asynchronously by default.
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 # Group chat — async processing is the default
 response = client.add(
     messages,
@@ -228,55 +215,50 @@ response = client.add(
 )
 print(response)
 ```
+</代码组>
 
-</CodeGroup>
+## 消息格式要求
 
-## Message Format Requirements
+### 必填字段
 
-### Required Fields
+群聊中的每条消息必须包含：
 
-Each message in a group chat must include:
+- `role`：参与者的角色（`"用户"`、`"助理"`、`"代理"`）
+- `content`：消息内容
+- `name`：参与者的姓名（群聊检测所需）
 
-- `role`: The participant's role (`"user"`, `"assistant"`, `"agent"`)
-- `content`: The message content
-- `name`: The participant's name (required for group chat detection)
-
-### Example Message Structure
-
-```json
+### 消息结构示例```json
 {
   "role": "user",
   "name": "Alice",
   "content": "I think we should use React for the frontend"
 }
 ```
-### Supported Roles
+### 支持的角色
 
-- **`user`**: Human participants (memories stored with `user_id`)
-- **`assistant`**: AI assistants (memories stored with `agent_id`)
+- **`user`**：人类参与者（用`user_id`存储的记忆）
+- **`assistant`**：AI助手（使用`agent_id`存储的记忆）
 
-## Best Practices
+## 最佳实践
 
-1. **Consistent Naming**: Use consistent names for participants across sessions to maintain proper memory attribution.
+1. **一致的命名**：在各个会话中为参与者使用一致的名称，以保持正确的内存归属。
 
-2. **Clear Role Assignment**: Ensure each participant has the correct role (`user`, `assistant`, or `agent`) for proper memory categorization.
+2. **明确的角色分配**：确保每个参与者都有正确的角色（“用户”、“助理”或“代理”），以进行正确的内存分类。
 
-3. **Session Management**: Use meaningful `run_id` values to organize group chat sessions and enable easy retrieval.
+3. **会话管理**：使用有意义的“run_id”值来组织群聊会话并轻松检索。
 
-4. **Memory Filtering**: Use filters to retrieve memories from specific participants or sessions when needed.
+4. **内存过滤**：在需要时使用过滤器从特定参与者或会话中检索内存。
 
-5. **Async Processing**: Memory additions are processed asynchronously by default, which is ideal for large group conversations.
+5. **异步处理**：默认情况下，内存添加是异步处理的，这对于大型群组对话来说是理想的选择。
 
-6. **Search Context**: Leverage the search functionality to find specific information within group chat contexts.
+6.**搜索上下文**：利用搜索功能在群聊上下文中查找特定信息。
 
-## Use Cases
+## 用例- **团队会议**：跟踪各个团队成员的偏好和贡献
+- **客户支持**：为不同的客户维护单独的内存配置文件
+- **多代理系统**：管理与多个人工智能助手的对话
+- **协作项目**：跟踪个人偏好和专业知识领域
+- **小组讨论**：维护每个参与者观点的背景
 
-- **Team Meetings**: Track individual team member preferences and contributions
-- **Customer Support**: Maintain separate memory profiles for different customers
-- **Multi-Agent Systems**: Manage conversations with multiple AI assistants
-- **Collaborative Projects**: Track individual preferences and expertise areas
-- **Group Discussions**: Maintain context for each participant's viewpoints
+如果您有任何疑问，请随时通过以下方式之一与我们联系：
 
-If you have any questions, please feel free to reach out to us using one of the following methods:
-
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

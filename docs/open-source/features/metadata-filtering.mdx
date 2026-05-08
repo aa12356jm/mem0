@@ -4,46 +4,46 @@ description: Fine-grained metadata queries for precise OSS memory retrieval.
 icon: "filter"
 ---
 
-Enhanced metadata filtering in Mem0 1.0.0 lets you run complex queries across memory metadata. Combine comparisons, logical operators, and wildcard matches to zero in on the exact memories your agent needs.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Info>
-  **You’ll use this when…**
-  - Retrieval must respect multiple metadata conditions before returning context.
-  - You need to mix numeric, boolean, and string filters in a single query.
-  - Agents rely on deterministic filtering instead of broad semantic search alone.
-</Info>
 
-<Warning>
-  Enhanced filtering requires Mem0 1.0.0 or later and a vector store that supports the operators you enable. Unsupported operators fall back to simple equality filters.
-</Warning>
 
-<Note>
-  The TypeScript SDK accepts the same filter shape shown here—transpose the dictionaries to objects and reuse the keys unchanged.
-</Note>
+Mem0 1.0.0 中增强的元数据过滤功能使您可以跨内存元数据运行复杂的查询。将比较、逻辑运算符和通配符匹配组合为零，以获取代理所需的确切内存。
+
+<信息>
+  **你会在以下情况下使用它......**
+  - 在返回上下文之前，检索必须尊重多个元数据条件。
+  - 您需要在单个查询中混合数字、布尔和字符串过滤器。
+  - 代理依赖于确定性过滤而不是单独的广泛语义搜索。
+</信息>
+
+<警告>
+  增强过滤需要 Mem0 1.0.0 或更高版本以及支持您启用的运算符的矢量存储。不受支持的运算符会退回到简单的相等过滤器。
+</警告>
+
+<注意>
+  TypeScript SDK 接受此处所示的相同过滤器形状 - 将字典转置为对象并按原样重复使用键。
+</注>
 
 ---
 
-## Feature anatomy
+## 特征剖析<手风琴组>
+  <Accordion title="操作员快速参考">
+    |操作员|意义|何时使用它 |
+    | ---| ---| ---|
+    | `eq` / `ne` |等于/不等于 |字符串、数字或布尔值的精确匹配。 |
+    | `gt` / `gte` |大于/大于或等于 |按分数、置信度或任何数字字段对结果进行排名。 |
+    | `lt` / `lte` |小于/小于或等于|限制数值（例如评级、时间戳）。 |
+    | `in` / `nin` |在列表中/不在列表中 |预先批准或阻止值集，无需链接多个过滤器。 |
+    | `包含` / `图标包含` |区分大小写/不区分大小写的子字符串匹配 |扫描文本字段中的关键字。 |
+    | `*` |通配符 |要求字段存在，无论值如何。 |
+    | “与”/“或”/“非” |组合过滤器|构建逻辑树，以便多个条件协同工作。|
+  </手风琴>
+</手风琴组>
 
-<AccordionGroup>
-  <Accordion title="Operator quick reference">
-    | Operator | Meaning | When to use it |
-    | --- | --- | --- |
-    | `eq` / `ne` | Equals / not equals | Exact matches on strings, numbers, or booleans. |
-    | `gt` / `gte` | Greater than / greater than or equal | Rank results by score, confidence, or any numeric field. |
-    | `lt` / `lte` | Less than / less than or equal | Cap numeric values (e.g., ratings, timestamps). |
-    | `in` / `nin` | In list / not in list | Pre-approve or block sets of values without chaining multiple filters. |
-    | `contains` / `icontains` | Case-sensitive / case-insensitive substring match | Scan text fields for keywords. |
-    | `*` | Wildcard | Require that a field exists, regardless of value. |
-    | `AND` / `OR` / `NOT` | Combine filters | Build logic trees so multiple conditions work together. |
-  </Accordion>
-</AccordionGroup>
+### 元数据选择器
 
-### Metadata selectors
-
-Start with key-value filters when you need direct matches on metadata fields.
-
-```python
+当您需要对元数据字段进行直接匹配时，请从键值过滤器开始。```python
 from mem0 import Memory
 
 m = Memory()
@@ -54,16 +54,13 @@ results = m.search(
     filters={"user_id": "alice", "category": "preferences"}
 )
 ```
+<信息图标=“检查”>
+  预计只有标有“category=”preferences“”的内存才会返回给定的“user_id”。
+</信息>
 
-<Info icon="check">
-  Expect only memories tagged with `category="preferences"` to return for the given `user_id`.
-</Info>
+### 比较运算符
 
-### Comparison operators
-
-Layer greater-than/less-than comparisons to rank results by score, confidence, or any numeric field. Equality helpers (`eq`, `ne`) keep string and boolean checks explicit.
-
-```python
+分层大于/小于比较，按分数、置信度或任何数字字段对结果进行排名。相等助手（`eq`、`ne`）使字符串和布尔检查保持明确。```python
 # Greater than / Less than
 results = m.search(
     "recent activities",
@@ -86,12 +83,9 @@ results = m.search(
     }
 )
 ```
+### 基于列表的运算符
 
-### List-based operators
-
-Use `in` and `nin` when you want to pre-approve or exclude specific values without writing multiple equality checks.
-
-```python
+当您想要预先批准或排除特定值而不编写多个相等检查时，请使用“in”和“nin”。```python
 # In / Not in operators
 results = m.search(
     "multi-category search",
@@ -102,16 +96,13 @@ results = m.search(
     }
 )
 ```
+<信息图标=“检查”>
+  验证响应仅包含白名单类别中的记忆，并忽略任何具有已存档或已删除状态的记忆。
+</信息>
 
-<Info icon="check">
-  Verify the response includes only memories in the whitelisted categories and omits any with archived or deleted status.
-</Info>
+### 字符串运算符
 
-### String operators
-
-`contains` and `icontains` capture substring matches, making it easy to scan descriptions or tags for keywords without retrieving irrelevant memories.
-
-```python
+`contains` 和 `icontains` 捕获子字符串匹配，可以轻松扫描关键字的描述或标签，而无需检索不相关的记忆。```python
 # Text matching operators
 results = m.search(
     "content search",
@@ -123,12 +114,9 @@ results = m.search(
     }
 )
 ```
+### 通配符匹配
 
-### Wildcard matching
-
-Allow any value for a field while still requiring the field to exist—handy when the mere presence of a field matters.
-
-```python
+允许字段具有任何值，同时仍然要求字段存在——当字段的存在很重要时，这很方便。```python
 # Match any value for a field
 results = m.search(
     "all with category",
@@ -138,12 +126,9 @@ results = m.search(
     }
 )
 ```
+### 逻辑组合
 
-### Logical combinations
-
-Combine filters with `AND`, `OR`, and `NOT` to express complex decision trees. Nest logical operators to encode multi-branch workflows.
-
-```python
+将过滤器与“AND”、“OR”和“NOT”组合起来以表达复杂的决策树。嵌套逻辑运算符来编码多分支工作流程。```python
 # Logical AND
 results = m.search(
     "complex query",
@@ -212,18 +197,15 @@ results = m.search(
     }
 )
 ```
-
-<Info icon="check">
-  Inspect the response metadata—each returned memory should satisfy the combined logic tree exactly. If results look too broad, log the raw filters sent to your vector store.
-</Info>
+<信息图标=“检查”>
+  检查响应元数据 - 每个返回的内存都应该完全满足组合逻辑树。如果结果看起来太宽泛，请记录发送到矢量存储的原始过滤器。
+</信息>
 
 ---
 
-## Configure it
+## 配置它
 
-Tune your vector store so filter-heavy queries stay fast. Index fields you frequently filter on and keep complex checks for later in the evaluation order.
-
-```python
+调整您的矢量存储，以便过滤繁重的查询保持快速。对您经常过滤的字段进行索引，并在评估顺序中保留复杂的检查以供稍后使用。```python
 # Ensure your vector store supports indexing on filtered fields
 config = {
     "vector_store": {
@@ -236,16 +218,13 @@ config = {
     }
 }
 ```
+<信息图标=“检查”>
+  启用索引后，对相同的查询进行基准测试 - 一旦存储可以在矢量评分之前修剪索引字段上的文档，延迟就会下降。
+</信息>
 
-<Info icon="check">
-  After enabling indexing, benchmark the same query—latency should drop once the store can prune documents on indexed fields before vector scoring.
-</Info>
-
-<Tip>
-  Put simple key=value filters on indexed fields before your range or text conditions so the store trims results early.
-</Tip>
-
-```python
+<提示>
+  在范围或文本条件之前将简单的 key=value 过滤器放在索引字段上，以便商店尽早修剪结果。
+</提示>```python
 # More efficient: Filter on indexed fields first
 good_filters = {
     "AND": [
@@ -263,35 +242,31 @@ avoid_filters = {
     ]
 }
 ```
+<信息图标=“检查”>
+  当您重新排序过滤器以使索引字段排在第一位（“good_filters”示例）时，查询通常比“avoid_filters”模式返回得更快，在“avoid_filters”模式中，昂贵的文本搜索先于简单检查运行。
+</信息>
 
-<Info icon="check">
-  When you reorder filters so indexed fields come first (`good_filters` example), queries typically return faster than the `avoid_filters` pattern where expensive text searches run before simple checks.
-</Info>
+矢量存储支持各不相同。发货前确认运营商承保范围：
 
-Vector store support varies. Confirm operator coverage before shipping:
+<手风琴组>
+  <手风琴标题=“Qdrant”>
+    完整的比较、列表和逻辑支持。有效处理深度嵌套的布尔逻辑。
+  </手风琴>
+  <手风琴标题=“色度”>
+    仅相等和基本比较。有限的嵌套——将大树分成更小的叫声。
+  </手风琴>
+  <手风琴标题=“松果”>
+    比较加上 `in`/`nin`。文本操作符受到限制；尽可能依赖标签。
+  </手风琴>
+  <手风琴标题=“Weaviate”>
+    通过高级文本过滤器全面覆盖操作员。当您需要混合文本+元数据查询时的最佳选择。</手风琴>
+</手风琴组>
 
-<AccordionGroup>
-  <Accordion title="Qdrant">
-    Full comparison, list, and logical support. Handles deeply nested boolean logic efficiently.
-  </Accordion>
-  <Accordion title="Chroma">
-    Equality and basic comparisons only. Limited nesting—break large trees into smaller calls.
-  </Accordion>
-  <Accordion title="Pinecone">
-    Comparisons plus `in`/`nin`. Text operators are constrained; rely on tags where possible.
-  </Accordion>
-  <Accordion title="Weaviate">
-    Full operator coverage with advanced text filters. Best option when you need hybrid text + metadata queries.
-  </Accordion>
-</AccordionGroup>
+<警告>
+  如果某个运算符不受支持，大多数商店都会默默地忽略该分支。在执行前添加验证，以便您可以回退到更简单的查询，而不是返回空结果。
+</警告>
 
-<Warning>
-  If an operator is unsupported, most stores silently ignore that branch. Add validation before execution so you can fall back to simpler queries instead of returning empty results.
-</Warning>
-
-### Migrate from earlier filters
-
-```python
+### 从早期过滤器迁移```python
 # Before (v0.x) - simple key-value filtering only
 results = m.search(
     "query",
@@ -311,18 +286,15 @@ results = m.search(
     }
 )
 ```
-
-<Note>
-  Existing equality filters continue to work; add new operator branches gradually so agents can adopt richer queries without downtime.
-</Note>
+<注意>
+  现有的平等过滤器继续工作；逐步添加新的运算符分支，以便代理可以采用更丰富的查询而无需停机。
+</注>
 
 ---
 
-## See it in action
+## 查看实际效果
 
-### Project management filtering
-
-```python
+### 项目管理过滤```python
 # Find high-priority active tasks
 results = m.search(
     "What tasks need attention?",
@@ -342,14 +314,11 @@ results = m.search(
     }
 )
 ```
+<信息图标=“检查”>
+  返回的任务应属于目标项目，保持不完整，并分配给列出的队友之一。
+</信息>
 
-<Info icon="check">
-  Tasks returned should belong to the targeted projects, remain incomplete, and be assigned to one of the listed teammates.
-</Info>
-
-### Customer support filtering
-
-```python
+### 客户支持过滤```python
 # Find recent unresolved tickets
 results = m.search(
     "pending support issues",
@@ -368,14 +337,11 @@ results = m.search(
     }
 )
 ```
+<提示>
+  将代理 ID 过滤器与特定于工单的元数据配对，以便共享支持机器人仅返回它们可以在当前会话中处理的工单。
+</提示>
 
-<Tip>
-  Pair agent ID filters with ticket-specific metadata so shared support bots return only the tickets they can act on in the current session.
-</Tip>
-
-### Content recommendation filtering
-
-```python
+### 内容推荐过滤```python
 # Personalized content filtering
 results = m.search(
     "recommend content",
@@ -395,14 +361,11 @@ results = m.search(
     }
 )
 ```
+<信息图标=“检查”>
+  确认个性化源仅显示符合评级和语言标准的未读标题。
+</信息>
 
-<Info icon="check">
-  Confirm personalized feeds show only unread titles that meet the rating and language criteria.
-</Info>
-
-### Handle invalid operators
-
-```python
+### 处理无效运算符```python
 try:
     results = m.search(
         "test query",
@@ -418,36 +381,33 @@ except ValueError as e:
         filters={"user_id": "alice", "category": "general"}
     )
 ```
-
-<Warning>
-  Validate filters before executing searches so you can catch typos or unsupported operators during development instead of at runtime.
-</Warning>
-
----
-
-## Verify the feature is working
-
-- Log the filters sent to your vector store and confirm the response metadata matches every clause.
-- Benchmark queries before and after indexing to ensure latency improvements materialize.
-- Add analytics or debug logging to track how often fallbacks execute when operators fail validation.
+<警告>
+  在执行搜索之前验证过滤器，以便您可以在开发期间而不是在运行时捕获拼写错误或不受支持的运算符。
+</警告>
 
 ---
 
-## Best practices
+## 验证该功能是否正常工作
 
-1. **Use indexed fields first:** Order filters so equality checks run before complex string operations.
-2. **Combine operators intentionally:** Keep logical trees readable—large nests are harder to debug.
-3. **Test performance regularly:** Benchmark critical queries with production-like payloads.
-4. **Plan graceful degradation:** Provide fallback filters when an operator isn’t available.
-5. **Validate syntax early:** Catch malformed filters during development to protect agents at runtime.
+- 记录发送到矢量存储的过滤器，并确认响应元数据与每个子句匹配。
+- 在索引之前和之后对查询进行基准测试，以确保实现延迟改进。
+- 添加分析或调试日志记录，以跟踪操作员验证失败时执行回退的频率。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Explore Vector Store Options" icon="database" href="/components/vectordbs/overview">
-    Compare operator coverage and indexing strategies across supported stores.
-  </Card>
-  <Card title="Tag and Organize Memories" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
-    Practice building workflows that label and retrieve memories with clear metadata filters.
-  </Card>
-</CardGroup>
+## 最佳实践
+
+1. **首先使用索引字段：** 对过滤器进行排序，以便在复杂的字符串操作之前运行相等性检查。
+2. **有意组合运算符：** 保持逻辑树可读 - 大嵌套更难调试。
+3. **定期测试性能：** 使用类似生产的有效负载对关键查询进行基准测试。
+4.**计划优雅的降级：**当操作员不可用时提供后备过滤器。
+5. **尽早验证语法：** 在开发过程中捕获格式错误的过滤器，以在运行时保护代理。
+
+---<卡组列={2}>
+  <Card title="探索矢量存储选项" icon="database" href="/components/vectordbs/overview">
+    比较受支持商店的运营商覆盖范围和索引策略。
+  </卡>
+  <Card title="标记和组织记忆" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
+    练习构建使用清晰的元数据过滤器标记和检索记忆的工作流程。
+  </卡>
+</卡组>

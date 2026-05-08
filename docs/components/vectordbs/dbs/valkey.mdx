@@ -2,19 +2,19 @@
 title: "Valkey"
 description: "Use Valkey as an open-source vector store in Mem0 for high-performance key-value storage with vector search."
 ---
-# Valkey Vector Store
 
-[Valkey](https://valkey.io/) is an open source (BSD) high-performance key/value datastore that supports a variety of workloads and rich datastructures including vector search.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Installation
 
-```bash
+
+# Valkey 矢量商店
+
+[Valkey](https://valkey.io/) 是一个开源 (BSD) 高性能键/值数据存储，支持各种工作负载和丰富的数据结构，包括矢量搜索。
+
+＃＃ 安装```bash
 pip install mem0ai[vector_stores]
 ```
-
-## Usage
-
-```python
+＃＃ 用法```python
 config = {
     "vector_store": {
         "provider": "valkey",
@@ -36,28 +36,25 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+## 参数
 
-## Parameters
+以下是可用于配置 Valkey 的参数：
 
-Here are the parameters available for configuring Valkey:
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |存储向量的集合的名称 | `mem0` |
+| `valkey_url` | Valkey 服务器的连接 URL | `valkey://localhost:6379` |
+| `embedding_model_dims` |嵌入模型的尺寸| `1536` |
+| `索引类型` |向量索引算法（`hnsw` 或 `flat`）| `hnsw` |
+| `hnsw_m` | HNSW 的双向链路数量 | `16` |
+| `hnsw_ef_construction` | HNSW 动态候选人名单的规模 | `200` |
+| `hnsw_ef_runtime` |用于搜索的动态候选列表的大小 | `10` |
+| `集群模式` |为 Valkey 集群 (CME) 部署启用集群模式 | `假` |
+| `距离度量` |向量相似度的距离度量 | `余弦` |
 
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collection_name` | The name of the collection to store the vectors | `mem0` |
-| `valkey_url` | Connection URL for the Valkey server | `valkey://localhost:6379` |
-| `embedding_model_dims` | Dimensions of the embedding model | `1536` |
-| `index_type` | Vector index algorithm (`hnsw` or `flat`) | `hnsw` |
-| `hnsw_m` | Number of bi-directional links for HNSW | `16` |
-| `hnsw_ef_construction` | Size of dynamic candidate list for HNSW | `200` |
-| `hnsw_ef_runtime` | Size of dynamic candidate list for search | `10` |
-| `cluster_mode` | Enable cluster mode for Valkey cluster (CME) deployments | `false` |
-| `distance_metric` | Distance metric for vector similarity | `cosine` |
+## 集群模式
 
-## Cluster Mode
-
-To use Valkey with cluster mode enabled (CME), set `cluster_mode` to `true`:
-
-```python
+要在启用集群模式 (CME) 的情况下使用 Valkey，请将 `cluster_mode` 设置为 `true`：```python
 config = {
     "vector_store": {
         "provider": "valkey",
@@ -70,5 +67,4 @@ config = {
     }
 }
 ```
-
-When cluster mode is enabled, the connector uses `ValkeyCluster` instead of the standalone client, which handles `MOVED`/`ASK` redirections automatically. Search queries are coordinated across all shards by the valkey-search module's built-in coordinator. See the [valkey-search documentation](https://github.com/valkey-io/valkey-search) for details on cluster mode behavior.
+启用集群模式后，连接器使用“ValkeyCluster”而不是独立客户端，后者会自动处理“MOVED”/“ASK”重定向。 valkey-search 模块的内置协调器在所有分片之间协调搜索查询。有关集群模式行为的详细信息，请参阅 [valkey-search 文档](https://github.com/valkey-io/valkey-search)。

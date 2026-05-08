@@ -3,23 +3,25 @@ title: Memory Filters
 description: Query and retrieve memories with powerful filtering capabilities. Filter by users, agents, content, time ranges, and more.
 ---
 
-> Memory filters provide a flexible way to query and retrieve specific memories from your memory store. You can filter by users, agents, content categories, time ranges, and combine multiple conditions using logical operators.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## When to use filters
 
-When working with large-scale memory stores, you need precise control over which memories to retrieve. Filters help you:
 
-* **Isolate user data**: Retrieve memories for specific users while maintaining privacy
-* **Debug and audit**: Export specific memory subsets for analysis
-* **Target content**: Find memories with specific categories or metadata
-* **Time-based queries**: Retrieve memories within specific date ranges
-* **Performance optimization**: Reduce query complexity by pre-filtering
+> 内存过滤器提供了一种灵活的方式来查询和检索内存存储中的特定内存。您可以按用户、代理、内容类别、时间范围进行过滤，并使用逻辑运算符组合多个条件。
 
-## Filter structure
+## 何时使用过滤器
 
-Filters use a nested JSON structure with logical operators at the root:
+使用大规模内存存储时，您需要精确控制要检索的内存。过滤器可以帮助您：
 
-```python
+* **隔离用户数据**：检索特定用户的记忆，同时维护隐私
+* **调试和审计**：导出特定内存子集进行分析
+* **目标内容**：查找具有特定类别或元数据的记忆
+* **基于时间的查询**：检索特定日期范围内的记忆
+* **性能优化**：通过预过滤降低查询复杂度
+
+## 过滤器结构
+
+过滤器使用嵌套的 JSON 结构，根部带有逻辑运算符：```python
 # Basic structure
 {
     "AND": [  # or "OR", "NOT"
@@ -28,67 +30,61 @@ Filters use a nested JSON structure with logical operators at the root:
     ]
 }
 ```
+## 可用字段和运算符
 
-## Available fields and operators
+### 实体字段
+|领域|运营商|示例|
+|--------|------------|---------|
+| `用户 ID` | `eq`、`ne`、`in`、`*` | `{"user_id": "user_123"}` |
+| `agent_id` | `eq`、`ne`、`in`、`*` | `{"agent_id": "*"}` |
+| `app_id` | `eq`、`ne`、`in`、`*` | `{"app_id": {"in": ["app1", "app2"]}}` |
+| `run_id` | `eq`、`ne`、`in`、`*` | `{"run_id": "*"}` |
 
-### Entity fields
-| Field | Operators | Example |
-|-------|-----------|---------|
-| `user_id` | `eq`, `ne`, `in`, `*` | `{"user_id": "user_123"}` |
-| `agent_id` | `eq`, `ne`, `in`, `*` | `{"agent_id": "*"}` |
-| `app_id` | `eq`, `ne`, `in`, `*` | `{"app_id": {"in": ["app1", "app2"]}}` |
-| `run_id` | `eq`, `ne`, `in`, `*` | `{"run_id": "*"}` |
+### 时间字段
+|领域|运营商|示例|
+|--------|------------|---------|
+| `创建于` | `gt`、`gte`、`lt`、`lte`、`eq`、`ne` | `{"created_at": {"gte": "2024-01-01"}}` |
+| `updated_at` | `gt`、`gte`、`lt`、`lte`、`eq`、`ne` | `{"updated_at": {"lt": "2024-12-31"}}` |
+| `时间戳` | `gt`、`gte`、`lt`、`lte`、`eq`、`ne` | `{"timestamp": {"gt": "2024-01-01"}}` |
 
-### Time fields
-| Field | Operators | Example |
-|-------|-----------|---------|
-| `created_at` | `gt`, `gte`, `lt`, `lte`, `eq`, `ne` | `{"created_at": {"gte": "2024-01-01"}}` |
-| `updated_at` | `gt`, `gte`, `lt`, `lte`, `eq`, `ne` | `{"updated_at": {"lt": "2024-12-31"}}` |
-| `timestamp` | `gt`, `gte`, `lt`, `lte`, `eq`, `ne` | `{"timestamp": {"gt": "2024-01-01"}}` |
-
-### Content fields
-| Field | Operators | Example |
-|-------|-----------|---------|
-| `categories` | `eq`, `ne`, `in`, `contains` | `{"categories": {"in": ["finance"]}}` |
-| `metadata` | `eq`, `ne`, `contains` | `{"metadata": {"key": "value"}}` |
-| `keywords` | `contains`, `icontains` | `{"keywords": {"icontains": "invoice"}}` |
-
-### Special fields
-| Field | Operators | Example |
-|-------|-----------|---------|
-| `memory_ids` | `in` | `{"memory_ids": ["id1", "id2"]}` |
+### 内容字段
+|领域|运营商|示例|
+|--------|------------|---------|
+| `类别` | `eq`、`ne`、`in`、`包含` | `{"categories": {"in": ["finance"]}}` |
+| `元数据` | `eq`、`ne`、`包含` | `{"元数据": {"键": "值"}}` |
+| `关键字` | `包含`、`图标` | `{"keywords": {"icontains": "发票"}}` |### 特殊字段
+|领域|运营商|示例|
+|--------|------------|---------|
+| `内存_id` | `在` | `{"memory_ids": ["id1", "id2"]}` |
 
 <Callout type="warning" icon="exclamation-triangle" color="#F7B731">
-The `*` wildcard matches any non-null value. Records with null values for that field are excluded.
-</Callout>
+“*”通配符匹配任何非空值。该字段具有空值的记录将被排除。
+</标注>
 
-<Callout type="info" icon="keyboard" color="#00A8FF">
-Use operator keywords exactly as shown (`eq`, `ne`, `gte`, etc.). SQL-style symbols such as `>=` or `!=` are rejected by the Platform API.
-</Callout>
+<标注类型=“信息”图标=“键盘”颜色=“#00A8FF”>
+完全按照所示使用运算符关键字（“eq”、“ne”、“gte”等）。平台 API 会拒绝诸如“>=”或“!=”之类的 SQL 样式符号。
+</标注>
 
-## Common filter patterns
+## 常见的过滤模式
 
-Use these ready-made filters to target typical retrieval scenarios without rebuilding logic from scratch.
+使用这些现成的过滤器来定位典型的检索场景，而无需从头开始重建逻辑。
 
-<AccordionGroup>
-  <Accordion title="Single user">
-    ```python
+<手风琴组>
+  <Accordion title="单用户">    ```python
     # Narrow to one user's memories
     filters = {"AND": [{"user_id": "user_123"}]}
     memories = client.get_all(filters=filters)
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="All users">
-    ```python
+  <Accordion title="所有用户">    ```python
     # Wildcard skips null user_id entries
     filters = {"AND": [{"user_id": "*"}]}
     memories = client.get_all(filters=filters)
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="User across all runs">
-    ```python
+  <Accordion title="所有运行中的用户">    ```python
     # Pair a user filter with a run wildcard
     filters = {
         "AND": [
@@ -98,14 +94,12 @@ Use these ready-made filters to target typical retrieval scenarios without rebui
     }
     memories = client.get_all(filters=filters)
     ```
-  </Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
 <Callout type="warning" icon="exclamation-triangle" color="#E74C3C">
-Metadata filters only support bare values/`eq`, `contains`, and `ne`. Operators such as `in`, `gt`, or `lt` trigger a `FilterValidationError`. For multi-value checks, wrap multiple equality clauses in `OR`.
-</Callout>
-
-```python
+元数据过滤器仅支持裸值/`eq`、`contains` 和 `ne`。 “in”、“gt”或“lt”等运算符会触发“FilterValidationError”。对于多值检查，请将多个相等子句包装在“OR”中。
+</标注>```python
 # Multi-value metadata workaround
 filters = {
     "OR": [
@@ -114,14 +108,12 @@ filters = {
     ]
 }
 ```
+### 内容搜索
 
-### Content search
+查找包含特定文本、类别或元数据值的记忆。
 
-Find memories containing specific text, categories, or metadata values.
-
-<AccordionGroup>
-  <Accordion title="Text search">
-    ```python
+<手风琴组>
+  <手风琴标题=“文本搜索”>    ```python
     # Case-insensitive match
     filters = {
         "AND": [
@@ -138,10 +130,9 @@ Find memories containing specific text, categories, or metadata values.
         ]
     }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Categories">
-    ```python
+  <手风琴标题=“类别”>    ```python
     # Match against category list
     filters = {
         "AND": [
@@ -158,10 +149,9 @@ Find memories containing specific text, categories, or metadata values.
         ]
     }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Metadata">
-    ```python
+  <手风琴标题=“元数据”>    ```python
     # Pin to a metadata attribute
     filters = {
         "AND": [
@@ -170,16 +160,15 @@ Find memories containing specific text, categories, or metadata values.
         ]
     }
     ```
-  </Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
-### Time-based filtering
+### 基于时间的过滤
 
-Retrieve memories within specific date ranges using time operators.
+使用时间运算符检索特定日期范围内的记忆。
 
-<AccordionGroup>
-  <Accordion title="Date range">
-    ```python
+<手风琴组>
+  <Accordion title="日期范围">    ```python
     # Created in January 2024
     filters = {
         "AND": [
@@ -197,16 +186,15 @@ Retrieve memories within specific date ranges using time operators.
         ]
     }
     ```
-  </Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
-### Multiple criteria
+### 多个条件
 
-Combine various filters for complex queries across different dimensions.
+组合各种过滤器以实现跨不同维度的复杂查询。
 
-<AccordionGroup>
-  <Accordion title="Multiple users">
-    ```python
+<手风琴组>
+  <Accordion title="多个用户">    ```python
     # Expand scope to a short user list
     filters = {
         "AND": [
@@ -214,10 +202,9 @@ Combine various filters for complex queries across different dimensions.
         ]
     }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="OR logic">
-    ```python
+  <手风琴标题=“或逻辑”>    ```python
     # Return matches on either condition
     filters = {
         "OR": [
@@ -226,10 +213,9 @@ Combine various filters for complex queries across different dimensions.
         ]
     }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Exclude categories">
-    ```python
+  <Accordion title="排除类别">    ```python
     # Wrap negative logic with NOT
     filters = {
         "AND": [
@@ -240,10 +226,9 @@ Combine various filters for complex queries across different dimensions.
         ]
     }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Specific memory IDs">
-    ```python
+  <Accordion title="特定内存 ID">    ```python
     # Fetch a fixed set of memory IDs
     filters = {
         "AND": [
@@ -252,10 +237,9 @@ Combine various filters for complex queries across different dimensions.
         ]
     }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="All entities populated (single entity scope)">
-    ```python
+  <Accordion title="填充的所有实体（单个实体范围）">    ```python
     # Require user_id plus non-null run/app IDs
     # (Memories are stored separately per entity, so scope one dimension at a time.)
     filters = {
@@ -266,16 +250,15 @@ Combine various filters for complex queries across different dimensions.
         ]
     }
     ```
-  </Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
-## Advanced examples
+## 高级示例
 
-Level up foundational patterns with compound filters that coordinate entity scope, tighten time windows, and weave in exclusion rules for high-precision retrievals.
+使用复合过滤器升级基础模式，协调实体范围、收紧时间窗口并编织排除规则以实现高精度检索。
 
-<AccordionGroup>
-  <Accordion title="Multi-dimensional filtering">
-    ```python
+<手风琴组>
+  <Accordion title="多维过滤">    ```python
     # Invoice memories in Q1 2024
     filters = {
         "AND": [
@@ -287,10 +270,9 @@ Level up foundational patterns with compound filters that coordinate entity scop
         ]
     }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Entity-specific retrieval">
-    ```python
+  <Accordion title="实体特定检索">    ```python
     # Query agent scope on its own
     filters = {
         "AND": [
@@ -306,10 +288,9 @@ Level up foundational patterns with compound filters that coordinate entity scop
         ]
     }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Nested NOT/OR logic">
-    ```python
+  <Accordion title="嵌套非/或逻辑">    ```python
     # User memories from 2024, excluding spam and test
     filters = {
         "AND": [
@@ -324,95 +305,90 @@ Level up foundational patterns with compound filters that coordinate entity scop
         ]
     }
     ```
-  </Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
-## Best practices
-
-<Callout type="tip" icon="lightbulb" color="#26A17B">
-The root must be `AND`, `OR`, or `NOT` with an array of conditions.
-</Callout>
+## 最佳实践
 
 <Callout type="tip" icon="lightbulb" color="#26A17B">
-Use `"*"` to match any non-null value for a field.
-</Callout>
+根必须是带有一系列条件的“AND”、“OR”或“NOT”。
+</标注>
+
+<Callout type="tip" icon="lightbulb" color="#26A17B">
+使用“*”来匹配字段的任何非空值。
+</标注>
 
 <Callout type="warning" icon="exclamation-triangle" color="#E74C3C">
-Memories are stored per-entity (user, agent, app, run). Combining `user_id` **and** `agent_id` in the same `AND` clause returns no results because no record contains both values at once. Query one entity scope at a time or use `OR` logic for parallel lookups.
-</Callout>
+内存按实体（用户、代理、应用程序、运行）存储。在同一个“AND”子句中组合“user_id”**和**“agent_id”不会返回任何结果，因为没有记录同时包含这两个值。一次查询一个实体范围或使用“OR”逻辑进行并行查找。
+</标注>
 
-## Troubleshooting
+## 故障排除
 
-<AccordionGroup>
-  <Accordion title="Missing results with agent_id">
-    **Problem**: Filtered by `user_id` but don't see agent memories.
+<手风琴组>
+  <Accordion title="缺少带有 agent_id 的结果">
+    **问题**：按“user_id”过滤，但看不到代理记忆。
 
-    **Solution**: User and agent memories are stored as separate records. Use OR to query both scopes:
-    ```python
+    **解决方案**：用户和代理记忆作为单独的记录存储。使用 OR 查询两个范围：    ```python
     {"OR": [{"user_id": "user_123"}, {"agent_id": "agent_name"}]}
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="ne operator returns too much">
-    **Problem**: `ne` comparison pulls in records with null values.
+  <Accordion title="ne 运算符返回太多">
+    **问题**：“ne”比较会拉入具有空值的记录。
 
-    **Solution**: Pair `ne` with a wildcard guard:
-    ```python
+    **解决方案**：将 `ne` 与通配符防护配对：    ```python
     {"AND": [{"agent_id": "*"}, {"agent_id": {"ne": "old_agent"}}]}
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Case-insensitive search">
-    **Solution**: Swap to `icontains` to normalize casing.
-  </Accordion>
+  <Accordion title="不区分大小写的搜索">
+    **解决方案**：交换到“icontains”以标准化大小写。
+  </手风琴>
 
-  <Accordion title="Date range between two dates">
-    **Solution**: Use `gte` for the start and `lt` for the end boundary:
-    ```python
+  <Accordion title="两个日期之间的日期范围">
+    **解决方案**：使用 `gte` 作为开始边界，使用 `lt` 作为结束边界：    ```python
     {"AND": [
         {"created_at": {"gte": "2024-01-01"}},
         {"created_at": {"lt": "2024-02-01"}}
     ]}
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Metadata filter not working">
-  **Solution**: Match top-level metadata keys exactly:
-  ```python
+  <Accordion title="元数据过滤器不起作用">
+  **解决方案**：完全匹配顶级元数据键：  ```python
   {"metadata": {"source": "email"}}
   ```
-</Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
-## FAQ
+## 常见问题解答
 
-<AccordionGroup>
-  <Accordion title="Do I need AND/OR/NOT?">
-    Yes. The root must be a logical operator with an array.
-  </Accordion>
+<手风琴组>
+  <Accordion title="我需要和/或/不需要吗？">
+    是的。根必须是带有数组的逻辑运算符。
+  </手风琴>
 
-  <Accordion title="What does * match?">
-    Any non-null value. Nulls are excluded.
-  </Accordion>
+  <Accordion title="* 匹配什么？">
+    任何非空值。排除空值。
+  </手风琴>
 
-  <Accordion title="Why use wildcards?">
-    Unspecified fields default to NULL. Use `"*"` to include non-null values.
-  </Accordion>
+  <Accordion title="为什么使用通配符？">
+    未指定的字段默认为 NULL。使用“*”来包含非空值。
+  </手风琴>
 
-  <Accordion title="Is = required?">
-    No. Equality is the default: `{"user_id": "u1"}` works.
-  </Accordion>
+  <Accordion title="= 是必需的吗？">
+    不。平等是默认设置：`{"user_id": "u1"}` 有效。
+  </手风琴>
 
-  <Accordion title="Can I filter nested metadata?">
-    Only top-level keys are supported.
-  </Accordion>
+  <Accordion title="我可以过滤嵌套元数据吗？">
+    仅支持顶级密钥。
+  </手风琴>
 
-  <Accordion title="How to search text?">
-    Use `keywords` with `contains` (case-sensitive) or `icontains` (case-insensitive).
-  </Accordion>
+  <Accordion title="如何搜索文本？">
+    将“keywords”与“contains”（区分大小写）或“icontains”（不区分大小写）结合使用。
+  </手风琴>
 
-<Accordion title="Can I nest AND/OR?">
-    ```python
+<Accordion title="我可以嵌套 AND/OR 吗？">    ```python
     {
         "AND": [
             {"user_id": "user_123"},
@@ -423,11 +399,11 @@ Memories are stored per-entity (user, agent, app, run). Combining `user_id` **an
         ]
     }
     ```
-  </Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
-## Known limitations
+## 已知限制
 
-- Entity filters operate on a single scope per record. Use separate queries or `OR` logic to compare users vs agents.
-- Metadata supports only bare/`eq`, `contains`, and `ne` comparisons.
-- Wildcards (`"*"` ) match only records where the field is already non-null.
+- 实体过滤器对每个记录的单个范围进行操作。使用单独的查询或“OR”逻辑来比较用户与代理。
+- 元数据仅支持裸/`eq`、`contains` 和 `ne` 比较。
+- 通配符 (`"*"` ) 仅匹配字段已非空的记录。

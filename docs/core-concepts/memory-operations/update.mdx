@@ -5,44 +5,44 @@ icon: "pen-to-square"
 iconType: "solid"
 ---
 
-# Keep Memories Accurate with Update
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0’s update operation lets you fix or enrich an existing memory without deleting it. When a user changes their preference or clarifies a fact, use update to keep the knowledge base fresh.
 
-<Info>
-  **Why it matters**
-  - Corrects outdated or incorrect memories immediately.
-  - Adds new metadata so filters and rerankers stay sharp.
-  - Works for both one-off edits and large batches (up to 1000 memories).
-</Info>
 
-## Key terms
+# 通过更新保持记忆准确
 
-- **memory_id** – Unique identifier returned by `add` or `search` results.
-- **text** / **data** – New content that replaces the stored memory value.
-- **metadata** – Optional key-value pairs you update alongside the text.
-- **timestamp** – Unix epoch (int/float) or ISO 8601 string to override the memory's timestamp.
-- **batch_update** – Platform API that edits multiple memories in a single request.
-- **immutable** – Flagged memories that must be deleted and re-added instead of updated.
+Mem0 的更新操作可让您修复或丰富现有内存，而无需删除它。当用户改变他们的偏好或澄清事实时，使用更新来保持知识库最新。
 
-## How the update flow works
+<信息>
+  **为什么重要**
+  - 立即纠正过时或不正确的记忆。
+  - 添加新的元数据，以便过滤器和重新排序器保持清晰。
+  - 适用于一次性编辑和大批量（最多 1000 个内存）。
+</信息>
 
-<Steps>
-<Step title="Locate the memory">
-Use `search` or dashboard inspection to capture the `memory_id` you want to change.
-</Step>
-<Step title="Submit the update">
-Call `update` (or `batch_update`) with new text and optional metadata. Mem0 overwrites the stored value and adjusts indexes.
-</Step>
-<Step title="Verify">
-Check the response or re-run `search` to ensure the revised memory appears with the new content.
-</Step>
-</Steps>
+## 关键术语
 
-## Single memory update (Platform)
+- **memory_id** – `add` 或 `search` 结果返回的唯一标识符。
+- **文本** / **数据** – 替换存储内存值的新内容。
+- **元数据** – 您与文本一起更新的可选键值对。
+- **timestamp** – Unix 纪元（int/float）或 ISO 8601 字符串来覆盖内存的时间戳。
+- **batch_update** – 在单个请求中编辑多个内存的平台 API。- **不可变** – 必须删除并重新添加而不是更新的标记记忆。
 
-<CodeGroup>
-```python Python
+## 更新流程如何工作<步骤>
+<Step title="找到内存">
+使用“搜索”或仪表板检查来捕获要更改的“memory_id”。
+</步骤>
+<步骤标题=“提交更新”>
+使用新文本和可选元数据调用“update”（或“batch_update”）。 Mem0 覆盖存储的值并调整索引。
+</步骤>
+<步骤标题=“验证”>
+检查响应或重新运行“搜索”以确保修改后的内存与新内容一起出现。
+</步骤>
+</步骤>
+
+## 单次内存更新（平台）
+
+<代码组>```python Python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your-api-key")
@@ -68,18 +68,17 @@ await client.update(memory_id, {
   timestamp: "2025-01-15T12:00:00Z"
 });
 ```
-</CodeGroup>
+</代码组>
 
-<Info icon="check">
-  Expect a confirmation message and the updated memory to appear in the dashboard almost instantly.
-</Info>
+<信息图标=“检查”>
+  预计确认消息和更新的内存几乎会立即出现在仪表板上。
+</信息>
 
-## Batch update (Platform)
+## 批量更新（平台）
 
-Update up to 1000 memories in one call.
+一次通话最多可更新 1000 个记忆。
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your-api-key")
@@ -107,12 +106,11 @@ client.batchUpdate(updateMemories)
   .then(response => console.log('Batch update response:', response))
   .catch(error => console.error(error));
 ```
-</CodeGroup>
+</代码组>
 
-## Update with Mem0 OSS
+## 使用 Mem0 OSS 进行更新
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 from mem0 import Memory
 
 memory = Memory()
@@ -124,55 +122,53 @@ memory.update(
 ```
 ```
 ```
-</CodeGroup>
+</代码组>
 
-<Note>
-  OSS JavaScript SDK does not expose `update` yet—use the REST API or Python SDK when self-hosting.
-</Note>
+<注意>
+  OSS JavaScript SDK 尚未公开“更新”——自托管时使用 REST API 或 Python SDK。
+</注>
 
-## Tips
+## 提示
 
-- Update both `text` **and** `metadata` together to keep filters accurate.
-- Batch updates are ideal after large imports or when syncing CRM corrections.
-- Immutable memories must be deleted and re-added instead of updated.
-- Pair updates with feedback signals (thumbs up/down) to self-heal memories automatically.
+- 一起更新“文本”**和**“元数据”以保持过滤器准确。
+- 批量更新是大量导入后或同步 CRM 更正时的理想选择。
+- 不可变的记忆必须被删除并重新添加而不是更新。
+- 将更新与反馈信号（赞成/反对）配对，以自动自我修复记忆。
 
 <Callout type="tip" icon="plug">
-  **MCP Alternative**: With <Link href="/platform/mem0-mcp">Mem0 MCP</Link>, AI agents can update their own memories when users correct information.
-</Callout>
+  **MCP 替代方案**：通过 <Link href="/platform/mem0-mcp">Mem0 MCP</Link>，AI 代理可以在用户更正信息时更新自己的记忆。
+</标注>
 
-## Managed vs OSS differences
+## 托管与 OSS 的差异
 
-| Capability | Mem0 Platform | Mem0 OSS |
-| --- | --- | --- |
-| Update call | `client.update(memory_id, {...})` | `memory.update(memory_id, data=...)` |
-| Batch updates | `client.batch_update` (up to 1000 memories) | Script your own loop or bulk job |
-| Dashboard visibility | Inspect updates in the UI | Inspect via logs or custom tooling |
-| Immutable handling | Returns descriptive error | Raises exception—delete and re-add |
+|能力| Mem0平台|内存0 OSS |
+| ---| ---| ---|
+|更新通话 | `client.update(memory_id, {...})` | `内存.更新（内存_id，数据= ...）` |
+|批量更新| `客户。batch_update`（最多 1000 个内存）|编写您自己的循环或批量作业脚本 |
+|仪表板可视性 |检查 UI 中的更新 |通过日志或自定义工具检查 |
+|不可变的处理 |返回描述性错误 |引发异常——删除并重新添加|
 
-## Put it into practice
+## 付诸实践- 查看<Link href="/api-reference/memory/update-memory">更新内存 API 参考</Link>以获取请求/响应详细信息。
+- 将更新与<Link href="/platform/features/feedback-mechanism">反馈机制</Link>相结合以自动更正。
 
-- Review the <Link href="/api-reference/memory/update-memory">Update Memory API reference</Link> for request/response details.
-- Combine updates with <Link href="/platform/features/feedback-mechanism">Feedback Mechanism</Link> to automate corrections.
+## 现场观看
 
-## See it live
+- <Link href="/cookbooks/operations/support-inbox">Support Inbox with Mem0</Link> 使用更新来完善客户资料。
+- <Link href="/cookbooks/companions/ai-tutor">AI Tutor with Mem0</Link> 演示用户偏好中途修正。
 
-- <Link href="/cookbooks/operations/support-inbox">Support Inbox with Mem0</Link> uses updates to refine customer profiles.
-- <Link href="/cookbooks/companions/ai-tutor">AI Tutor with Mem0</Link> demonstrates user preference corrections mid-course.
+{/* DEBUG：验证 CTA 目标 */}
 
-{/* DEBUG: verify CTA targets */}
-
-<CardGroup cols={2}>
-  <Card
-    title="Learn Delete Concepts"
-    description="Understand when to remove memories instead of editing them."
-    icon="trash"
-    href="/core-concepts/memory-operations/delete"
+<卡组列={2}>
+  <卡片
+    title="学习删除概念"
+    描述=“了解何时删除记忆而不是编辑它们。”
+    图标=“垃圾桶”
+    href="/core-concepts/内存操作/删除"
   />
-  <Card
-    title="Automate Corrections"
-    description="See how feedback loops trigger updates in production."
-    icon="rocket"
+  <卡片
+    title="自动更正"
+    描述=“了解反馈循环如何触发生产中的更新。”
+    图标=“火箭”
     href="/platform/features/feedback-mechanism"
   />
-</CardGroup>
+</卡组>

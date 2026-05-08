@@ -3,25 +3,28 @@ title: Advanced Retrieval
 description: "Advanced memory search with intelligent reranking for precise results"
 ---
 
-## What is Advanced Retrieval?
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Advanced Retrieval gives you precise control over how memories are found and ranked. While basic search uses semantic similarity, these advanced options help you find exactly what you need, when you need it.
 
-## Search Enhancement Options
 
-### Reranking
+## 什么是高级检索？
 
-Reorders results using deep semantic understanding to put the most relevant memories first.
+高级检索使您能够精确控制如何查找和排序记忆。虽然基本搜索使用语义相似性，但这些高级选项可帮助您在需要时准确找到所需内容。
 
-<Tabs>
-  <Tab title="When to Use">
-- Need the most relevant result at the top
-- Result order is critical for your application
-- Want consistent quality across different queries
-- Building user-facing features where accuracy matters
-</Tab>
-<Tab title="How it Works">
-```python Python
+## 搜索增强选项
+
+### 重新排名
+
+使用深度语义理解对结果重新排序，将最相关的记忆放在第一位。
+
+<标签>
+  <Tab title="何时使用">
+- 需要将最相关的结果放在顶部
+- 结果顺序对于您的应用至关重要
+- 希望不同查询的质量保持一致
+- 构建面向用户的功能，其中准确性很重要
+</标签>
+<标签标题=“它是如何工作的”>```python Python
 # Get the most relevant travel plans first
 results = client.search(
     query="What are my upcoming travel plans?",
@@ -34,20 +37,19 @@ results = client.search(
 # 2. "Tokyo trip next" →   2. "Need to book hotel in Tokyo"  
 # 3. "Need hotel"      →   3. "Went to Paris last year"
 ```
-</Tab>
-<Tab title="Performance">
-- **Latency**: 150-200ms additional
-- **Accuracy**: Significantly improved
-- **Ordering**: Much more relevant
-- **Best for**: Top-N precision, user-facing results
-</Tab>
-</Tabs>
+</标签>
+<选项卡标题=“性能”>
+- **延迟**：额外 150-200 毫秒
+- **准确性**：显着提高
+- **排序**：更相关
+- **最适合**：Top-N 精度、面向用户的结果
+</标签>
+</标签>
 
-## Real-World Use Cases
+## 实际用例
 
-<Tabs>
-<Tab title="Personal AI Assistant">
-```python Python
+<标签>
+<Tab title="个人人工智能助理">```python Python
 # Smart home assistant finding device preferences
 results = client.search(
     query="How do I like my bedroom temperature?",
@@ -57,9 +59,8 @@ results = client.search(
 
 # Finds: "Keep bedroom at 68°F", "Too cold last night at 65°F", etc.
 ```
-</Tab>
-<Tab title="Customer Support">
-```python Python
+</标签>
+<标签标题=“客户支持”>```python Python
 # Find specific product issues with high precision
 results = client.search(
     query="Problems with premium subscription billing",
@@ -68,9 +69,8 @@ results = client.search(
 
 # Returns only relevant billing problems, not general questions
 ```
-</Tab>
-<Tab title="Healthcare AI">
-```python Python
+</标签>
+<标签标题=“医疗保健人工智能”>```python Python
 # Critical medical information needs perfect accuracy
 results = client.search(
     query="Patient allergies and contraindications",
@@ -80,9 +80,8 @@ results = client.search(
 
 # Ensures critical allergy info appears first
 ```
-</Tab>
-<Tab title="Learning Platform">
-```python Python
+</标签>
+<Tab title="学习平台">```python Python
 # Find learning progress for specific topics
 results = client.search(
     query="Python programming progress and difficulties",
@@ -92,15 +91,14 @@ results = client.search(
 
 # Gets comprehensive view of Python learning journey
 ```
-</Tab>
-</Tabs>
+</标签>
+</标签>
 
-## Choosing the Right Configuration
+## 选择正确的配置
 
-### Recommended Configurations
+### 推荐配置
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 # Basic search - good for exploration
 def quick_search(query, user_id):
     return client.search(
@@ -149,28 +147,26 @@ function preciseSearch(query, userId) {
     });
 }
 ```
-</CodeGroup>
+</代码组>
 
-## Best Practices
+## 最佳实践
 
-### Do
+### 做
 
-- Start simple with basic search and measure impact before enabling reranking
-- Use reranking when the top result quality matters most
-- Monitor latency and adjust based on your application's needs
-- Handle empty results gracefully
+- 从基本搜索开始简单并衡量影响，然后再启用重新排名
+- 当最高结果质量最重要时使用重新排名
+- 监控延迟并根据应用程序的需求进行调整
+- 优雅地处理空结果
 
-### Don't
+### 不要
 
-- Enable reranking by default without measuring necessity
-- Ignore latency impact in real-time applications
-- Use advanced retrieval for simple, fast lookup scenarios
+- 默认情况下启用重新排名，无需衡量必要性
+- 忽略实时应用程序中的延迟影响
+- 使用高级检索来实现简单、快速的查找场景
 
-## Performance Guidelines
+## 性能指南
 
-### Latency Expectations
-
-```python Python
+### 延迟预期```python Python
 # Performance monitoring example
 import time
 
@@ -183,12 +179,11 @@ results = client.search(
 latency = time.time() - start_time
 print(f"Search completed in {latency:.2f}s")
 ```
+### 优化技巧
 
-### Optimization Tips
+1. **缓存频繁查询**以避免重复的高级处理
+2. **使用特定于会话的搜索**和`run_id`来减少搜索空间
+3. **当搜索返回空结果时实施回退逻辑**
+4. **监视并警告**搜索延迟模式
 
-1. **Cache frequent queries** to avoid repeated advanced processing
-2. **Use session-specific search** with `run_id` to reduce search space
-3. **Implement fallback logic** when search returns empty results
-4. **Monitor and alert** on search latency patterns
-
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

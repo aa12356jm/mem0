@@ -5,82 +5,74 @@ icon: "arrow-right"
 iconType: "solid"
 ---
 
-<Warning>
-**Breaking changes ahead.** This release includes renamed parameters, removed parameters, changed defaults, and a fundamentally different extraction model. Read this guide before upgrading.
-</Warning>
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-The new Mem0 release redesigns both extraction and retrieval, and cleans up the SDK surface across Python and TypeScript:
 
-- **Extraction**: Single-pass ADD-only (one LLM call, no UPDATE/DELETE)
-- **Retrieval**: Multi-signal hybrid search (semantic + BM25 keyword + entity matching)
-- **Entity linking**: Automatic entity extraction and cross-memory linking
-- **SDK cleanup**: Deprecated parameters removed, naming conventions standardized
-- **API surface aligned with Platform**: Entity IDs now follow the same convention across OSS and Platform — top-level kwargs for `add()` / `delete_all()`, inside `filters` for `search()` / `get_all()`
+<警告>
+**未来的重大更改。**此版本包括重命名的参数、删除的参数、更改的默认值以及根本不同的提取模型。升级前请阅读本指南。</警告>
 
-These changes produce a **+20 point improvement on LoCoMo** (71.4 → 91.6) and **+26 point improvement on LongMemEval** (67.8 → 93.4), while cutting extraction latency roughly in half.
+## 概述
 
-## Breaking Changes
+新的 Mem0 版本重新设计了提取和检索，并清理了 Python 和 TypeScript 的 SDK 表面：
 
-### Python Open Source
+- **提取**：单次仅添加（一次 LLM 调用，无更新/删除）
+- **检索**：多信号混合搜索（语义+BM25关键词+实体匹配）
+- **实体链接**：自动实体提取和跨内存链接
+- **SDK清理**：删除不推荐使用的参数，标准化命名约定
+- **API 表面与平台一致**：实体 ID 现在在 OSS 和平台上遵循相同的约定 - 顶级 kwargs 用于“add()”/“delete_all()”，在“filters”内用于“search()”/“get_all()”
 
-| Change | Old | New | Migration |
+这些变化使 LoCoMo** (71.4 → 91.6) 提高了 **+20 点，对 LongMemEval** (67.8 → 93.4) 提高了 **+26 点，同时将提取延迟大约减少了一半。
+
+## 重大变更
+
+### Python 开源|改变 |旧|新 |移民|
 |---|---|---|---|
-| `search()` / `get_all()` entity IDs | Top-level kwargs (`user_id="..."`) | Inside `filters` dict | `m.search("q", filters={"user_id": "..."})` — top-level kwargs now raise `ValueError` |
-| `top_k` default | `100` | `20` | Pass `top_k=100` explicitly to restore |
-| `threshold` default | `None` (no filtering) | `0.1` (filters low-relevance) | Pass `threshold=0.0` for old behavior |
-| `threshold` validation | Any float | Must be in `[0, 1]` | Out-of-range values now raise `ValueError` |
-| `rerank` default | `True` | `False` | Pass `rerank=True` to restore |
-| Entity ID validation | Accepted any string | Trimmed; empty / whitespace-only rejected (`ValueError`) | Pass a non-empty identifier without internal spaces |
-| `messages` in `add()` | Could be `None` | Must be `str` / `dict` / `list[dict]` — other types raise `Mem0ValidationError` (code `VALIDATION_003`) | Always pass a string, dict, or list of messages |
-| `add()` events | Returns `ADD`, `UPDATE`, `DELETE` | Returns `ADD` only | Update code expecting UPDATE/DELETE |
-| Custom extraction prompt | `custom_fact_extraction_prompt` | `custom_instructions` | Rename in config |
-| Custom update prompt | `custom_update_memory_prompt` | Deprecated | Use `custom_instructions` instead |
-| Graph memory | `enable_graph` + `graph_store` in config | Removed | Graph store support has been removed entirely |
-| Qdrant client | `>=1.9.1` | `>=1.12.0` | Update dependency |
-| Upstash client | `>=0.1.0` | `>=0.6.0` | Update dependency |
-
-### TypeScript Open Source
-
-| Change | Old | New | Migration |
+| `search()` / `get_all()` 实体 ID |顶级 kwargs (`user_id="..."`) |在 `filters` 字典中 | `m.search("q",filters={"user_id": "..."})` — 顶级 kwargs 现在引发 `ValueError` |
+| `top_k` 默认 | `100` | `20` |显式传递 `top_k=100` 来恢复 |
+| `阈值` 默认 | `无`（无过滤）| `0.1`（过滤低相关性）|为旧行为传递“threshold=0.0” |
+| “阈值”验证 |任意浮动 |必须位于 `[0, 1]` | 中超出范围的值现在会引发 `ValueError` |
+| `rerank` 默认值 | '真实' | ‘假’|通过 `rerank=True` 来恢复 |
+|实体 ID 验证 |接受任何字符串 |修剪；空/仅空白被拒绝（`ValueError`）|传递一个不带内部空格的非空标识符 |
+| `add()` 中的 `messages` |可能是“无” |必须是 `str` / `dict` / `list[dict]` — 其他类型引发 `Mem0ValidationError` (代码 `VALIDATION_003`) |始终传递字符串、字典或消息列表 |
+| `add()` 事件 |返回`ADD`、`UPDATE`、`DELETE` |仅返回“ADD” |更新代码期待更新/删除 |
+|自定义提取提示| `custom_fact_extraction_prompt` | `自定义说明` |在配置中重命名 |
+|自定义更新提示| `自定义_更新_内存_提示` |已弃用 |使用 `custom_instructions` 代替 |
+|图形存储器|配置中的`enable_graph` + `graph_store`已删除 |图形存储支持已被完全删除 |
+| Qdrant 客户端 | `>=1.9.1` | `>=1.12.0` |更新依赖|
+| Upstash 客户端 | `>=0.1.0` | `>=0.6.0` |更新依赖|### TypeScript 开源|改变 |旧|新 |移民|
 |---|---|---|---|
-| Search parameter | `search(query, { limit: 10 })` | `search(query, { topK: 10 })` | Rename `limit` → `topK` |
-| `topK` default | `100` | `20` | Pass `topK: 100` explicitly to restore |
-| `search()` / `getAll()` entity IDs | Top-level options (`userId: "..."`) | Inside `filters` object | `m.search("q", { filters: { userId: "..." } })` |
-| `threshold` validation | Any number | Must be in `[0, 1]` | Out-of-range values now throw |
-| Entity ID validation | Any string | Trimmed; empty / whitespace-only rejected | Pass non-empty identifiers without internal spaces |
-| `messages` in `add()` | Could be `null` / `undefined` | Required — throws on null/undefined | Always pass a string or array |
-| Payload key for lemmatized text | `text_lemmatized` (snake_case) | `textLemmatized` (camelCase) | TS-only internal field. If you share a vector store collection between Python and TS SDKs, lemma-based BM25 will not resolve across languages — keep collections language-scoped. |
-| Custom prompt | `customPrompt` | `customInstructions` | Rename in config |
-| Graph memory | `enableGraph` + `graphStore` in config | Removed | Graph store support has been removed entirely |
-| Default graph config | Neo4j default config applied | No default graph config | Graph store config is no longer used |
+|搜索参数| `搜索（查询，{限制：10}）` | `搜索（查询，{ topK：10 }）` |重命名 `limit` → `topK` |
+| `topK` 默认 | `100` | `20` |显式传递 `topK: 100` 来恢复 |
+| `search()` / `getAll()` 实体 ID |顶级选项 (`userId: "..."`) |在“filters”对象内部 | `m.search("q", { 过滤器: { userId: "..." } })` |
+| “阈值”验证 |任意数量|必须位于 `[0, 1]` | 中超出范围的值现在会抛出 |
+|实体 ID 验证 |任何字符串 |修剪；空/仅限空白被拒绝 |传递不带内部空格的非空标识符 |
+| `add()` 中的 `messages` |可能是“null”/“undefined” |必需 — 抛出空/未定义 |始终传递字符串或数组 |
+|词形还原文本的有效负载密钥 | `text_lemmatized` (snake_case) | `text_lemmatized` (snake_case) | `文本词形还原`（驼峰式）|仅 TS 内部字段。如果您在 Python 和 TS SDK 之间共享矢量存储集合，基于引理的 BM25 将无法跨语言解析 - 保持集合的语言范围。 |
+|自定义提示| `自定义提示` | `自定义说明` |在配置中重命名 |
+|图形存储器|配置中的 `enableGraph` + `graphStore`已删除 |图形存储支持已被完全删除 |
+|默认图形配置 | Neo4j 默认配置已应用 |没有默认的图形配置 |不再使用图形存储配置 |### Python 客户端 SDK
 
-### Python Client SDK
-
-| Change | Old | New | Migration |
+|改变 |旧|新 |移民|
 |---|---|---|---|
-| Constructor | `MemoryClient(api_key, org_id, project_id)` | `MemoryClient(api_key)` | Remove `org_id`, `project_id` from constructor |
-| Method options | `client.add(messages, **kwargs)` | `client.add(messages, options=AddMemoryOptions(...))` | Use typed option classes (or `**kwargs` still works) |
-| Removed params | `api_version`, `output_format`, `async_mode`, `filter_memories`, `expiration_date`, `keyword_search`, `force_add_only`, `batch_size`, `immutable`, `includes`, `excludes`, `enable_graph`, `org_name`, `project_name` | — | Remove from all calls |
+|构造函数| `MemoryClient（api_key，org_id，project_id）` | `MemoryClient(api_key)` |从构造函数中删除 `org_id`、`project_id` |
+|方法选项 | `client.add(消息，**kwargs)` | `client.add(消息，选项=AddMemoryOptions(...))` |使用类型化选项类（或“**kwargs”仍然有效）|
+|删除参数 | `api_version`、`output_format`、`async_mode`、`filter_memories`、`expiration_date`、`keyword_search`、`force_add_only`、`batch_size`、`immutable`、`includes`、`excludes`、`enable_graph`、`org_name`、`project_name` | — |从所有通话中删除 |
 
-### TypeScript Client SDK
-
-| Change | Old | New | Migration |
+### TypeScript 客户端 SDK|改变 |旧|新 |移民|
 |---|---|---|---|
-| Constructor | `new MemoryClient({ apiKey, organizationId, projectId })` | `new MemoryClient({ apiKey })` | Remove `organizationId`, `projectId`, `organizationName`, `projectName` |
-| All params | snake_case: `user_id`, `agent_id`, `top_k` | camelCase: `userId`, `agentId`, `topK` | Rename all params to camelCase |
-| Removed params | `api_version`, `output_format`, `async_mode`, `enable_graph`, `org_id`, `project_id`, `org_name`, `project_name`, `filter_memories`, `batch_size`, `force_add_only`, `immutable`, `expiration_date`, `includes`, `excludes`, `keyword_search` | — | Remove from all calls |
-| Output format enum | `OutputFormat.V1`, `OutputFormat.V1_1` | Removed | v1.1 is now always used |
-| API version enum | `API_VERSION.V1`, `API_VERSION.V2` | Removed | Handled internally |
+|构造函数| `new MemoryClient({ apiKey,organizationId,projectId })` | `new MemoryClient({ apiKey })` |删除 `organizationId`、`projectId`、`organizationName`、`projectName` |
+|所有参数| Snake_case：`user_id`、`agent_id`、`top_k` |驼峰命名法：`userId`、`agentId`、`topK` |将所有参数重命名为camelCase |
+|删除参数 | `api_version`、`output_format`、`async_mode`、`enable_graph`、`org_id`、`project_id`、`org_name`、`project_name`、`filter_memories`、`batch_size`、`force_add_only`、`immutable`、`expiration_date`、`includes`、`excludes`、`keyword_search` | — |从所有通话中删除 |
+|输出格式枚举| `OutputFormat.V1`、`OutputFormat.V1_1` |已删除 |现在一直使用v1.1 |
+| API 版本枚举 | `API_VERSION.V1`、`API_VERSION.V2` |已删除 |内部处理|
 
-## Step-by-Step Migration
+## 逐步迁移
 
-### 1. Update Installation
+### 1.更新安装
 
-<Tabs>
-  <Tab title="Python">
-    ```bash
+<标签>
+  <标签标题=“Python”>    ```bash
     # Basic upgrade
     pip install --upgrade mem0ai
 
@@ -91,35 +83,30 @@ These changes produce a **+20 point improvement on LoCoMo** (71.4 → 91.6) and 
     # Qdrant users: also install fastembed to enable BM25 keyword search
     pip install fastembed
     ```
-
-    <Info>
-    **Supported Python versions for `[nlp]` extras: 3.10 – 3.12.** spaCy and its `blis` / `thinc` dependencies do not yet ship prebuilt wheels for Python 3.13, so installs on 3.13 will fail at build time. Use Python 3.12 (or older) for the `[nlp]` extras until upstream support lands. The base `mem0ai` package works on all supported Python versions; only the NLP extras are constrained.
-    </Info>
-  </Tab>
-  <Tab title="TypeScript">
-    ```bash
+<信息>
+    **“[nlp]”附加功能支持的 Python 版本：3.10 – 3.12。** spaCy 及其“blis”/“thinc”依赖项尚未为 Python 3.13 提供预构建的轮子，因此在 3.13 上安装将在构建时失败。使用 Python 3.12（或更早版本）作为“[nlp]”附加功能，直到上游支持落地。基础 `mem0ai` 包适用于所有受支持的 Python 版本；只有 NLP 额外内容受到限制。
+    </信息>
+  </标签>
+  <选项卡标题=“TypeScript”>    ```bash
     npm install mem0ai@latest
     ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-<Info>
-The Python `[nlp]` extra installs [spaCy](https://spacy.io/) for entity extraction and keyword lemmatization. Without it, Mem0 still works but falls back to semantic-only search (no entity linking, no BM25 lemmatization).
-</Info>
+<信息>
+Python `[nlp]` 额外安装了 [spaCy](https://spacy.io/) 用于实体提取和关键字词形还原。没有它，Mem0 仍然可以工作，但会退回到纯语义搜索（没有实体链接，没有 BM25 词形还原）。
+</信息>
 
-<Warning>
-**Qdrant users — install `fastembed` to enable BM25 keyword search.** The Qdrant backend uses [fastembed](https://github.com/qdrant/fastembed) to encode sparse (BM25) vectors alongside dense vectors in the same collection. Without it, BM25 is silently disabled and search falls back to semantic-only — you'll see a log warning `"fastembed not installed — BM25 keyword search disabled"` on the first search call. Other vector stores use their native full-text capabilities and don't need `fastembed`.
-
-```bash
+<警告>
+**Qdrant 用户 — 安装 `fastembed` 以启用 BM25 关键字搜索。** Qdrant 后端使用 [fastembed](https://github.com/qdrant/fastembed) 对同一集合中的稀疏 (BM25) 向量和密集向量进行编码。如果没有它，BM25 将被静默禁用，搜索将退回到仅语义 — 您将在第一次搜索调用时看到一条日志警告“fastembed 未安装 — BM25 关键字搜索已禁用”。其他矢量存储使用其本机全文功能，不需要“fastembed”。```bash
 pip install fastembed
 ```
-</Warning>
+</警告>
 
-### 2. Update Configuration
+### 2.更新配置
 
-<Tabs>
-  <Tab title="Python OSS">
-    ```python
+<标签>
+  <标签标题=“Python OSS”>    ```python
     # Before
     config = {
         "custom_fact_extraction_prompt": "Focus on user preferences",  # [REMOVED] Renamed
@@ -138,9 +125,8 @@ pip install fastembed
         # enable_graph and graph_store removed — graph store support has been removed
     }
     ```
-  </Tab>
-  <Tab title="TypeScript OSS">
-    ```typescript
+</标签>
+  <标签标题=“TypeScript OSS”>    ```typescript
     // Before
     const config = {
       customPrompt: "Focus on user preferences",  // [REMOVED] Renamed
@@ -157,14 +143,13 @@ pip install fastembed
       // enableGraph and graphStore removed — graph store support has been removed
     };
     ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-### 3. Update Search Calls
+### 3. 更新搜索调用
 
-<Tabs>
-  <Tab title="Python OSS">
-    ```python
+<标签>
+  <标签标题=“Python OSS”>    ```python
     # Before — entity IDs as top-level kwargs
     results = m.search(
         "what meetings did I attend?",
@@ -185,13 +170,11 @@ pip install fastembed
     for r in results:
         print(r["score"])
     ```
-
-    <Warning>
-    Passing `user_id`, `agent_id`, or `run_id` as a top-level kwarg to `search()` or `get_all()` now raises `ValueError`. They must be inside the `filters` dict. The change aligns the OSS SDK with the Platform API contract.
-    </Warning>
-  </Tab>
-  <Tab title="TypeScript OSS">
-    ```typescript
+<警告>
+    将 `user_id`、`agent_id` 或 `run_id` 作为顶级 kwarg 传递给 `search()` 或 `get_all()` 现在会引发 `ValueError`。它们必须位于“filters”字典内。此更改使 OSS SDK 与平台 API 合约保持一致。
+    </警告>
+  </标签>
+  <标签标题=“TypeScript OSS”>    ```typescript
     // Before — entity IDs as top-level options
     const results = await m.search("what meetings did I attend?", {
       userId: "alice",
@@ -204,9 +187,8 @@ pip install fastembed
       topK: 20                        // [OK] Renamed from 'limit'
     });
     ```
-  </Tab>
-  <Tab title="Python Client SDK">
-    ```python
+</标签>
+  <选项卡标题=“Python客户端SDK”>    ```python
     from mem0 import MemoryClient
     from mem0.client.types import SearchMemoryOptions
 
@@ -224,9 +206,8 @@ pip install fastembed
         )
     )
     ```
-  </Tab>
-  <Tab title="TypeScript Client SDK">
-    ```typescript
+</标签>
+  <选项卡标题=“TypeScript 客户端 SDK”>    ```typescript
     // Before
     const client = new MemoryClient({
       apiKey: "...",
@@ -246,14 +227,13 @@ pip install fastembed
       topK: 20
     });
     ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-### 4. Update Add Calls
+### 4.更新添加通话
 
-<Tabs>
-  <Tab title="Python OSS">
-    ```python
+<标签>
+  <标签标题=“Python OSS”>    ```python
     # Before — could return ADD, UPDATE, DELETE events
     result = m.add("I love hiking and my dog's name is Max", user_id="alice")
     for item in result["results"]:
@@ -269,9 +249,8 @@ pip install fastembed
     for item in result["results"]:
         print("New memory:", item["memory"])  # Only ADD events
     ```
-  </Tab>
-  <Tab title="Python Client SDK">
-    ```python
+</标签>
+  <选项卡标题=“Python客户端SDK”>    ```python
     from mem0.client.types import AddMemoryOptions
 
     # Before
@@ -285,9 +264,8 @@ pip install fastembed
     # Or using **kwargs
     client.add(messages, user_id="alice")
     ```
-  </Tab>
-  <Tab title="TypeScript Client SDK">
-    ```typescript
+</标签>
+  <选项卡标题=“TypeScript 客户端 SDK”>    ```typescript
     // Before
     await client.add(messages, {
       user_id: "alice",       // [REMOVED] snake_case
@@ -301,61 +279,52 @@ pip install fastembed
       userId: "alice"         // [OK] camelCase
     });
     ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-<Tip>
-The ADD-only model means memories accumulate over time. When information changes, the new fact is stored alongside the old one. Retrieval handles ranking — the most relevant, current information surfaces first.
-</Tip>
+<提示>
+仅 ADD 模型意味着记忆会随着时间的推移而积累。当信息发生变化时，新事实会与旧事实一起存储。检索处理排名——最相关的、最新的信息首先出现。
+</提示>
 
-### 5. Update Vector Store Dependencies
+### 5.更新向量存储依赖项
 
-If you're using Qdrant or Upstash, update your client libraries:
-
-```bash
+如果您使用的是 Qdrant 或 Upstash，请更新您的客户端库：```bash
 # Qdrant users
 pip install "qdrant-client>=1.12.0"
 
 # Upstash users
 pip install "upstash-vector>=0.6.0"
 ```
+### 6.实体商店设置
 
-### 6. Entity Store Setup
+新算法会自动创建一个名为“{your_collection}_entities”的并行实体存储集合。无需手动设置——它是在首次使用时创建的。
 
-The new algorithm automatically creates a parallel entity store collection named `{your_collection}_entities`. No manual setup is required — it's created on first use.
+<警告>
+确保您的矢量存储用户/凭据有权创建新集合。如果您使用权限受限的托管矢量数据库，请预先创建“{collection_name}_entities”集合，其嵌入维度与主集合相同。
+</警告>
 
-<Warning>
-Make sure your vector store user/credentials have permission to create new collections. If you're using a managed vector database with restricted permissions, pre-create the `{collection_name}_entities` collection with the same embedding dimensions as your main collection.
-</Warning>
+## 图存储器→实体链接
 
-## Graph Memory → Entity Linking
+开源 SDK 中已删除图形存储支持。它被**内置实体链接**取代，后者在本机运行，没有外部依赖项。**删除了什么：**
+- `enable_graph` / `enableGraph` 配置标志
+- `graph_store` / `graphStore` 配置块（Neo4j、Memgraph、Kuzu、Apache AGE、Neptune）
+- 所有图形内存代码路径（约 4000 行）
 
-Graph store support has been removed from the open-source SDK. It is replaced by **built-in entity linking**, which runs natively with no external dependencies.
+**取代它的是：**实体链接在添加管道期间从每个内存中提取实体（专有名词、引用文本、复合名词短语），并将它们存储在现有向量存储内的并行集合（`{collection}_entities`）中。在搜索时，查询中的实体与该集合进行匹配，并用于增强相关记忆。提升将合并到每个结果的组合“分数”中。
 
-**What was removed:**
-- `enable_graph` / `enableGraph` config flag
-- `graph_store` / `graphStore` configuration block (Neo4j, Memgraph, Kuzu, Apache AGE, Neptune)
-- All graph memory code paths (~4000 lines)
+**迁移：**
+- 从配置中删除 `enable_graph` / `enableGraph`
+- 删除 `graph_store` / `graphStore` 块——它不再被读取
+- 如果您仅将图形驱动程序（neo4j、memgraph 等）用于 Mem0，请卸载它们
+- 无需数据迁移。实体链接在下一个“add()”调用时自动激活。
 
-**What replaces it:**
+<警告>
+不再填充通过搜索结果中旧的“关系”字段公开的图形关系。实体关系通过检索排名间接使用，而不是作为可查询的图形结构公开。如果您的应用程序直接依赖于遍历图形关系，您将需要根据新的 API 重新设计该部分。
+</警告>
 
-Entity linking extracts entities (proper nouns, quoted text, compound noun phrases) from every memory during the add pipeline and stores them in a parallel collection (`{collection}_entities`) inside your existing vector store. At search time, entities from the query are matched against this collection and used to boost relevant memories. The boost is folded into the combined `score` on each result.
+## 新算法如何工作
 
-**Migration:**
-- Remove `enable_graph` / `enableGraph` from your config
-- Remove the `graph_store` / `graphStore` block — it is no longer read
-- Uninstall graph drivers (neo4j, memgraph, etc.) if you were using them only for Mem0
-- No data migration is required. Entity linking activates automatically on the next `add()` call.
-
-<Warning>
-Graph relationships exposed via the old `relations` field on search results are no longer populated. Entity relationships are consumed indirectly through retrieval ranking, not exposed as a queryable graph structure. If your application depended on traversing graph relationships directly, you will need to redesign that part against the new API.
-</Warning>
-
-## How the New Algorithm Works
-
-### Extraction: Single-Pass ADD-Only
-
-```
+### 提取：单通道 ADD-Only```
 Input conversation
     → Retrieve top-10 related existing memories (for deduplication context)
     → Single LLM call: extract all distinct new facts
@@ -364,12 +333,9 @@ Input conversation
     → Batch insert into vector store
     → Entity extraction + linking
 ```
+之前的算法使用了两个 LLM 调用——一个用于提取候选事实，一个用于决定对现有内存的添加/更新/删除操作。新算法将其折叠成一个仅进行相加的调用。该模型将其能力用于理解输入，而不是与现有状态进行比较。
 
-The previous algorithm used two LLM calls — one to extract candidate facts, one to decide ADD/UPDATE/DELETE actions against existing memories. The new algorithm collapses this into a single call that only adds. The model spends its capacity on understanding the input rather than diffing against existing state.
-
-### Retrieval: Multi-Signal Hybrid Search
-
-```
+### 检索：多信号混合搜索```
 Query
     → Preprocess (lemmatize keywords, extract entities)
     → Parallel scoring:
@@ -378,161 +344,136 @@ Query
         3. Entity matching (entity graph boost)
     → Score fusion → Top-K selection
 ```
+**评分：** 将三个信号标准化并融合为每个结果的单个组合“分数”。融合根据运行时可用的信号进行调整（仅语义、语义 + BM25，或当 spaCy + 实体存储处于活动状态时全部三种）。
 
-**Scoring:** The three signals are normalized and fused into a single combined `score` per result. The fusion adapts based on which signals are available at runtime (semantic-only, semantic + BM25, or all three when spaCy + the entity store are active).
+**BM25 是一个提升信号，而不是召回扩展器。** 只有语义搜索结果才是候选者 - BM25 和实体分数可以提升排名，但不会添加新的候选者。## 矢量存储兼容性
 
-**BM25 is a boost signal, not a recall expander.** Only semantic search results are candidates — BM25 and entity scores boost ranking but don't add new candidates.
+所有 15 个受支持的矢量存储都已通过两项新功能得到增强：
 
-## Vector Store Compatibility
-
-All 15 supported vector stores have been enhanced with two new capabilities:
-
-| Capability | Purpose | Fallback if Unsupported |
+|能力|目的|如果不受支持则回退 |
 |---|---|---|
-| `keyword_search()` | BM25/full-text keyword matching | Falls back to semantic-only search |
-| `search_batch()` | Batch search for entity matching | Falls back to sequential search |
+| `keyword_search()` | BM25/全文关键词匹配 |退回到纯语义搜索 |
+| `search_batch()` |批量搜索实体匹配 |退回到顺序搜索 |
 
-**Qdrant-specific changes:**
-- Now uses sparse vectors (BM25) alongside dense vectors in the same collection
-- Requires `fastembed` library for BM25 encoding (lazy-loaded, gracefully degrades)
-- Install: `pip install fastembed`
+**特定于 Qdrant 的更改：**
+- 现在在同一集合中使用稀疏向量 (BM25) 和密集向量
+- 需要用于 BM25 编码的“fastembed”库（延迟加载，优雅降级）
+- 安装：`pip install fastembed`
 
-**All other vector stores:**
-- Enhanced with `keyword_search()` methods using their native full-text capabilities
-- No additional dependencies required
+**所有其他矢量商店：**
+- 使用原生全文功能通过“keyword_search()”方法进行增强
+- 不需要额外的依赖
 
-## Graceful Degradation
+## 优雅降级当可选依赖项缺失时，新功能会正常降级：
 
-The new features degrade gracefully when optional dependencies are missing:
-
-| Missing Dependency | Impact | Search Still Works? |
+|缺少依赖|影响 |搜索仍然有效吗？ |
 |---|---|---|
-| spaCy (`mem0ai[nlp]`) | No entity extraction, no BM25 lemmatization | Yes (semantic-only) |
-| `fastembed` (Qdrant) | No BM25 keyword search | Yes (semantic + entity) |
-| Entity store unavailable | No entity boosting | Yes (semantic + BM25) |
+| spaCy (`mem0ai[nlp]`) |无实体提取，无 BM25 词形还原 |是（仅语义）|
+| `fastembed` (Qdrant) |没有BM25关键字搜索|是（语义+实体）|
+|实体店不可用 |没有实体提升 |是（语义 + BM25）|
 
-You always get semantic search. Hybrid search features layer on top when available.
+你总是会得到语义搜索。混合搜索功能可用时位于顶部。
 
-## Removed Parameters Reference
+## 删除参数参考
 
-These parameters have been removed across all SDKs. Remove them from your code:
+这些参数已在所有 SDK 中删除。从您的代码中删除它们：
 
-### Python Client SDK — Removed parameters
+### Python 客户端 SDK — 删除的参数
 
-**Constructor:** `org_id`, `project_id`
+**构造函数：** `org_id`, `project_id`
 
-**All methods:** `api_version`, `output_format`, `async_mode`, `org_name`, `project_name`, `org_id`, `project_id`
+**所有方法：** `api_version`、`output_format`、`async_mode`、`org_name`、`project_name`、`org_id`、`project_id`
 
-**add():** `enable_graph`, `immutable`, `expiration_date`, `filter_memories`, `batch_size`, `force_add_only`, `includes`, `excludes`, `keyword_search`
+**add():** `enable_graph`、`immutable`、`expiration_date`、`filter_memories`、`batch_size`、`force_add_only`、`includes`、`excludes`、`keyword_search`
 
-**search():** `enable_graph`
+**搜索（）：** `enable_graph`
 
 **get_all():** `enable_graph`
 
 **project.update():** `enable_graph`
 
-### TypeScript Client SDK — Removed parameters
+### TypeScript 客户端 SDK — 删除的参数
 
-**Constructor:** `organizationId`, `projectId`, `organizationName`, `projectName`
+**构造函数：** `organizationId`, `projectId`, `organizationName`, `projectName`**所有方法：** `OutputFormat` 枚举、`API_VERSION` 枚举
 
-**All methods:** `OutputFormat` enum, `API_VERSION` enum
+**add():**`enable_graph`/`enableGraph`、`async_mode`/`asyncMode`、`output_format`/`outputFormat`、`immutable`、`expiration_date`/`expirationDate`、`filter_memories`/`filterMemories`、`batch_size`/`batchSize`、`force_add_only`/`forceAddOnly`、`includes`、 `排除`、`keyword_search` / `keywordSearch`
 
-**add():** `enable_graph` / `enableGraph`, `async_mode` / `asyncMode`, `output_format` / `outputFormat`, `immutable`, `expiration_date` / `expirationDate`, `filter_memories` / `filterMemories`, `batch_size` / `batchSize`, `force_add_only` / `forceAddOnly`, `includes`, `excludes`, `keyword_search` / `keywordSearch`
-
-**search():** `enable_graph` / `enableGraph`
+**搜索（）：** `enable_graph` / `enableGraph`
 
 **get_all():** `enable_graph` / `enableGraph`
 
-### Python OSS — Removed/renamed parameters
+### Python OSS — 删除/重命名参数
 
-**Config:** `custom_fact_extraction_prompt` → renamed to `custom_instructions`
+**配置：** `custom_fact_extraction_prompt` → 重命名为 `custom_instructions`
 
-**Config:** `custom_update_memory_prompt` → deprecated, use `custom_instructions`
+**配置：** `custom_update_memory_prompt` → 已弃用，使用 `custom_instructions`
 
-**Config:** `enable_graph` + `graph_store` → removed (graph store support removed entirely)
+**配置：** `enable_graph` + `graph_store` → 删除（图形存储支持完全删除）
 
-### TypeScript OSS — Removed/renamed parameters
+### TypeScript OSS — 删除/重命名参数
 
-**Config:** `customPrompt` → renamed to `customInstructions`
+**配置：** `customPrompt` → 重命名为 `customInstructions`
 
-**Config:** `enableGraph` + `graphStore` → removed (graph store support removed entirely)
+**配置：** `enableGraph` + `graphStore` → 删除（图形存储支持完全删除）
 
-**search():** `limit` → renamed to `topK`
+**search():** `limit` → 重命名为 `topK`
 
-## Common Issues
+## 常见问题
 
-### TypeScript: `limit` is not a valid parameter
+### TypeScript：“limit”不是有效参数
 
-The `limit` parameter has been renamed to `topK` in the TypeScript OSS:
-
-```typescript
+TypeScript OSS 中的“limit”参数已重命名为“topK”：```typescript
 // Before
 const results = await m.search("query", { userId: "alice", limit: 20 });
 
 // After
 const results = await m.search("query", { filters: { userId: "alice" }, topK: 20 });
 ```
+### TypeScript 客户端：snake_case 参数不再起作用
 
-### TypeScript Client: snake_case params no longer work
-
-All TypeScript Client SDK parameters now use camelCase. The SDK handles conversion to/from the API automatically:
-
-```typescript
+所有 TypeScript 客户端 SDK 参数现在都使用驼峰命名法。 SDK 自动处理与 API 之间的转换：```typescript
 // Before
 await client.search("query", { user_id: "alice", top_k: 20 });
 
 // After
 await client.search("query", { filters: { userId: "alice" }, topK: 20 });
 ```
+### `ValueError：search() / get_all() 不支持顶级实体参数`
 
-### `ValueError: Top-level entity parameters not supported in search() / get_all()`
-
-`search()` and `get_all()` now require entity IDs inside `filters`. Top-level kwargs raise `ValueError`. This aligns the OSS SDK with the Platform API.
-
-```python
+`search()` 和 `get_all()` 现在需要 `filter` 内的实体 ID。顶级 kwargs 引发 `ValueError`。这使 OSS SDK 与平台 API 保持一致。```python
 # Before
 results = m.search("query", user_id="alice", top_k=20)
 
 # After
 results = m.search("query", filters={"user_id": "alice"}, top_k=20)
 ```
+`add()` 和 `delete_all()` 继续接受实体 ID 作为顶级 kwargs。
 
-`add()` and `delete_all()` continue to accept entity IDs as top-level kwargs.
+### 搜索返回的结果比以前少
 
-### Search returns fewer results than before
-
-The default `threshold` changed from `None` to `0.1`. Low-relevance results that were previously included are now filtered out. To restore the old behavior:
-
-```python
+默认“阈值”从“无”更改为“0.1”。以前包含的低相关性结果现在已被过滤掉。要恢复旧行为：```python
 results = m.search("query", filters={"user_id": "alice"}, threshold=0.0)
 ```
+### 未找到 spaCy 模型
 
-### spaCy model not found
-
-If you see errors about missing spaCy models, download the required model:
-
-```bash
+如果您看到有关缺少 spaCy 模型的错误，请下载所需的模型：```bash
 python -m spacy download en_core_web_sm
 ```
-
-If spaCy is not installed at all, install the NLP extras:
-
-```bash
+如果根本没有安装 spaCy，请安装 NLP 附加组件：```bash
 pip install "mem0ai[nlp]"
 ```
+### 实体存储集合创建失败
 
-### Entity store collection creation fails
+实体存储尝试自动创建“{collection_name}_entities”集合。如果您的矢量数据库具有受限权限，请使用与主集合相同的嵌入尺寸预先创建此集合。
 
-The entity store tries to create a `{collection_name}_entities` collection automatically. If your vector database has restricted permissions, pre-create this collection with the same embedding dimensions as your main collection.
+### 分数值与之前不同
 
-### Score values are different from before
+顶级 `score` 的范围仍然是 `[0, 1]`，但在 v3 中计算方式有所不同。结果之间的相对排名保持可比，但绝对数字发生变化 - 根据代表性查询重新调整应用程序中的任何硬阈值。
 
-The top-level `score` still ranges `[0, 1]`, but it is computed differently in v3. Relative ranking between results stays comparable, but absolute numbers shift — retune any hard thresholds in your app against representative queries.
+如果您需要特定用例的原始余弦相似度，请通过“vector_store.search(...)”直接针对矢量存储运行未增强的矢量查询。
 
-If you need the raw cosine similarity for a specific use case, run an unboosted vector query directly against your vector store via `vector_store.search(...)`.
+## 需要帮助吗？
 
-## Need Help?
-
-- Join our [Discord community](https://mem0.ai/discord) for real-time support
-- Open an issue on [GitHub](https://github.com/mem0ai/mem0/issues)
-- Check the [evaluation docs](/core-concepts/memory-evaluation) to benchmark the new algorithm on your data
+- 加入我们的[Discord社区](https://mem0.ai/discord)以获得实时支持
+- 在 [GitHub](https://github.com) 上打开问题。com/mem0ai/mem0/问题）
+- 检查[评估文档](/core-concepts/memory-evaluation)以根据您的数据对新算法进行基准测试

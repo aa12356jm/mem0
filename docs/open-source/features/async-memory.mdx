@@ -4,52 +4,50 @@ description: Run Mem0 operations without blocking your event loop.
 icon: "bolt"
 ---
 
-`AsyncMemory` gives you a non-blocking interface to Mem0’s storage layer so Python applications can add, search, and manage memories directly from async code. Use it when you embed Mem0 inside FastAPI services, background workers, or any workflow that relies on `asyncio`.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Info>
-  **You’ll use this when…**
-  - Your agent already runs in an async framework and you need memory calls to await cleanly.
-  - You want to embed Mem0’s storage locally without sending requests through the synchronous client.
-  - You plan to mix memory operations with other async APIs (OpenAI, HTTP calls, databases).
-</Info>
 
-<Warning>
-  `AsyncMemory` expects a running event loop. Always call it inside `async def` functions or through helpers like `asyncio.run()` to avoid runtime errors.
-</Warning>
 
-<Note>
-  Working in TypeScript? The Node SDK still uses synchronous calls—use `Memory` there and rely on Python’s `AsyncMemory` when you need awaited operations.
-</Note>
+“AsyncMemory”为您提供了 Mem0 存储层的非阻塞接口，因此 Python 应用程序可以直接从异步代码添加、搜索和管理内存。当您将 Mem0 嵌入 FastAPI 服务、后台工作人员或任何依赖“asyncio”的工作流程时，请使用它。
 
-## Feature anatomy
+<信息>
+  **你会在以下情况下使用它......**
+  - 您的代理已经在异步框架中运行，并且您需要内存调用来干净地等待。
+  - 您想要在本地嵌入 Mem0 的存储，而不通过同步客户端发送请求。
+  - 您计划将内存操作与其他异步 API（OpenAI、HTTP 调用、数据库）混合。
+</信息>
 
-- **Direct storage access:** `AsyncMemory` talks to the same backends as the synchronous client but keeps everything in-process for lower latency.
-- **Method parity:** Each memory operation (`add`, `search`, `get_all`, `delete`, etc.) mirrors the synchronous API, letting you reuse payload shapes.
-- **Concurrent execution:** Non-blocking I/O lets you schedule multiple memory tasks with `asyncio.gather`.
-- **Scoped organization:** Continue using `user_id`, `agent_id`, and `run_id` to separate memories across sessions and agents.
+<警告>
+  `AsyncMemory` 需要一个正在运行的事件循环。始终在“async def”函数中或通过“asyncio.run()”等帮助程序调用它，以避免运行时错误。
+</警告>
 
-<AccordionGroup>
-  <Accordion title="Async method parity">
-    | Operation | Async signature | Notes |
-    | --- | --- | --- |
-    | Create memories | `await memory.add(...)` | Same arguments as synchronous `Memory.add`. |
-    | Search memories | `await memory.search(...)` | Returns dict with `results`, identical shape. |
-    | List memories | `await memory.get_all(...)` | Filter by `user_id`, `agent_id`, `run_id`. |
-    | Retrieve memory | `await memory.get(memory_id=...)` | Raises `ValueError` if ID is invalid. |
-    | Update memory | `await memory.update(memory_id=..., data=...)` | Accepts partial updates. |
-    | Delete memory | `await memory.delete(memory_id=...)` | Returns confirmation payload. |
-    | Delete in bulk | `await memory.delete_all(...)` | Requires at least one scope filter. |
-    | History | `await memory.history(memory_id=...)` | Fetches change log for auditing. |
-  </Accordion>
-</AccordionGroup>
+<注意>
+  使用 TypeScript 工作？Node SDK 仍然使用同步调用——使用“Memory”，并在需要等待操作时依赖 Python 的“AsyncMemory”。
+</注>
+
+## 特征剖析- **直接存储访问：** `AsyncMemory` 与同步客户端相同的后端通信，但使所有内容保持在进程中以降低延迟。
+- **方法奇偶校验：** 每个内存操作（“add”、“search”、“get_all”、“delete”等）都会镜像同步 API，让您可以重用有效负载形状。
+- **并发执行：** 非阻塞 I/O 允许您使用“asyncio.gather”安排多个内存任务。
+- **范围组织：** 继续使用 `user_id`、`agent_id` 和 `run_id` 来分隔会话和代理之间的内存。<手风琴组>
+  <Accordion title="异步方法奇偶校验">
+    |运营|异步签名 |笔记|
+    | ---| ---| ---|
+    |创造回忆| `等待内存.add(...)` |与同步“Memory.add”相同的参数。 |
+    |搜索记忆 | `等待内存.search(...)` |返回带有“results”的字典，形状相同。 |
+    |列出回忆 | `等待内存.get_all(...)` |按“user_id”、“agent_id”、“run_id”过滤。 |
+    |找回记忆| `等待内存.get(memory_id=...)` |如果 ID 无效，则引发“ValueError”。 |
+    |更新内存 | `等待内存.更新（内存_id = ...，数据= ...）` |接受部分更新。 |
+    |删除记忆| `等待内存.删除(memory_id=...)` |返回确认负载。 |
+    |批量删除 | `等待内存.delete_all(...)` |至少需要一个示波器过滤器。 |
+    |历史| `等待内存.history(memory_id=...)` |获取更改日志以进行审核。|
+  </手风琴>
+</手风琴组>
 
 ---
 
-## Configure it
+## 配置它
 
-### Initialize the client
-
-```python
+### 初始化客户端```python
 import asyncio
 from mem0 import AsyncMemory
 
@@ -63,18 +61,15 @@ custom_config = MemoryConfig(
 )
 memory = AsyncMemory(config=custom_config)
 ```
+<信息图标=“检查”>
+  初始化后立即运行一次“await memory.search(...)”。如果它返回内存且没有错误，则您的配置有效。
+</信息>
 
-<Info icon="check">
-  Run `await memory.search(...)` once right after initialization. If it returns memories without errors, your configuration works.
-</Info>
+<提示>
+  将配置对象保持在靠近异步客户端的位置，以便您可以在工作线程之间重用它们，而无需重新创建矢量存储连接。
+</提示>
 
-<Tip>
-  Keep configuration objects close to the async client so you can reuse them across workers without recreating vector store connections.
-</Tip>
-
-### Manage lifecycle and concurrency
-
-```python
+### 管理生命周期和并发性```python
 import asyncio
 from contextlib import asynccontextmanager
 from mem0 import AsyncMemory
@@ -92,12 +87,9 @@ async def safe_memory_usage():
     async with get_memory() as memory:
         return await memory.search("test query", filters={"user_id": "alice"})
 ```
-
-<Tip>
-  Wrap the client in an async context manager when you need a clean shutdown (for example, inside FastAPI startup/shutdown hooks).
-</Tip>
-
-```python
+<提示>
+  当您需要干净关闭时（例如，在 FastAPI 启动/关闭挂钩内），将客户端包装在异步上下文管理器中。
+</提示>```python
 async def batch_operations():
     memory = AsyncMemory()
 
@@ -116,14 +108,11 @@ async def batch_operations():
         else:
             print(f"Task {i} completed successfully")
 ```
+<信息图标=“检查”>
+  当并发正常工作时，成功的任务会返回内存 ID，而失败的任务会在“结果”列表中显示为异常。
+</信息>
 
-<Info icon="check">
-  When concurrency works correctly, successful tasks return memory IDs while failures surface as exceptions in the `results` list.
-</Info>
-
-### Add resilience with retries
-
-```python
+### 通过重试增加弹性```python
 import asyncio
 from mem0 import AsyncMemory
 
@@ -149,18 +138,15 @@ async def robust_memory_search():
 
     return await with_timeout_and_retry(search_operation)
 ```
-
-<Warning>
-  Always cap retries—runaway loops can keep the event loop busy and block other tasks.
-</Warning>
+<警告>
+  始终限制重试 - 失控循环会使事件循环保持繁忙并阻塞其他任务。
+</警告>
 
 ---
 
-## See it in action
+## 查看实际效果
 
-### Core operations
-
-```python
+### 核心运营```python
 # Create memories
 result = await memory.add(
     messages=[
@@ -194,18 +180,15 @@ await memory.delete(memory_id="memory-id-here")
 # Delete scoped memories
 await memory.delete_all(user_id="alice")
 ```
+<信息图标=“检查”>
+  确认每个调用返回与同步客户端相同的响应字段（ID、“结果”或确认对象）。缺少键通常意味着没有等待协程。
+</信息>
 
-<Info icon="check">
-  Confirm each call returns the same response fields as the synchronous client (IDs, `results`, or confirmation objects). Missing keys usually mean the coroutine wasn’t awaited.
-</Info>
+<注意>
+  “delete_all”至少需要“user_id”、“agent_id”或“run_id”之一。提供所有三个以将删除范围缩小到单个会话。
+</注>
 
-<Note>
-  `delete_all` requires at least one of `user_id`, `agent_id`, or `run_id`. Provide all three to narrow deletion to a single session.
-</Note>
-
-### Scoped organization
-
-```python
+### 范围组织```python
 await memory.add(
     messages=[{"role": "user", "content": "I prefer vegetarian food"}],
     user_id="alice",
@@ -222,14 +205,11 @@ specific_memories = await memory.get_all(
 
 history = await memory.history(memory_id="memory-id-here")
 ```
+<提示>
+  当您需要审核跟踪以确保合规性或调试更新逻辑时，请使用“历史记录”。
+</提示>
 
-<Tip>
-  Use `history` when you need audit trails for compliance or debugging update logic.
-</Tip>
-
-### Blend with other async APIs
-
-```python
+### 与其他异步 API 混合```python
 import asyncio
 from openai import AsyncOpenAI
 from mem0 import AsyncMemory
@@ -263,14 +243,11 @@ async def chat_with_memories(message: str, user_id: str = "default_user") -> str
 
     return assistant_response
 ```
+<信息图标=“检查”>
+  当一切都正确连接时，OpenAI 响应应该包含最近的记忆，并且后续的“add”调用应该持续新的助手轮流。
+</信息>
 
-<Info icon="check">
-  When everything is wired correctly, the OpenAI response should incorporate recent memories and the follow-up `add` call should persist the new assistant turn.
-</Info>
-
-### Handle errors gracefully
-
-```python
+### 优雅地处理错误```python
 from mem0 import AsyncMemory
 from mem0.configs.base import MemoryConfig
 
@@ -299,14 +276,11 @@ async def handle_memory_operation_errors():
     except ValueError as err:
         print(f"Invalid search query: {err}")
 ```
+<警告>
+  捕获并记录来自无效输入的“ValueError”异常 - 否则异步堆栈跟踪可能会在后台任务中消失。
+</警告>
 
-<Warning>
-  Catch and log `ValueError` exceptions from invalid inputs—async stack traces can otherwise disappear inside background tasks.
-</Warning>
-
-### Serve through FastAPI
-
-```python
+### 通过 FastAPI 提供服务```python
 from fastapi import FastAPI, HTTPException
 from mem0 import AsyncMemory
 
@@ -329,14 +303,11 @@ async def search_memories(query: str, user_id: str, limit: int = 10):
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 ```
+<提示>
+  使用 FastAPI 时，为每个进程创建一个“AsyncMemory”实例 - 启动挂钩是配置和重用它的好地方。
+</提示>
 
-<Tip>
-  Create one `AsyncMemory` instance per process when using FastAPI—startup hooks are a good place to configure and reuse it.
-</Tip>
-
-### Instrument logging
-
-```python
+### 仪器记录```python
 import logging
 import time
 from functools import wraps
@@ -366,49 +337,45 @@ def log_async_operation(operation_name):
 async def logged_memory_add(memory, messages, user_id):
     return await memory.add(messages=messages, user_id=user_id)
 ```
-
-<Info icon="check">
-  Logged durations give you the baseline needed to spot regressions once AsyncMemory is in production.
-</Info>
-
----
-
-## Verify the feature is working
-
-- Run a quick add/search cycle and confirm the returned memory content matches your input.
-- Inspect application logs to ensure async tasks complete without blocking the event loop.
-- In FastAPI or other frameworks, hit health endpoints to verify the shared client handles concurrent requests.
-- Monitor retry counters—unexpected spikes indicate configuration or connectivity issues.
+<信息图标=“检查”>
+  记录的持续时间为您提供了在 AsyncMemory 投入生产后发现回归所需的基线。
+</信息>
 
 ---
 
-## Best practices
+## 验证该功能是否正常工作
 
-1. **Keep operations awaited:** Forgetting `await` is the fastest way to miss writes—lint for it or add helper wrappers.
-2. **Scope deletions carefully:** Always supply `user_id`, `agent_id`, or `run_id` to avoid purging too much data.
-3. **Batch writes thoughtfully:** Use `asyncio.gather` for throughput but cap concurrency based on backend capacity.
-4. **Log errors with context:** Capture user and agent scopes to triage failures quickly.
-5. **Reuse clients:** Instantiate `AsyncMemory` once per worker to avoid repeated backend handshakes.
-
----
-
-## Troubleshooting
-
-| Issue | Possible causes | Fix |
-| --- | --- | --- |
-| Initialization fails | Missing dependencies, invalid config | Validate `MemoryConfig` settings and environment variables. |
-| Slow operations | Large datasets, network latency | Cache heavy queries and tune vector store parameters. |
-| Memory not found | Invalid ID or deleted record | Check ID source and handle soft-deleted states. |
-| Connection timeouts | Network issues, overloaded backend | Apply retries/backoff and inspect infrastructure health. |
-| Out-of-memory errors | Oversized batches | Reduce concurrency or chunk operations into smaller sets. |
+- 运行快速添加/搜索周期并确认返回的内存内容与您的输入匹配。
+- 检查应用程序日志以确保异步任务完成而不阻塞事件循环。
+- 在 FastAPI 或其他框架中，点击运行状况端点以验证共享客户端是否处理并发请求。
+- 监控重试计数器——意外的峰值表明配置或连接问题。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Master Memory Operations" icon="layers" href="/core-concepts/memory-operations/add">
-    Review how add, search, update, and delete behave across synchronous and async clients.
-  </Card>
-  <Card title="Connect Async Agents" icon="plug" href="/cookbooks/integrations/openai-tool-calls">
-    Follow a full workflow that mixes AsyncMemory with OpenAI tool-call automation.
-  </Card>
-</CardGroup>
+## 最佳实践
+
+1. **保持等待操作：** 忘记 `await` 是错过写入的最快方法 - 对其进行 lint 或添加辅助包装器。
+2. **仔细删除范围：** 始终提供 `user_id`、`agent_id` 或 `run_id` 以避免清除太多数据。
+3. **批量写入深思熟虑：** 使用 `asyncio.收集吞吐量，但根据后端容量限制并发性。
+4. **使用上下文记录错误：** 捕获用户和代理范围以快速分类故障。
+5. **重用客户端：** 每个工作进程实例化一次`AsyncMemory`以避免重复的后端握手。
+
+---
+
+## 故障排除|问题 |可能的原因 |修复 |
+| ---| ---| ---|
+|初始化失败 |缺少依赖项，无效配置 |验证“MemoryConfig”设置和环境变量。 |
+|操作缓慢|大数据集、网络延迟 |缓存大量查询并调整向量存储参数。 |
+|找不到内存 | ID无效或记录已删除 |检查 ID 来源并处理软删除状态。 |
+|连接超时 |网络问题、后端超载 |应用重试/退避并检查基础设施运行状况。 |
+|内存不足错误 |超大批量|将并发或块操作减少为更小的集合。 |
+
+---
+
+<卡组列={2}>
+  <Card title="掌握内存操作" icon="layers" href="/core-concepts/memory-operations/add">
+    查看添加、搜索、更新和删除在同步和异步客户端之间的行为方式。</卡>
+  <Card title="连接异步代理" icon="plug" href="/cookbooks/integrations/openai-tool-calls">
+    遵循将 AsyncMemory 与 OpenAI 工具调用自动化相结合的完整工作流程。
+  </卡>
+</卡组>

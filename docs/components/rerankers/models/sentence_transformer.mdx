@@ -3,26 +3,25 @@ title: Sentence Transformer
 description: 'Local reranking with HuggingFace cross-encoder models'
 ---
 
-Sentence Transformer reranker provides local reranking using HuggingFace cross-encoder models, perfect for privacy-focused deployments where you want to keep data on-premises.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Models
 
-Any HuggingFace cross-encoder model can be used. Popular choices include:
 
-- **`cross-encoder/ms-marco-MiniLM-L-6-v2`**: Default, good balance of speed and accuracy
-- **`cross-encoder/ms-marco-TinyBERT-L-2-v2`**: Fastest, smaller model size
-- **`cross-encoder/ms-marco-electra-base`**: Higher accuracy, larger model
-- **`cross-encoder/stsb-distilroberta-base`**: Good for semantic similarity tasks
+Sentence Transformer reranker 使用 HuggingFace 交叉编码器模型提供本地重新排名，非常适合您希望将数据保留在本地的注重隐私的部署。
 
-## Installation
+## 型号
 
-```bash
+可以使用任何 HuggingFace 交叉编码器模型。受欢迎的选择包括：
+
+- **`cross-encoder/ms-marco-MiniLM-L-6-v2`**：默认，速度和精度的良好平衡
+- **`cross-encoder/ms-marco-TinyBERT-L-2-v2`**：最快、更小的模型尺寸
+- **`cross-encoder/ms-marco-electra-base`**：精度更高，模型更大
+- **`cross-encoder/stsb-distilroberta-base`**：适合语义相似性任务
+
+## 安装```bash
 pip install sentence-transformers
 ```
-
-## Configuration
-
-```python Python
+＃＃ 配置```python Python
 from mem0 import Memory
 
 config = {
@@ -53,12 +52,9 @@ config = {
 
 memory = Memory.from_config(config)
 ```
+## GPU 加速
 
-## GPU Acceleration
-
-For better performance, use GPU acceleration:
-
-```python Python
+为了获得更好的性能，请使用 GPU 加速：```python Python
 config = {
     "rerank": {
         "provider": "sentence_transformer",
@@ -70,10 +66,7 @@ config = {
     }
 }
 ```
-
-## Usage Example
-
-```python Python
+## 使用示例```python Python
 from mem0 import Memory
 
 # Initialize memory with local reranker
@@ -109,12 +102,9 @@ for result in results['results']:
     print(f"Rerank Score: {result['rerank_score']:.3f}")
     print()
 ```
+## 定制模型
 
-## Custom Models
-
-You can use any HuggingFace cross-encoder model:
-
-```python Python
+您可以使用任何 HuggingFace 交叉编码器模型：```python Python
 # Using a different model
 config = {
     "rerank": {
@@ -126,34 +116,31 @@ config = {
     }
 }
 ```
+## 配置参数
 
-## Configuration Parameters
+|参数|描述 |类型 |默认|
+|------------|-------------|------|---------|
+| `模型` | HuggingFace 交叉编码器模型名称 | `str` | `“交叉编码器/ms-marco-MiniLM-L-6-v2”` |
+| `设备` |运行模型的设备（“cpu”、“cuda”等）)| `str` | `无` |
+| `batch_size` |处理文件的批量大小 | `int` | `32` |
+| `显示进度条` |处理过程中显示进度条 | `布尔` | ‘假’|
+| `top_k` |返回的最大文件数 | `int` | `无` |
 
-| Parameter | Description | Type | Default |
-|-----------|-------------|------|---------|
-| `model` | HuggingFace cross-encoder model name | `str` | `"cross-encoder/ms-marco-MiniLM-L-6-v2"` |
-| `device` | Device to run model on (`cpu`, `cuda`, etc.) | `str` | `None` |
-| `batch_size` | Batch size for processing documents | `int` | `32` |
-| `show_progress_bar` | Show progress bar during processing | `bool` | `False` |
-| `top_k` | Maximum documents to return | `int` | `None` |
+## 优点
 
-## Advantages
+- **隐私**：完全本地处理，无外部API调用
+- **成本**：初始模型下载后，不再按代币收费
+- **定制**：使用任何 HuggingFace 交叉编码器模型
+- **离线**：模型下载后无需互联网连接即可工作
 
-- **Privacy**: Complete local processing, no external API calls
-- **Cost**: No per-token charges after initial model download
-- **Customization**: Use any HuggingFace cross-encoder model
-- **Offline**: Works without internet connection after model download
+## 性能考虑因素
 
-## Performance Considerations
+- **首次运行**：模型下载最初可能需要一些时间
+- **内存使用**：模型需要 GPU/CPU 内存
+- **批量大小**：根据可用内存优化批量大小
+- **设备**：GPU加速显着提高速度
 
-- **First Run**: Model download may take time initially
-- **Memory Usage**: Models require GPU/CPU memory
-- **Batch Size**: Optimize batch size based on available memory
-- **Device**: GPU acceleration significantly improves speed
-
-## Best Practices
-
-1. **Model Selection**: Choose model based on accuracy vs speed requirements
-2. **Device Management**: Use GPU when available for better performance
-3. **Batch Processing**: Process multiple documents together for efficiency
-4. **Memory Monitoring**: Monitor system memory usage with larger models
+## 最佳实践1. **模型选择**：根据精度与速度要求选择模型
+2. **设备管理**：在可用时使用 GPU 以获得更好的性能
+3. **批处理**：同时处理多个文档以提高效率
+4. **内存监控**：监控较大模型的系统内存使用情况

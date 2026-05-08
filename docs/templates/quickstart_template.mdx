@@ -4,26 +4,25 @@ description: "Guidance and skeleton for Mem0 quickstart documentation."
 icon: "rocket"
 ---
 
-# Quickstart Template
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Quickstarts are the fastest path to first success. Each page should configure the minimum viable setup for its section, execute one complete add/search/delete loop, and hand readers off to deeper docs once the core flow succeeds.
 
----
 
-## ❌ DO NOT COPY — Guidance & Constraints
-- Keep the intro tight: one-sentence promise + `<Info>` prerequisites. Add `<Warning>` only for blocking requirements (e.g., “requires paid tier”).
-- Default to Python + TypeScript examples inside `<Tabs>` with `<Steps>` per language. If a second language truly doesn’t exist, add a `<Note>` explaining why.
-- Every journey must follow **Install → Configure → Add → Search → Delete** (or closest equivalents). Drop verification `<Info icon="check">` immediately after the critical operation.
-- When migrating an existing quickstart, reuse canonical snippets and screenshots—reshape them into this flow rather than rewriting content unless the product changed.
-- If you include a Mermaid diagram, keep it optional and render left-to-right (`graph LR`) so it doesn’t flood the page.
-- End with exactly two CTA cards: left = related/alternative path, right = next step in the journey. No link farms.
+# 快速入门模板
+
+快速入门是迈向首次成功的最快途径。每个页面都应该为其部分配置最小可行的设置，执行一个完整的添加/搜索/删除循环，并在核心流程成功后让读者转到更深入的文档。
 
 ---
 
-## ✅ COPY THIS — Content Skeleton
-Paste the block below into a new quickstart, then replace **every** placeholder. Remove optional sections only after the happy path is working.
+## ❌ 请勿复制 — 指南和限制
+- 保持简介紧凑：一句话承诺 + `<Info>` 先决条件。仅针对阻止要求（例如，“需要付费等级”）添加“<警告>”。
+- 默认为“<Tabs>”内的 Python + TypeScript 示例，每种语言带有“<Steps>”。如果第二语言确实不存在，请添加“<Note>”解释原因。
+- 每个旅程都必须遵循**安装→配置→添加→搜索→删除**（或最接近的等效项）。在关键操作后立即删除验证`<Info icon="check">`。- 迁移现有快速入门时，重用规范的片段和屏幕截图 - 将它们重新塑造到此流程中，而不是重写内容，除非产品发生变化。
+- 如果您包含美人鱼图，请将其保留为可选并从左到右渲染（“graph LR”），这样它就不会淹没页面。
+- 以两张 CTA 卡结束：左 = 相关/替代路径，右 = 旅程的下一步。没有链接农场。---
 
-````mdx
+## ✅ 复制此内容 — 内容骨架
+将下面的块粘贴到新的快速入门中，然后替换**每个**占位符。仅在快乐路径正常工作后才删除可选部分。````mdx
 ---
 title: [Quickstart title — action focused]
 description: [1 sentence outcome]
@@ -46,12 +45,11 @@ estimatedTime: "[~X minutes]"
 
 {/* Optional: delete if not needed */}
 ```mermaid
-graph LR
-  A[Install] */} B[Configure keys]
-  B */} C[Add memory]
-  C */} D[Search]
-  D */} E[Delete]
-```
+图LR
+  A[安装] */} B[配置密钥]
+  B */} C[添加内存]
+  C */} D[搜索]
+  D */} E[删除]```
 
 ## Install dependencies
 
@@ -60,8 +58,7 @@ graph LR
 <Steps>
 <Step title="Install the SDK">
 ```bash
-pip install [package-name]
-```
+pip install [包名]```
 </Step>
 </Steps>
   </Tab>
@@ -69,8 +66,7 @@ pip install [package-name]
 <Steps>
 <Step title="Install the SDK">
 ```bash
-npm install [package-name]
-```
+npm install [包名]```
 </Step>
 </Steps>
   </Tab>
@@ -85,15 +81,13 @@ npm install [package-name]
 <Steps>
 <Step title="Set environment variables">
 ```bash
-export MEM0_API_KEY="sk-..."
-```
+导出 MEM0_API_KEY="sk-..."```
 </Step>
 <Step title="Initialize the client">
 ```python
-from mem0 import Memory
+从 mem0 导入内存
 
-memory = Memory(api_key="sk-...")
-```
+内存 = 内存(api_key="sk-...")```
 </Step>
 </Steps>
   </Tab>
@@ -101,15 +95,13 @@ memory = Memory(api_key="sk-...")
 <Steps>
 <Step title="Set environment variables">
 ```bash
-export MEM0_API_KEY="sk-..."
-```
+导出 MEM0_API_KEY="sk-..."```
 </Step>
 <Step title="Initialize the client">
 ```typescript
-import { Memory } from "mem0ai";
+从“mem0ai”导入{内存}；
 
-const memory = new Memory({ apiKey: process.env.MEM0_API_KEY! });
-```
+const 内存 = new Memory({ apiKey: process.env.MEM0_API_KEY! });```
 </Step>
 </Steps>
   </Tab>
@@ -126,13 +118,12 @@ const memory = new Memory({ apiKey: process.env.MEM0_API_KEY! });
 <Steps>
 <Step title="Send a conversation">
 ```python
-messages = [
-    {"role": "user", "content": "Hi, I'm Alex and I love basketball."},
-    {"role": "assistant", "content": "Noted! I'll remember that."},
+消息 = [
+    {"role": "user", "content": "嗨，我是亚历克斯，我喜欢篮球。"},
+    {"role": "assistant", "content": "注意了！我会记住的。"},
 ]
 
-memory.add(messages, user_id="alex")
-```
+内存.add（消息，user_id =“alex”）```
 </Step>
 </Steps>
   </Tab>
@@ -140,13 +131,12 @@ memory.add(messages, user_id="alex")
 <Steps>
 <Step title="Send a conversation">
 ```typescript
-const messages = [
-  { role: "user", content: "Hi, I'm Alex and I love basketball." },
-  { role: "assistant", content: "Noted! I'll remember that." },
+常量消息 = [
+  { 角色：“用户”，内容：“嗨，我是亚历克斯，我喜欢篮球。” },
+  { role: "assistant", content: "注意了！我会记住的。" },
 ];
 
-await memory.add(messages, { userId: "alex" });
-```
+等待内存.add(messages, { userId: "alex" });```
 </Step>
 </Steps>
   </Tab>
@@ -163,9 +153,8 @@ await memory.add(messages, { userId: "alex" });
 <Steps>
 <Step title="Query the memory">
 ```python
-result = memory.search("What does Alex like?", filters={"user_id": "alex"})
-print(result)
-```
+result = memory.search("Alex 喜欢什么？",filters={"user_id": "alex"})
+打印（结果）```
 </Step>
 </Steps>
   </Tab>
@@ -173,9 +162,8 @@ print(result)
 <Steps>
 <Step title="Query the memory">
 ```typescript
-const result = await memory.search("What does Alex like?", { userId: "alex" });
-console.log(result);
-```
+const result = wait memory.search("Alex 喜欢什么？", { userId: "alex" });
+控制台.log(结果);```
 </Step>
 </Steps>
   </Tab>
@@ -192,8 +180,7 @@ console.log(result);
 <Steps>
 <Step title="Clean up">
 ```python
-memory.delete_all(user_id="alex")
-```
+内存.delete_all(user_id="alex")```
 </Step>
 </Steps>
   </Tab>
@@ -201,8 +188,7 @@ memory.delete_all(user_id="alex")
 <Steps>
 <Step title="Clean up">
 ```typescript
-await memory.deleteAll({ userId: "alex" });
-```
+等待内存.deleteAll({ userId: "alex" });```
 </Step>
 </Steps>
   </Tab>
@@ -230,105 +216,100 @@ await memory.deleteAll({ userId: "alex" });
   />
 </CardGroup>
 ````
-
 ---
 
-## ✅ Publish Checklist
-- [ ] Replace every placeholder and delete unused sections (`<Tip>`, Mermaid diagram, etc.).
-- [ ] Python **and** TypeScript tabs render correctly (or you added a `<Note>` explaining a missing language).
-- [ ] Each major step includes an inline verification `<Info icon="check">`.
-- [ ] Quick recovery section lists at least two common issues.
-- [ ] Final `<CardGroup>` has exactly two cards (related on the left, next step on the right).
-- [ ] Links, commands, and code snippets were tested or clearly marked if hypothetical.
+## ✅ 发布清单
+- [ ] 替换每个占位符并删除未使用的部分（`<Tip>`、美人鱼图等）。
+- [ ] Python **和** TypeScript 选项卡正确呈现（或者您添加了“<Note>”来解释缺少的语言）。
+- [ ] 每个主要步骤都包含内联验证“<Info icon="check">”。
+- [ ] 快速恢复部分列出了至少两个常见问题。
+- [ ] 最终 `<CardGroup>` 恰好有两张卡（左侧相关，右侧下一步）。
+- [ ] 链接、命令和代码片段经过测试或清晰标记（如果是假设的）。
 
-## Browse Other Templates
-
-<CardGroup cols={3}>
-  <Card
-    title="Quickstart"
-    description="Install → Configure → Add → Search → Delete."
-    icon="rocket"
+## 浏览其他模板<卡组列={3}>
+  <卡片
+    标题=“快速入门”
+    描述=“安装→配置→添加→搜索→删除。”
+    图标=“火箭”
     href="/templates/quickstart_template"
   />
-  <Card
-    title="Operation Guide"
-    description="Single task walkthrough with verification checkpoints."
-    icon="circle-check"
+  <卡片
+    title="操作指南"
+    描述 =“带有验证检查点的单个任务演练。”
+    图标=“圆圈检查”
     href="/templates/operation_guide_template"
   />
-  <Card
-    title="Feature Guide"
-    description="Explain when and why to use a capability, not just the API."
-    icon="sparkles"
+  <卡片
+    title="功能指南"
+    description="解释何时以及为何使用某个功能，而不仅仅是 API。"
+    图标=“闪闪发光”
     href="/templates/feature_guide_template"
   />
-  <Card
-    title="Concept Guide"
-    description="Define mental models, key terms, and diagrams."
-    icon="brain"
+  <卡片
+    标题=“概念指南”
+    描述=“定义心智模型、关键术语和图表。”
+    图标=“大脑”
     href="/templates/concept_guide_template"
   />
-  <Card
-    title="Integration Guide"
-    description="Configure Mem0 alongside third-party tools."
-    icon="plug"
+  <卡片
+    title="集成指南"
+    description="与第三方工具一起配置 Mem0。”
+    图标=“插头”
     href="/templates/integration_guide_template"
   />
-  <Card
-    title="Cookbook"
-    description="Narrative, end-to-end walkthroughs."
-    icon="book-open"
+  <卡片
+    标题=“食谱”
+    描述=“叙述性、端到端的演练。”
+    图标=“书本打开”
     href="/templates/cookbook_template"
   />
-  <Card
-    title="API Reference"
-    description="Endpoint specifics with dual-language examples."
-    icon="code"
+  <卡片
+    标题=“API参考”
+    description="带有双语言示例的端点细节。"
+    图标=“代码”
     href="/templates/api_reference_template"
   />
-  <Card
-    title="Parameters Reference"
-    description="Accepted fields, defaults, and misuse fixes."
-    icon="list"
+  <卡片
+    title="参数参考"
+    描述 =“接受的字段、默认值和误用修复。”
+    图标=“列表”
     href="/templates/parameters_reference_template"
   />
-  <Card
-    title="Migration Guide"
-    description="Plan → migrate → validate with rollback."
-    icon="arrow-right"
+  <卡片
+    title="迁移指南"
+    描述=“计划→迁移→通过回滚进行验证。”
+    图标=“右箭头”
     href="/templates/migration_guide_template"
   />
-  <Card
-    title="Release Notes"
-    description="Ship highlights and required CTAs."
-    icon="megaphone"
+  <卡片
+    title="发行说明"
+    描述=“发布亮点和所需的 CTA。”
+    图标=“扩音器”
     href="/templates/release_notes_template"
   />
-  <Card
-    title="Troubleshooting Playbook"
-    description="Symptom → diagnose → fix."
-    icon="life-buoy"
+  <卡片
+    title="故障排除手册"
+    描述=“症状→诊断→修复。”
+    图标=“救生圈”
     href="/templates/troubleshooting_playbook_template"
   />
-  <Card
-    title="Section Overview"
-    description="Landing pages with card grids and CTA pair."
-    icon="grid"
+  <卡片
+    title="本节概述"
+    描述 =“带有卡片网格和 CTA 对的着陆页。”
+    图标=“网格”
     href="/templates/section_overview_template"
   />
-</CardGroup>
-
-<CardGroup cols={2}>
-  <Card
-    title="Contribution Hub"
-    description="Review the authoring workflow and linked templates."
-    icon="clipboard-list"
-    href="/platform/contribute"
+</卡组><卡组列={2}>
+  <卡片
+    title="贡献中心"
+    描述 =“查看创作工作流程和链接的模板。”
+    图标=“剪贴板列表”
+    href="/平台/贡献"
   />
-  <Card
-    title="Docs Home"
-    description="Return to the platform overview once you’re done."
-    icon="compass"
-    href="/platform/overview"
+  <卡片
+    title="文档主页"
+    description="完成后返回平台概述。"
+    图标=“指南针”
+    href="/平台/概述"
   />
-</CardGroup>
+</卡组>

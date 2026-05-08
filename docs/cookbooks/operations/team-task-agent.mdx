@@ -3,22 +3,20 @@ title: Collaborative Task Assistant
 description: "Coordinate multi-user projects with shared memories and roles."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-Build a multi-user collaborative chat or task management system with Mem0. Each message is attributed to its author, and all messages are stored in a shared project space. Mem0 makes it easy to track contributions, sort and group messages, and collaborate in real time.
 
-## Setup
+## 概述
 
-Install the required packages:
+使用 Mem0 构建多用户协作聊天或任务管理系统。每条消息都归属于其作者，并且所有消息都存储在共享的项目空间中。 Mem0 可以轻松跟踪贡献、对消息进行排序和分组以及实时协作。
 
-```bash
+## 设置
+
+安装所需的软件包：```bash
 pip install openai mem0ai
 ```
-
-## Full Code Example
-
-```python
+## 完整代码示例```python
 from openai import OpenAI
 from mem0 import Memory
 import os
@@ -93,10 +91,7 @@ class CollaborativeAgent:
                     ts_fmt = ts
                 print(f"[{ts_fmt}] {m['memory']}")
 ```
-
-## Usage
-
-```python
+＃＃ 用法```python
 # Example usage
 agent = CollaborativeAgent(RUN_ID)
 agent.add_message("user", "alice", "Let's list tasks for the new landing page.")
@@ -112,25 +107,24 @@ agent.print_sorted_by_time()
 # Print all messages grouped by actor
 agent.print_grouped_by_actor()
 ```
+## 要点
 
-## Key Points
+- 每条消息都归属于一个用户或代理（参与者）
+- 所有消息都存储在共享项目空间（`run_id`）中
+- 您可以按时间对消息进行排序，按参与者进行分组，并设置时间戳格式以确保清晰
+- Mem0 可以轻松构建协作、归因的聊天/任务系统
 
-- Each message is attributed to a user or agent (actor)
-- All messages are stored in a shared project space (`run_id`)
-- You can sort messages by time, group by actor, and format timestamps for clarity
-- Mem0 makes it easy to build collaborative, attributed chat/task systems
+## 结论
 
-## Conclusion
-
-Mem0 enables fast, transparent collaboration for teams and agents, with full attribution, flexible memory search, and easy message organization.
+Mem0 具有完整的归属、灵活的内存搜索和轻松的消息组织，为团队和代理提供快速、透明的协作。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Partition Memories by Entity" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
-    Learn how to scope memories across users, agents, and runs for team workflows.
-  </Card>
+<卡组列={2}>
+  <Card title="按实体划分记忆" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
+    了解如何跨用户、代理和团队工作流程运行确定内存范围。
+  </卡>
   <Card title="Support Inbox with Mem0" icon="headset" href="/cookbooks/operations/support-inbox">
-    Apply collaborative memory patterns to customer support scenarios.
-  </Card>
-</CardGroup>
+    将协作记忆模式应用于客户支持场景。
+  </卡>
+</卡组>

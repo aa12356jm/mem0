@@ -3,42 +3,38 @@ title: MCP Integration
 description: "Connect any AI client to Mem0 using Model Context Protocol for universal memory access"
 ---
 
-> Model Context Protocol (MCP) provides a standardized way for AI agents to manage their own memory through Mem0, without manual API calls.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Why use MCP
 
-When building AI applications, memory management often requires manual integration. MCP eliminates this complexity by:
 
-- **Universal compatibility**: Works with any MCP-compatible client (Claude, Claude Code, Cursor, Windsurf, VS Code, OpenCode)
-- **Agent autonomy**: AI agents decide when to save, search, or update memories
-- **Zero infrastructure**: No servers to maintain - Mem0's cloud MCP handles everything
-- **Standardized protocol**: One integration works across all your AI tools
+> 模型上下文协议 (MCP) 为 AI 代理提供了一种标准化方法，通过 Mem0 管理自己的内存，无需手动 API 调用。
 
-## Setup
+## 为什么使用 MCP
 
-Add Mem0 MCP to all supported clients with a single command:
+在构建人工智能应用程序时，内存管理通常需要手动集成。 MCP 通过以下方式消除了这种复杂性：
 
-```bash
+- **通用兼容性**：适用于任何 MCP 兼容客户端（Claude、Claude Code、Cursor、Windsurf、VS Code、OpenCode）
+- **代理自主**：人工智能代理决定何时保存、搜索或更新记忆
+- **零基础设施**：无需维护服务器 - Mem0 的云 MCP 处理一切
+- **标准化协议**：一种集成适用于您的所有人工智能工具
+
+## 设置
+
+使用单个命令将 Mem0 MCP 添加到所有支持的客户端：```bash
 npx mcp-add \
   --name mem0-mcp \
   --type http \
   --url "https://mcp.mem0.ai/mcp" \
   --clients "claude,claude code,cursor,windsurf,vscode,opencode"
 ```
-
-Or configure a specific client:
-
-```bash
+或者配置特定的客户端：```bash
 npx mcp-add \
   --name mem0-mcp \
   --type http \
   --url "https://mcp.mem0.ai/mcp" \
   --clients "cursor"
 ```
-
-For manual configuration, add this to your MCP client config:
-
-```json
+对于手动配置，请将其添加到您的 MCP 客户端配置中：```json
 {
   "mcpServers": {
     "mem0-mcp": {
@@ -48,51 +44,43 @@ For manual configuration, add this to your MCP client config:
   }
 }
 ```
+有关每个客户端的详细说明，请参阅 [Mem0 MCP 快速入门](/platform/mem0-mcp)。
 
-For detailed per-client instructions, see the [Mem0 MCP Quickstart](/platform/mem0-mcp).
+## 可用工具
 
-## Available tools
+MCP 服务器向您的 AI 客户端公开 11 种内存工具：
 
-The MCP server exposes 11 memory tools to your AI client:
-
-| Tool | Purpose |
+|工具|目的|
 |------|---------|
-| `add_memory` | Store conversations or facts |
-| `search_memories` | Find relevant memories with filters |
-| `get_memories` | List memories with pagination |
-| `update_memory` | Modify existing memory content |
-| `delete_memory` | Remove specific memories |
-| `delete_all_memories` | Bulk delete memories |
-| `delete_entities` | Remove user/agent/app entities |
-| `get_memory` | Retrieve single memory by ID |
-| `list_entities` | View stored entities |
-| `list_events` | List memory operation events with filters and pagination |
-| `get_event_status` | Check the status of an async memory operation by `event_id` |
+| `添加内存` |存储对话或事实 |
+| `搜索记忆` |使用过滤器查找相关记忆 |
+| `获取记忆` |用分页列出回忆 |
+| `更新内存` |修改现有内存内容 |
+| `删除内存` |删除特定记忆 |
+| `删除所有记忆` |批量删除记忆|
+| `删除实体` |删除用户/代理/应用程序实体 |
+| `获取内存` |通过ID检索单个内存|
+| `列表实体` |查看存储的实体 |
+| `列表事件` |使用过滤器和分页列出内存操作事件 |
+| `获取事件状态` |通过`event_id`检查异步内存操作的状态 |
 
-## How it works
+## 它是如何工作的1. **配置 MCP 服务器** - 使用上面的设置命令将 Mem0 MCP 添加到您的 AI 客户端
+2. **代理连接** - 您的 AI 客户端通过 HTTP 连接到 Mem0 的云 MCP 服务器
+3. **自主记忆** - 代理决定何时存储/检索记忆作为其推理的一部分
+4. **无需手动 API 调用** - 代理通过 MCP 工具自动管理内存
 
-1. **Configure the MCP server** - Add Mem0 MCP to your AI client using the setup command above
-2. **Agent connects** - Your AI client connects to Mem0's cloud MCP server over HTTP
-3. **Autonomous memory** - The agent decides when to store/retrieve memories as part of its reasoning
-4. **No manual API calls** - The agent manages memory automatically through MCP tools
+## 交互示例
 
-## Example interactions
-
-Once connected, your AI agent can:
-
-```
+连接后，您的 AI 代理可以：```
 User: Remember that I'm allergic to peanuts
 Agent: [calls add_memory] Got it! I've saved your peanut allergy.
 
 User: What dietary restrictions do I know about?
 Agent: [calls search_memories] You have a peanut allergy.
 ```
+代理根据上下文自动决定何时使用记忆工具。
 
-The agent automatically decides when to use memory tools based on context.
-
-## Try these prompts
-
-```python
+## 尝试这些提示```python
 # Multi-task operations
 "Generate 5 user personas for our e-commerce app with different demographics, store them all, then search for existing personas"
 
@@ -114,45 +102,42 @@ The agent automatically decides when to use memory tools based on context.
 # Health and wellness tracking
 "I'm allergic to peanuts and shellfish, and I go for 5km runs on weekday mornings"
 ```
+这些示例演示了 MCP 如何实现自然语言记忆操作 - AI 代理根据上下文自动确定何时添加、搜索、更新或删除记忆。
 
-These examples demonstrate how MCP enables natural language memory operations - the AI agent automatically determines when to add, search, update, or delete memories based on context.
+## 你可以做什么
 
-## What you can do
+Mem0 MCP 服务器为您的 AI 应用程序提供强大的内存功能：
 
-The Mem0 MCP server enables powerful memory capabilities for your AI applications:
+- **健康追踪**：“我对花生和贝类过敏” - 添加新的健康信息
+- **研究数据**：“存储这些试验参数：200 名参与者，双盲，安慰剂对照” - 保存结构化数据
+- **偏好查询**：“你对我的饮食偏好了解多少？” - 搜索并检索相关记忆
+- **项目更新**：“更新我的项目状态：移动应用程序现已完成 80%” - 修改现有内存
+- **数据清理**：“删除2023年以来的所有记忆” - 批量删除过时的信息
+- **主题概述**：“向我展示有关凤凰计划的所有内容” - 列出某个主题的所有记忆
 
-- **Health tracking**: "I'm allergic to peanuts and shellfish" - Add new health information
-- **Research data**: "Store these trial parameters: 200 participants, double-blind, placebo-controlled" - Save structured data
-- **Preference queries**: "What do you know about my dietary preferences?" - Search and retrieve relevant memories
-- **Project updates**: "Update my project status: the mobile app is now 80% complete" - Modify existing memory
-- **Data cleanup**: "Delete all memories from 2023" - Bulk remove outdated information
-- **Topic overview**: "Show me everything about Project Phoenix" - List all memories for a subject
+## 性能提示
 
-## Performance tips
+- 启用图形记忆以进行关系感知回忆
+- 搜索大内存集时使用特定过滤器
+- 添加多个内存时的批量操作
+- 在 Mem0 仪表板中监控内存使用情况
 
-- Enable graph memories for relationship-aware recall
-- Use specific filters when searching large memory sets
-- Batch operations when adding multiple memories
-- Monitor memory usage in the Mem0 dashboard
+## 最佳实践- **使用云 MCP**：位于“https://mcp.mem0.ai/mcp”的托管 MCP 服务器为您处理基础设施
+- **使用通配符**：`user_id: "*"` 在所有用户中搜索
+- **监控使用情况**：在仪表板中跟踪内存操作
+- **文档模式**：与您的团队分享成功的提示模式
 
-## Best practices
-
-- **Use the cloud MCP**: The hosted MCP server at `https://mcp.mem0.ai/mcp` handles infrastructure for you
-- **Use wildcards**: `user_id: "*"` to search across all users
-- **Monitor usage**: Track memory operations in the dashboard
-- **Document patterns**: Share successful prompt patterns with your team
-
-<CardGroup cols={2}>
-  <Card
-    title="Memory Filters"
-    description="Refine memory retrieval with powerful filtering capabilities"
-    icon="scale-balanced"
-    href="/platform/features/v2-memory-filters"
+<卡组列={2}>
+  <卡片
+    title =“内存过滤器”
+    description="通过强大的过滤功能优化内存检索"
+    图标=“规模平衡”
+    href="/platform/features/v2-内存过滤器"
   />
-  <Card
-    title="Gemini 3 with MCP"
-    description="See MCP in action with Google's Gemini 3 model"
-    icon="book-open"
+  <卡片
+    title="双子座 3 与 MCP"
+    description="查看 MCP 与 Google Gemini 3 模型的实际应用"
+    图标=“书本打开”
     href="/cookbooks/frameworks/gemini-3-with-mem0-mcp"
   />
-</CardGroup>
+</卡组>

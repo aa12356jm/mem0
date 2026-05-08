@@ -3,46 +3,39 @@ title: Memory-Powered Agent SDK
 description: "Expose Mem0 memories as callable tools inside OpenAI agent workflows."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Integrate Mem0's memory capabilities with OpenAI's Agents SDK to create AI agents with persistent memory. You can create agents that remember past conversations and use that context to provide better responses.
 
-## Installation
 
-First, install the required packages:
-```bash
+将 Mem0 的内存功能与 OpenAI 的 Agents SDK 集成，创建具有持久内存的 AI 代理。您可以创建能够记住过去对话的代理，并使用该上下文来提供更好的响应。
+
+## 安装
+
+首先，安装所需的软件包：```bash
 pip install mem0ai pydantic openai-agents
 ```
+您还需要一个用于此实现的自定义代理框架。
 
-You'll also need a custom agents framework for this implementation.
+## 设置环境变量
 
-## Setting Up Environment Variables
-
-Store your Mem0 API key as an environment variable:
-
-```bash
+将您的 Mem0 API 密钥存储为环境变量：```bash
 export MEM0_API_KEY="your_mem0_api_key"
 ```
-
-Or in your Python script:
-
-```python
+或者在你的 Python 脚本中：```python
 import os
 os.environ["MEM0_API_KEY"] = "your_mem0_api_key"
 ```
+## 代码结构
 
-## Code Structure
+该集成由三个主要部分组成：
 
-The integration consists of three main components:
+1. **上下文管理器**：定义内存操作的用户上下文
+2. **记忆工具**：添加、搜索、检索记忆的功能
+3. **内存代理**：配置为使用这些内存工具的代理
 
-1. **Context Manager**: Defines user context for memory operations
-2. **Memory Tools**: Functions to add, search, and retrieve memories
-3. **Memory Agent**: An agent configured to use these memory tools
+## 逐步实施
 
-## Step-by-Step Implementation
-
-### 1. Import Dependencies
-
-```python
+### 1. 导入依赖项```python
 from __future__ import annotations
 import os
 import asyncio
@@ -63,25 +56,16 @@ from agents import (
     function_tool,
 )
 ```
-
-### 2. Define Memory Context
-
-```python
+### 2. 定义内存上下文```python
 class Mem0Context(BaseModel):
     user_id: str | None = None
 ```
-
-### 3. Initialize the Mem0 Client
-
-```python
+### 3.初始化Mem0客户端```python
 client = AsyncMemoryClient(api_key=os.getenv("MEM0_API_KEY"))
 ```
+### 4. 创建记忆工具
 
-### 4. Create Memory Tools
-
-#### Add to Memory
-
-```python
+#### 添加到内存```python
 @function_tool
 async def add_to_memory(
     context: RunContextWrapper[Mem0Context],
@@ -97,10 +81,7 @@ async def add_to_memory(
     await client.add(messages, user_id=user_id)
     return f"Stored message: {content}"
 ```
-
-#### Search Memory
-
-```python
+#### 搜索内存```python
 @function_tool
 async def search_memory(
     context: RunContextWrapper[Mem0Context],
@@ -116,10 +97,7 @@ async def search_memory(
     results = '\n'.join([result["memory"] for result in memories["results"]])
     return str(results)
 ```
-
-#### Get All Memories
-
-```python
+#### 获取所有记忆```python
 @function_tool
 async def get_all_memory(
     context: RunContextWrapper[Mem0Context],
@@ -130,10 +108,7 @@ async def get_all_memory(
     results = '\n'.join([result["memory"] for result in memories["results"]])
     return str(results)
 ```
-
-### 5. Configure the Memory Agent
-
-```python
+### 5. 配置内存代理```python
 memory_agent = Agent[Mem0Context](
     name="Memory Assistant",
     instructions="""You are a helpful assistant with memory capabilities. You can:
@@ -147,10 +122,7 @@ memory_agent = Agent[Mem0Context](
     tools=[add_to_memory, search_memory, get_all_memory],
 )
 ```
-
-### 6. Implement the Main Runtime Loop
-
-```python
+### 6. 实现主运行时循环```python
 async def main():
     current_agent: Agent[Mem0Context] = memory_agent
     input_items: list[TResponseInputItem] = []
@@ -176,30 +148,21 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 ```
+## 用法示例
 
-## Usage Examples
-
-### Storing Information
-
-```
+### 存储信息```
 User: Remember that my favorite color is blue
 Agent: Calling a tool
 Agent: Tool call output: Stored message: my favorite color is blue
 Agent: I've stored that your favorite color is blue in my memory. I'll remember that for future conversations.
 ```
-
-### Searching Memory
-
-```
+### 搜索内存```
 User: What's my favorite color?
 Agent: Calling a tool
 Agent: Tool call output: my favorite color is blue
 Agent: Your favorite color is blue, based on what you've told me earlier.
 ```
-
-### Retrieving All Memories
-
-```
+### 找回所有记忆```
 User: What do you know about me?
 Agent: Calling a tool
 Agent: Tool call output: favorite color is blue
@@ -208,31 +171,26 @@ Agent: Based on our previous conversations, I know that:
 1. Your favorite color is blue
 2. Your birthday is on March 15
 ```
+## 高级配置
 
-## Advanced Configuration
+### 自定义用户 ID
 
-### Custom User IDs
-
-You can specify different user IDs to maintain separate memory stores for multiple users:
-
-```python
+您可以指定不同的用户 ID 来为多个用户维护单独的内存存储：```python
 context = Mem0Context(user_id="user123")
 ```
+## 资源
 
-
-## Resources
-
-- [Mem0 Documentation](https://docs.mem0.ai/introduction)
-- <a href="https://app.mem0.ai/dashboard?utm_source=oss&utm_medium=cookbook-agents-sdk-tool" rel="nofollow">Mem0 Dashboard</a>
-- [API Reference](https://docs.mem0.ai/api-reference)
+- [Mem0 文档](https://docs.mem0.ai/introduction)
+- <a href="https://app.mem0.ai/dashboard?utm_source=oss&utm_medium=cookbook-agents-sdk-tool" rel="nofollow">Mem0 仪表板</a>
+- [API参考](https://docs.mem0.ai/api-reference)
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="OpenAI Tool Calls with Mem0" icon="wrench" href="/cookbooks/integrations/openai-tool-calls">
-    Extend OpenAI assistants with tool-based memory operations.
-  </Card>
-  <Card title="Build a Mem0 Companion" icon="users" href="/cookbooks/essentials/building-ai-companion">
-    Learn the core patterns for memory-powered agents with any SDK.
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="OpenAI Tool 使用 Mem0 进行调用" icon="wrench" href="/cookbooks/integrations/openai-tool-calls">
+    通过基于工具的内存操作扩展 OpenAI 助手。
+  </卡>
+  <Card title="构建 Mem0 伴侣" icon="users" href="/cookbooks/essentials/building-ai-companion">
+    使用任何 SDK 了解内存驱动代理的核心模式。
+  </卡>
+</卡组>

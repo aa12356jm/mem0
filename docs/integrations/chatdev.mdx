@@ -3,55 +3,48 @@ title: ChatDev
 description: "Add persistent, cloud-managed memory to ChatDev multi-agent workflows with Mem0 — no code required, just YAML configuration."
 ---
 
-Build multi-agent workflows in [ChatDev](https://github.com/OpenBMB/ChatDev) with persistent memory powered by Mem0. ChatDev is a zero-code multi-agent platform where agents, tools, and workflows are defined entirely in YAML. Mem0 integrates as a built-in memory store (`type: mem0`), giving your agents cloud-managed semantic search and cross-session persistence — all without writing any code.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-In this guide, you'll:
-1. Set up ChatDev with the Mem0 memory store
-2. Configure agents with persistent memory using YAML
-3. Enable automatic memory retrieval and storage across conversations
-4. Leverage cross-session persistence for personalized multi-agent interactions
 
-## Prerequisites
+使用由 Mem0 提供支持的持久内存在 [ChatDev](https://github.com/OpenBMB/ChatDev) 中构建多代理工作流程。 ChatDev 是一个零代码多代理平台，其中代理、工具和工作流程完全在 YAML 中定义。 Mem0 集成为内置内存存储（“类型：mem0”），为您的代理提供云管理的语义搜索和跨会话持久性 - 所有这些都无需编写任何代码。
+
+## 概述
+
+在本指南中，您将：
+1. 使用 Mem0 内存存储设置 ChatDev
+2. 使用 YAML 配置具有持久内存的代理
+3. 启用跨对话的自动内存检索和存储
+4. 利用跨会话持久性进行个性化多代理交互
+
+## 先决条件
 
 - **Python 3.12+**
-- **[uv](https://docs.astral.sh/uv/)** — Python package manager
-- **Node.js 18+** and **npm** — only needed if using the web console
-- A **Mem0 API key** from <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-chatdev" rel="nofollow">app.mem0.ai</a>
-- An **OpenAI API key** (or another LLM provider supported by ChatDev)
+- **[uv](https://docs.astral.sh/uv/)** — Python 包管理器
+- **Node.js 18+** 和 **npm** — 仅在使用 Web 控制台时需要
+- 来自 <a href="https://app.mem0" 的 **Mem0 API 密钥**mem0.ai?utm_source=oss&utm_medium=integration-chatdev" rel="nofollow">app.mem0.ai</a>
+- **OpenAI API 密钥**（或 ChatDev 支持的其他 LLM 提供商）
 
-## Setup and Configuration
+## 设置和配置
 
-Install ChatDev and its dependencies (includes `mem0ai`):
-
-```bash
+安装 ChatDev 及其依赖项（包括 `mem0ai`）：```bash
 git clone https://github.com/OpenBMB/ChatDev.git
 cd ChatDev
 uv sync
 ```
-
-If you plan to use the web console, also install the frontend:
-
-```bash
+如果您计划使用 Web 控制台，还需安装前端：```bash
 cd frontend && npm install && cd ..
 ```
+在 `.env` 文件中设置环境变量：
 
-Set up your environment variables in a `.env` file:
-
-<Note>Get your Mem0 API key from <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-chatdev" rel="nofollow">Mem0 Platform</a>.</Note>
-
-```bash
+<Note>从 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-chatdev" rel="nofollow">Mem0 平台</a>获取 Mem0 API 密钥。</Note>```bash
 MEM0_API_KEY=your-mem0-api-key
 API_KEY=your-openai-api-key
 BASE_URL=https://api.openai.com/v1
 ```
+## 配置 Mem0 内存存储
 
-## Configure Mem0 Memory Store
-
-In your ChatDev workflow YAML, add a Mem0 memory store in the `memory` section:
-
-```yaml
+在 ChatDev 工作流程 YAML 中，在“内存”部分添加 Mem0 内存存储：```yaml
 memory:
   - name: mem0_store
     type: mem0
@@ -60,14 +53,11 @@ memory:
       user_id: my-user-123       # optional: scope memories to a user
       agent_id: my-agent         # optional: scope memories to an agent
 ```
+Mem0 在服务器端处理所有存储、嵌入和搜索 - 不需要本地向量数据库或嵌入模型。
 
-Mem0 handles all storage, embeddings, and search server-side — no local vector databases or embedding models are needed.
+## 将内存附加到代理
 
-## Attach Memory to an Agent
-
-Reference the memory store in your agent node's `memories` list:
-
-```yaml
+引用代理节点的“memories”列表中的内存存储：```yaml
 nodes:
   - id: writer
     type: agent
@@ -84,18 +74,15 @@ nodes:
           read: true
           write: true
 ```
+- **`read: true`** — 代理在生成响应之前检索相关记忆
+- **`write: true`** — 代理在每次交互后存储来自用户输入的新记忆
+- **`top_k`** — 每个查询检索的内存数量
+- **`similarity_threshold`** — 检索到的记忆的最小相关性得分。设置为“-1.0”以返回所有结果，无论分数如何
+- **`retrieve_stage`** — 何时检索记忆。选项：`pre_gen_thinking`（生成前）、`gen`（生成期间）、`post_gen_thinking`（生成后）、`finished`（完成后）
 
-- **`read: true`** — Agent retrieves relevant memories before generating a response
-- **`write: true`** — Agent stores new memories from user input after each interaction
-- **`top_k`** — Number of memories to retrieve per query
-- **`similarity_threshold`** — Minimum relevance score for retrieved memories. Set to `-1.0` to return all results regardless of score
-- **`retrieve_stage`** — When to retrieve memories. Options: `pre_gen_thinking` (before generation), `gen` (during generation), `post_gen_thinking` (after generation), `finished` (after completion)
+## 完整示例工作流程
 
-## Full Example Workflow
-
-Here's a complete workflow YAML that creates a memory-backed conversational agent:
-
-```yaml
+以下是创建内存支持的对话代理的完整工作流程 YAML：```yaml
 version: 0.4.0
 graph:
   description: Memory-backed conversation using Mem0
@@ -136,10 +123,7 @@ graph:
     - writer
   end: []
 ```
-
-Run the workflow:
-
-```bash
+运行工作流程：```bash
 # Option 1: CLI (recommended for quick testing)
 uv run python run.py --path yaml_instance/demo_mem0_memory.yaml --name my_project
 
@@ -147,36 +131,30 @@ uv run python run.py --path yaml_instance/demo_mem0_memory.yaml --name my_projec
 make dev
 # Backend starts at http://localhost:6400, frontend at http://localhost:5173
 ```
+要使用 Web 控制台，请打开“http://localhost:5173”，创建一个新工作流程，然后将 YAML 配置粘贴到编辑器中。 Web 控制台提供了一个可视化聊天界面，用于与内存支持的代理进行交互。
 
-To use the web console, open `http://localhost:5173`, create a new workflow, and paste your YAML configuration into the editor. The web console provides a visual chat interface for interacting with your memory-backed agents.
+## 它是如何工作的
 
-## How It Works
+当具有 Mem0 内存的代理收到输入时，会自动运行以下循环：
 
-When an agent with Mem0 memory receives input, the following cycle runs automatically:
-
-**1. Retrieve** — Before generating a response, ChatDev queries Mem0 with the user's input using semantic search. Relevant memories are injected into the agent's context in this format:
-
-```
+**1.检索** — 在生成响应之前，ChatDev 使用语义搜索使用用户的输入查询 Mem0。相关记忆以这种格式注入到代理的上下文中：```
 ===== Related Memories =====
 --- mem0_store ---
 1. User's favorite language is Rust
 2. User lives in San Francisco
 ===== End of Memory =====
 ```
+这就是示例中的角色提示引用“=====相关记忆=====”的原因——代理需要知道如何使用这个注入的上下文。
 
-This is why the role prompt in the example references `===== Related Memories =====` — the agent needs to know how to use this injected context.
+**2.生成** - 代理使用检索到的记忆作为附加上下文来生成响应。
 
-**2. Generate** — The agent produces a response using the retrieved memories as additional context.
+**3. Store** — 生成后，用户的输入通过 `client.add()` 发送到 Mem0。 Mem0 的提取模型自动识别并存储事实、偏好和关键信息。仅存储用户输入 - 排除代理输出以保持记忆清晰。
 
-**3. Store** — After generation, the user's input is sent to Mem0 via `client.add()`. Mem0's extraction model automatically identifies and stores facts, preferences, and key information. Only user input is stored — agent output is excluded to keep memories clean.
+在所有会话中，记忆都保留在 Mem0 的云中。下次使用相同的“user_id”或“agent_id”时，将自动检索以前的记忆。
 
-Memories persist in Mem0's cloud across all sessions. The next time the same `user_id` or `agent_id` is used, previous memories are automatically retrieved.
+## 双作用域内存（用户 + 代理）
 
-## Dual-Scope Memory (User + Agent)
-
-When both `user_id` and `agent_id` are configured, Mem0 uses an OR filter to search across both scopes in a single query:
-
-```yaml
+当同时配置了“user_id”和“agent_id”时，Mem0 使用 OR 过滤器在单个查询中跨两个范围进行搜索：```yaml
 memory:
   - name: shared_store
     type: mem0
@@ -185,59 +163,49 @@ memory:
       user_id: alice              # stores user preferences ("Alice prefers dark mode")
       agent_id: support-bot       # stores agent-learned context ("Resolved Alice's billing issue")
 ```
+这意味着检索会从用户范围和代理范围中返回记忆。写入包括两个 ID，因此每个内存都可以从任一维度访问。当您希望代理记住用户告诉它的内容*和代理在会话中学到的内容时，请使用此选项。
 
-This means retrieval returns memories from **both** the user's scope and the agent's scope. Writes include both IDs, so each memory is accessible from either dimension. Use this when you want an agent to remember both what the user told it *and* what the agent learned across sessions.
+## 配置参考
 
-## Configuration Reference
+### 内存存储配置
 
-### Memory Store Config
+|领域|必填 |描述 |
+|--------|----------|-------------|
+| `api_key` |是的 |来自 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-chatdev" rel="nofollow">app.mem0.ai</a> 的 Mem0 API 密钥 |
+| `用户 ID` |没有 |将内存范围分配给特定用户|
+| `agent_id` |没有 |将内存范围限制到特定代理|
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `api_key` | Yes | Mem0 API key from <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-chatdev" rel="nofollow">app.mem0.ai</a> |
-| `user_id` | No | Scope memories to a specific user |
-| `agent_id` | No | Scope memories to a specific agent |
+### 内存附件配置|领域|默认|描述 |
+|--------|---------|-------------|
+| `top_k` | `3` |要检索的记忆数量 |
+| `相似度阈值` | `-1.0`（禁用）|最低相关性分数。设置“0.0”和“1.0”之间的值以过滤低相关性结果。默认值 (`-1.0`) 返回所有匹配项而不进行过滤 |
+| `检索阶段` | `["gen"]` |何时检索：`pre_gen_thinking`、`gen`、`post_gen_thinking` 或 `finished` |
+| `阅读` | `真实` |特工是否检索记忆 |
+| `写` | `真实` |特工是否储存新的记忆 |
 
-### Memory Attachment Config
+## 提示和常见陷阱
 
-| Field | Default | Description |
-|-------|---------|-------------|
-| `top_k` | `3` | Number of memories to retrieve |
-| `similarity_threshold` | `-1.0` (disabled) | Minimum relevance score. Set a value between `0.0` and `1.0` to filter low-relevance results. Default (`-1.0`) returns all matches without filtering |
-| `retrieve_stage` | `["gen"]` | When to retrieve: `pre_gen_thinking`, `gen`, `post_gen_thinking`, or `finished` |
-| `read` | `true` | Whether the agent retrieves memories |
-| `write` | `true` | Whether the agent stores new memories |
+<信息>
+**索引延迟** — 新存储的内存可能需要几秒钟才能被搜索。如果存储后没有立即检索到内存，请稍等片刻，然后重试。
+</信息>- **第一次运行时没有返回记忆** — 这是预期的。记忆是在代理做出响应之后存储的，因此第一次交互没有先前的上下文。从第二次互动开始，记忆就会出现。
+- **`mem0ai` 未安装** — 如果您看到 `ImportError: mem0ai is required for Mem0Memory`，请运行 `uv add mem0ai` 或 `pip install mem0ai` 以添加依赖项。
+- **无效的 API 密钥** — 错误或过期的“MEM0_API_KEY”将记录“Mem0 搜索失败”或“Mem0 添加失败”等错误，但不会使代理崩溃。请在 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-chatdev" rel="nofollow">app.mem0.ai</a> 检查您的密钥。
+- **内存中的管道标头** — ChatDev 在将文本发送到 Mem0 之前自动删除内部管道标头（例如 `=== INPUT FROM TASK (user) ===`），因此您的内存保持干净。- **清除测试内存** — 要删除测试期间创建的内存，请使用 Mem0 仪表板 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-chatdev" rel="nofollow">app.mem0.ai</a> 或 Python SDK：`MemoryClient().delete_all(user_id="your-test-user")`。
 
-## Tips and Common Pitfalls
+## 主要特点1. **零代码集成** — 完全通过 YAML 配置 Mem0，无需 Python 代码
+2. **云管理存储** - Mem0 处理嵌入、持久性和搜索服务器端
+3. **语义搜索** - 检索上下文相关的记忆，而不仅仅是关键字匹配
+4. **跨会话持久性** — 记忆在运行、会话和重新启动后仍然存在
+5. **多代理内存共享** - 多个代理可以通过共同的“user_id”或“agent_id”范围共享内存
+6. **智能输入处理**——仅存储用户输入；代理输出被排除以防止嘈杂的记忆
 
-<Info>
-**Indexing delay** — Freshly stored memories may take a few seconds to become searchable. If a memory isn't retrieved immediately after being stored, wait a moment and try again.
-</Info>
+## 结论
 
-- **No memories returned on first run** — This is expected. Memories are stored *after* the agent responds, so the first interaction has no prior context. Memories appear starting from the second interaction onward.
-- **`mem0ai` not installed** — If you see `ImportError: mem0ai is required for Mem0Memory`, run `uv add mem0ai` or `pip install mem0ai` to add the dependency.
-- **Invalid API key** — A wrong or expired `MEM0_API_KEY` will log errors like `Mem0 search failed` or `Mem0 add failed` but won't crash the agent. Check your key at <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-chatdev" rel="nofollow">app.mem0.ai</a>.
-- **Pipeline headers in memories** — ChatDev automatically strips internal pipeline headers (e.g., `=== INPUT FROM TASK (user) ===`) before sending text to Mem0, so your memories stay clean.
-- **Clearing test memories** — To delete memories created during testing, use the Mem0 dashboard at <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-chatdev" rel="nofollow">app.mem0.ai</a> or the Python SDK: `MemoryClient().delete_all(user_id="your-test-user")`.
-
-## Key Features
-
-1. **Zero-Code Integration** — Configure Mem0 entirely through YAML, no Python code required
-2. **Cloud-Managed Storage** — Mem0 handles embeddings, persistence, and search server-side
-3. **Semantic Search** — Retrieve contextually relevant memories, not just keyword matches
-4. **Cross-Session Persistence** — Memories survive across runs, sessions, and restarts
-5. **Multi-Agent Memory Sharing** — Multiple agents can share memories through common `user_id` or `agent_id` scopes
-6. **Intelligent Input Processing** — Only user input is stored; agent output is excluded to prevent noisy memories
-
-## Conclusion
-
-By adding Mem0 as a memory store in ChatDev, your multi-agent workflows gain persistent, intelligent memory with zero code changes. Agents automatically remember past interactions and use that context to provide personalized, coherent responses across sessions.
-
-<CardGroup cols={2}>
+通过在 ChatDev 中添加 Mem0 作为内存存储，您的多代理工作流程可以通过零代码更改获得持久的智能内存。代理会自动记住过去的交互，并使用该上下文在会话中提供个性化、连贯的响应。<卡组列={2}>
   <Card title="CrewAI Integration" icon="users" href="/integrations/crewai">
-    Build multi-agent systems with CrewAI and Mem0
-  </Card>
+    使用 CrewAI 和 Mem0 构建多代理系统
+  </卡>
   <Card title="AutoGen Integration" icon="robot" href="/integrations/autogen">
-    Build conversational agents with AutoGen and Mem0
-  </Card>
-</CardGroup>
+    使用 AutoGen 和 Mem0 构建对话代理
+  </卡>
+</卡组>

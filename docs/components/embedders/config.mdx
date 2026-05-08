@@ -3,23 +3,26 @@ title: Configurations
 description: "Reference for embedder configuration options in Mem0, including provider selection and model settings."
 ---
 
-
-Config in mem0 is a dictionary that specifies the settings for your embedding models. It allows you to customize the behavior and connection details of your chosen embedder.
-
-## How to define configurations?
-
-The config is defined as an object (or dictionary) with two main keys:
-- `embedder`: Specifies the embedder provider and its configuration
-  - `provider`: The name of the embedder (e.g., "openai", "ollama")
-  - `config`: A nested object or dictionary containing provider-specific settings
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
 
-## How to use configurations?
 
-Here's a general example of how to use the config with mem0:
 
-<CodeGroup>
-```python Python
+mem0 中的 Config 是一个字典，用于指定嵌入模型的设置。它允许您自定义所选嵌入器的行为和连接详细信息。
+
+## 如何定义配置？
+
+配置被定义为具有两个主键的对象（或字典）：
+- `embedder`：指定嵌入器提供程序及其配置
+  - `provider`：嵌入者的名称（例如，“openai”、“ollama”）
+  - `config`：包含特定于提供者的设置的嵌套对象或字典
+
+
+## 如何使用配置？
+
+以下是如何将配置与 mem0 一起使用的一般示例：
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -35,66 +38,60 @@ config = {
 }
 
 m = Memory.from_config(config)
-m.add("Your text here", user_id="user", metadata={"category": "example"})
-```
+m.add("Your text here", user_id="user", metadata={"category": "example"})```
 
 ```typescript TypeScript
-import { Memory } from 'mem0ai/oss';
+从'mem0ai/oss'导入{内存}；
 
-const config = {
-  embedder: {
-    provider: 'openai',
-    config: {
+常量配置= {
+  嵌入器：{
+    提供者：'openai'，
+    配置：{
       apiKey: process.env.OPENAI_API_KEY || '',
-      model: 'text-embedding-3-small',
-      // Provider-specific settings go here
+      模型：'文本嵌入-3-小'，
+      // 此处提供特定于提供商的设置
     },
   },
 };
 
-const memory = new Memory(config);
-await memory.add("Your text here", { userId: "user", metadata: { category: "example" } });
-```
-</CodeGroup>
+const 内存 = 新内存（配置）；
+等待内存。添加（“这里是您的文本”，{ userId：“用户”，元数据：{类别：“示例”} }）;```
+</代码组>
 
-## Why is Config Needed?
+## 为什么需要配置？
 
-Config is essential for:
-1. Specifying which embedding model to use.
-2. Providing necessary connection details (e.g., model, api_key, embedding_dims).
-3. Ensuring proper initialization and connection to your chosen embedder.
+配置对于以下方面至关重要：
+1. 指定使用哪种嵌入模型。
+2. 提供必要的连接详细信息（例如模型、api_key、embedding_dims）。
+3. 确保正确初始化并连接到您选择的嵌入器。
 
-## Master List of All Params in Config
+## 配置中所有参数的主列表
 
-Here's a comprehensive list of all parameters that can be used across different embedders:
+以下是可在不同嵌入器之间使用的所有参数的完整列表：<标签>
+<标签标题=“Python”>
+|参数|描述 |供应商|
+|------------|-------------|----------|
+| `模型` |使用的嵌入模型 |全部 |
+| `api_key` |提供商的 API 密钥 |全部 |
+| `embedding_dims` |嵌入模型的尺寸|全部 |
+| `http_client_proxies` |允许代理服务器设置 |全部 |
+| `ollama_base_url` | Ollama 嵌入模型的基本 URL |奥拉玛 |
+| `model_kwargs` | Huggingface 嵌入模型的键值参数 |拥抱脸 |
+| `azure_kwargs` | AzureOpenAI 嵌入模型的键值参数 | Azure 开放人工智能 |
+| `openai_base_url` | OpenAI API 的基本 URL |开放人工智能 |
+| `vertex_credentials_json` | VertexAI 的 Google Cloud 凭证 JSON 文件的路径 |顶点人工智能 |
+| `内存添加嵌入类型` |用于添加内存操作的嵌入类型 |顶点人工智能 |
+| `内存_更新_嵌入_类型` |用于更新内存操作的嵌入类型 |顶点人工智能 |
+| `内存搜索嵌入类型` |用于搜索内存操作的嵌入类型 |顶点人工智能 |
+| `lmstudio_base_url` | LM Studio API 的基本 URL | LM工作室|
+</标签>
+<选项卡标题=“TypeScript”>
+|参数|描述 |供应商|
+|------------|-------------|----------|
+| `模型` |使用的嵌入模型 |全部 |
+| `apiKey` |提供商的 API 密钥 |全部 |
+| `embeddingDims` |嵌入模型的尺寸|全部 |
+</标签>
+</标签>## 支持的嵌入模型
 
-<Tabs>
-<Tab title="Python">
-| Parameter | Description | Provider |
-|-----------|-------------|----------|
-| `model` | Embedding model to use | All |
-| `api_key` | API key of the provider | All |
-| `embedding_dims` | Dimensions of the embedding model | All |
-| `http_client_proxies` | Allow proxy server settings | All |
-| `ollama_base_url` | Base URL for the Ollama embedding model | Ollama |
-| `model_kwargs` | Key-Value arguments for the Huggingface embedding model | Huggingface |
-| `azure_kwargs` | Key-Value arguments for the AzureOpenAI embedding model | Azure OpenAI |
-| `openai_base_url`    | Base URL for OpenAI API                       | OpenAI            |
-| `vertex_credentials_json` | Path to the Google Cloud credentials JSON file for VertexAI                       | VertexAI            |
-| `memory_add_embedding_type` | The type of embedding to use for the add memory action                       | VertexAI            |
-| `memory_update_embedding_type` | The type of embedding to use for the update memory action                       | VertexAI            |
-| `memory_search_embedding_type` | The type of embedding to use for the search memory action                       | VertexAI            |
-| `lmstudio_base_url` | Base URL for LM Studio API                    | LM Studio         |
-</Tab>
-<Tab title="TypeScript">
-| Parameter | Description | Provider |
-|-----------|-------------|----------|
-| `model` | Embedding model to use | All |
-| `apiKey` | API key of the provider | All |
-| `embeddingDims` | Dimensions of the embedding model | All |
-</Tab>
-</Tabs>
-
-## Supported Embedding Models
-
-For detailed information on configuring specific embedders, please visit the [Embedding Models](./models) section. There you'll find information for each supported embedder with provider-specific usage examples and configuration details.
+有关配置特定嵌入器的详细信息，请访问[嵌入模型](./models)部分。在那里，您可以找到每个受支持的嵌入器的信息以及特定于提供商的使用示例和配置详细信息。

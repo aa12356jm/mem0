@@ -3,12 +3,15 @@ title: Mistral AI
 description: "Configure Mistral AI as an LLM provider in Mem0 using the litellm integration and Mixtral model family."
 ---
 
-To use mistral's models, please obtain the Mistral AI api key from their [console](https://console.mistral.ai/). Set the `MISTRAL_API_KEY` environment variable to use the model as given below in the example.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Usage
 
-<CodeGroup>
-```python Python
+
+要使用 Mistral 的模型，请从其[控制台](https://console.mistral.ai/) 获取 Mistral AI api 密钥。设置“MISTRAL_API_KEY”环境变量以使用下面示例中给出的模型。
+
+## 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -60,8 +63,8 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-## Config
+## 配置
 
-All available parameters for the `litellm` config are present in [Master List of All Params in Config](../config).
+`litellm` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

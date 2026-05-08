@@ -4,49 +4,50 @@ description: Tailor fact extraction so Mem0 stores only the details you care abo
 icon: "wand-magic-sparkles"
 ---
 
-Custom instructions let you decide exactly which facts Mem0 records from a conversation. Define a focused prompt, give a few examples, and Mem0 will add only the memories that match your use case.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Info>
-  **You'll use this when...**
-  - A project needs domain-specific facts (order numbers, customer info) without storing casual chatter.
-  - You already have a clear schema for memories and want the LLM to follow it.
-  - You must prevent irrelevant details from entering long-term storage.
-</Info>
 
-<Warning>
-  Prompts that are too broad cause unrelated facts to slip through. Keep instructions tight and test them with real transcripts.
-</Warning>
 
-<Note>
-  The `custom_fact_extraction_prompt` parameter has been renamed to `custom_instructions`. If you are upgrading from an older version, update your configuration accordingly.
-</Note>
+自定义指令可让您准确决定 Mem0 从对话中记录哪些事实。定义一个重点提示，给出一些示例，Mem0 将仅添加与您的用例匹配的内存。
 
----
+<信息>
+  **您将在以下情况下使用它...**
+  - 项目需要特定领域的事实（订单号、客户信息），而不存储随意的闲聊。
+  - 您已经有一个清晰的记忆模式，并希望法学硕士遵循它。
+  - 您必须防止不相关的详细信息进入长期存储。
+</信息>
 
-## Feature anatomy
+<警告>
+  过于宽泛的提示会导致忽略不相关的事实。严格遵守指示并用真实的成绩单进行测试。
+</警告>
 
-- **Prompt instructions:** Describe which entities or phrases to keep. Specific guidance keeps the extractor focused.
-- **Few-shot examples:** Show positive and negative cases so the model copies the right format.
-- **Structured output:** Responses return JSON with a `facts` array that Mem0 converts into individual memories.
-- **LLM configuration:** `custom_instructions` (Python) or `customInstructions` (TypeScript) lives alongside your model settings.
-
-<AccordionGroup>
-  <Accordion title="Prompt blueprint">
-    1. State the allowed fact types.
-    2. Include short examples that mirror production messages.
-    3. Show both empty (`[]`) and populated outputs.
-    4. Remind the model to return JSON with a `facts` key only.
-  </Accordion>
-</AccordionGroup>
+<注意>
+  “custom_fact_extraction_prompt”参数已重命名为“custom_instructions”。如果您要从旧版本升级，请相应地更新您的配置。
+</注>
 
 ---
 
-## Configure it
+## 特征剖析- **提示说明：** 描述要保留哪些实体或短语。特定的指导使提取器保持专注。
+- **少量示例：** 显示正面和负面案例，以便模型复制正确的格式。
+- **结构化输出：** 响应返回带有“facts”数组的 JSON，Mem0 将其转换为单独的内存。
+- **LLM 配置：** `custom_instructions` (Python) 或 `customInstructions` (TypeScript) 与您的模型设置一起存在。
 
-### Write the custom prompt
+<手风琴组>
+  <Accordion title="提示蓝图">
+    1. 说明允许的事实类型。
+    2. 包括反映生产消息的简短示例。
+    3. 显示空 (`[]`) 和已填充的输出。
+    4. 提醒模型仅返回带有“facts”键的 JSON。
+  </手风琴>
+</手风琴组>
 
-<CodeGroup>
-```python Python
+---
+
+## 配置它
+
+### 编写自定义提示
+
+<代码组>```python Python
 custom_instructions = """
 Please only extract entities containing customer support information, order details, and user information.
 Here are some few shot examples:
@@ -93,16 +94,15 @@ Output: {"facts" : ["Ordered red shirt, size medium", "Received blue shirt inste
 Return the facts and customer information in a json format as shown above.
 `;
 ```
-</CodeGroup>
+</代码组>
 
-<Tip>
-  Keep example pairs short and mirror the capitalization, punctuation, and tone you see in real user messages.
-</Tip>
+<提示>
+  保持示例对简短并反映您在真实用户消息中看到的大小写、标点符号和语气。
+</提示>
 
-### Load the prompt in configuration
+### 在配置中加载提示
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 from mem0 import Memory
 
 config = {
@@ -138,20 +138,19 @@ const config = {
 
 const memory = new Memory(config);
 ```
-</CodeGroup>
+</代码组>
 
-<Info icon="check">
-  After initialization, run a quick `add` call with a known example and confirm the response splits into separate facts.
-</Info>
+<信息图标=“检查”>
+  初始化后，使用已知示例运行快速“add”调用，并确认响应拆分为单独的事实。
+</信息>
 
 ---
 
-## See it in action
+## 查看实际效果
 
-### Example: Order support memory
+### 示例：订单支持内存
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 m.add("Yesterday, I ordered a laptop, the order id is 12345", user_id="alice")
 ```
 
@@ -169,16 +168,15 @@ await memory.add("Yesterday, I ordered a laptop, the order id is 12345", { userI
   "relations": []
 }
 ```
-</CodeGroup>
+</代码组>
 
-<Info icon="check">
-  The output contains only the facts described in your prompt, each stored as a separate memory entry.
-</Info>
+<信息图标=“检查”>
+  输出仅包含提示中描述的事实，每个事实都存储为单独的内存条目。
+</信息>
 
-### Example: Irrelevant message filtered out
+### 示例：过滤掉不相关的消息
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 m.add("I like going to hikes", user_id="alice")
 ```
 
@@ -192,37 +190,35 @@ await memory.add("I like going to hikes", { userId: "user123" });
   "relations": []
 }
 ```
-</CodeGroup>
+</代码组>
 
-<Tip>
-  Empty `results` show the prompt successfully ignored content outside your target domain.
-</Tip>
-
----
-
-## Verify the feature is working
-
-- Log every call during rollout and confirm the `facts` array matches your schema.
-- Check that unrelated messages return an empty `results` array.
-- Run regression samples whenever you edit the prompt to ensure previously accepted facts still pass.
+<提示>
+  空“结果”显示提示已成功忽略目标域之外的内容。
+</提示>
 
 ---
 
-## Best practices
+## 验证该功能是否正常工作
 
-1. **Be precise:** Call out the exact categories or fields you want to capture.
-2. **Show negative cases:** Include examples that should produce `[]` so the model learns to skip them.
-3. **Keep JSON strict:** Avoid extra keys; only return `facts` to simplify downstream parsing.
-4. **Version prompts:** Track prompt changes with a version number so you can roll back quickly.
-5. **Review outputs regularly:** Spot-check stored memories to catch drift early.
+- 记录部署期间的每个调用并确认“facts”数组与您的架构匹配。
+- 检查不相关的消息是否返回空的“结果”数组。
+- 每当您编辑提示时运行回归示例，以确保先前接受的事实仍然通过。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Review Add Operations" icon="list" href="/core-concepts/memory-operations/add">
-    Refresh how Mem0 stores memories and how prompts influence fact creation.
-  </Card>
-  <Card title="Automate Support Triage" icon="inbox" href="/cookbooks/operations/support-inbox">
-    Apply custom extraction to route customer requests in a full workflow.
-  </Card>
-</CardGroup>
+## 最佳实践
+
+1. **精确：** 准确指出您想要捕获的类别或字段。
+2. **显示负面案例：** 包含应生成“[]”的示例，以便模型学会跳过它们。
+3. **保持 JSON 严格：** 避免额外的键；只返回“facts”以简化下游解析。
+4. **版本提示：** 使用版本号跟踪提示更改，以便您可以快速回滚。
+5. **定期检查输出：** 抽查存储的记忆以尽早发现偏差。
+
+---<卡组列={2}>
+  <Card title="查看添加操作" icon="list" href="/core-concepts/memory-operations/add">
+    刷新 Mem0 如何存储记忆以及提示如何影响事实创建。
+  </卡>
+  <Card title="自动支持分类" icon="inbox" href="/cookbooks/operations/support-inbox">
+    应用自定义提取在完整的工作流程中路由客户请求。
+  </卡>
+</卡组>

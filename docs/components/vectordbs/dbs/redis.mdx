@@ -2,22 +2,22 @@
 title: "Redis"
 description: "Use Redis as a real-time vector database in Mem0 for fast vector search using Redis Stack and redisvl."
 ---
-[Redis](https://redis.io/) is a scalable, real-time database that can store, search, and analyze vector data.
 
-### Installation
-```bash
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
+
+
+
+[Redis](https://redis.io/) 是一个可扩展的实时数据库，可以存储、搜索和分析矢量数据。
+
+＃＃＃ 安装```bash
 pip install redis redisvl
 ```
-
-Redis Stack using Docker:
-```bash
+使用 Docker 的 Redis 堆栈：```bash
 docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
 ```
+### 用法
 
-### Usage
-
-<CodeGroup>
-```python Python
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -70,27 +70,27 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-### Config
+### 配置
 
-Let's see the available parameters for the `redis` config:
+让我们看看“redis”配置的可用参数：
 
-<Tabs>
-<Tab title="Python">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collection_name` | The name of the collection to store the vectors | `mem0` |
-| `embedding_model_dims` | Dimensions of the embedding model | `1536` |
-| `redis_url` | The URL of the Redis server | `None` |
-</Tab>
-<Tab title="TypeScript">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collectionName` | The name of the collection to store the vectors | `mem0` |
-| `embeddingModelDims` | Dimensions of the embedding model | `1536` |
-| `redisUrl` | The URL of the Redis server | `None` |
-| `username` | Username for Redis connection | `None` |
-| `password` | Password for Redis connection | `None` |
-</Tab>
-</Tabs>
+<标签>
+<标签标题=“Python”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |存储向量的集合的名称 | `mem0` |
+| `embedding_model_dims` |嵌入模型的尺寸| `1536` |
+| `redis_url` | Redis服务器的URL | `无` |
+</标签>
+<选项卡标题=“TypeScript”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |存储向量的集合的名称 | `mem0` |
+| `embeddingModelDims` |嵌入模型的尺寸| `1536` |
+| `redisUrl` | Redis服务器的URL | `无` |
+| `用户名` | Redis 连接的用户名 | `无` |
+| `密码` | Redis 连接密码 | `无` |
+</标签>
+</标签>

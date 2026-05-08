@@ -3,74 +3,71 @@ title: Advanced Memory Operations
 description: "Run richer add/search/update/delete flows on the managed platform with metadata, rerankers, and per-request controls."
 ---
 
-# Make Platform Memory Operations Smarter
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Info>
-  **Prerequisites**
-  - Platform workspace with API key
-  - Python 3.10+ and Node.js 18+
-  - Async memories enabled in your dashboard (Settings → Memory Options)
-</Info>
 
-<Tip>
-  Need a refresher on the core concepts first? Review the <Link href="/core-concepts/memory-operations/add">Add Memory</Link> overview, then come back for the advanced flow.
-</Tip>
 
-## Install and authenticate
+# 让平台内存操作更智能
 
-<Tabs>
-  <Tab title="Python">
-<Steps>
-<Step title="Install the SDK with async extras">
-```bash
+<信息>
+  **先决条件**
+  - 具有 API 密钥的平台工作区
+  - Python 3.10+ 和 Node.js 18+
+  - 在仪表板中启用异步内存（设置→内存选项）
+</信息>
+
+<提示>
+  需要先复习一下核心概念吗？查看<Link href="/core-concepts/memory-operations/add">添加内存</Link>概述，然后返回查看高级流程。
+</提示>
+
+## 安装并验证
+
+<标签>
+  <标签标题=“Python”>
+<步骤>
+<Step title="安装带有异步附加功能的 SDK">```bash
 pip install "mem0ai[async]"
 ```
-</Step>
-<Step title="Export your API key">
-```bash
+</步骤>
+<Step title="导出您的 API 密钥">```bash
 export MEM0_API_KEY="sk-platform-..."
 ```
-</Step>
-<Step title="Create an async client">
-```python
+</步骤>
+<Step title="创建异步客户端">```python
 import os
 from mem0 import AsyncMemoryClient
 
 memory = AsyncMemoryClient(api_key=os.environ["MEM0_API_KEY"])
 ```
-</Step>
-</Steps>
-  </Tab>
-  <Tab title="TypeScript">
-<Steps>
-<Step title="Install the OSS SDK">
-```bash
+</步骤>
+</步骤>
+  </标签>
+  <选项卡标题=“TypeScript”>
+<步骤>
+<Step title="安装OSS SDK">```bash
 npm install mem0ai
 ```
-</Step>
-<Step title="Load your API key">
-```bash
+</步骤>
+<Step title="加载您的 API 密钥">```bash
 export MEM0_API_KEY="sk-platform-..."
 ```
-</Step>
-<Step title="Instantiate the client">
-```typescript
+</步骤>
+<Step title="实例化客户端">```typescript
 import { Memory } from "mem0ai";
 
 const memory = new Memory({ apiKey: process.env.MEM0_API_KEY!, async: true });
 ```
-</Step>
-</Steps>
-  </Tab>
-</Tabs>
+</步骤>
+</步骤>
+  </标签>
+</标签>
 
-## Add memories with metadata and graph context
+## 添加带有元数据和图形上下文的记忆
 
-<Tabs>
-  <Tab title="Python">
-<Steps>
-<Step title="Record conversations with metadata">
-```python
+<标签>
+  <标签标题=“Python”>
+<步骤>
+<Step title="使用元数据记录对话">```python
 conversation = [
     {"role": "user", "content": "I'm Morgan, planning a 3-week trip to Japan in May."},
     {"role": "assistant", "content": "Great! I'll track dietary notes and cities you mention."},
@@ -84,13 +81,12 @@ result = await memory.add(
     run_id="planning-call-1",
 )
 ```
-</Step>
-</Steps>
-  </Tab>
-  <Tab title="TypeScript">
-<Steps>
-<Step title="Capture context-rich memories">
-```typescript
+</步骤>
+</步骤>
+  </标签>
+  <选项卡标题=“TypeScript”>
+<步骤>
+<Step title="捕捉上下文丰富的记忆">```typescript
 const conversation = [
   { role: "user", content: "I'm Morgan, planning a 3-week trip to Japan in May." },
   { role: "assistant", content: "Great! I'll track dietary notes and cities you mention." },
@@ -103,22 +99,21 @@ const result = await memory.add(conversation, {
   runId: "planning-call-1",
 });
 ```
-</Step>
-</Steps>
-  </Tab>
-</Tabs>
+</步骤>
+</步骤>
+  </标签>
+</标签>
 
-<Info icon="check">
-  Successful calls return memories tagged with the metadata you passed. In the dashboard, confirm a graph edge between “Morgan” and “Tokyo” and verify the `trip=japan-2025` tag exists.
-</Info>
+<信息图标=“检查”>
+  成功的调用会返回标有您传递的元数据的记忆。在仪表板中，确认“Morgan”和“Tokyo”之间的图形边缘，并验证“trip=japan-2025”标签是否存在。
+</信息>
 
-## Retrieve and refine
+## 检索和细化
 
-<Tabs>
-  <Tab title="Python">
-<Steps>
-<Step title="Filter by metadata + reranker">
-```python
+<标签>
+  <标签标题=“Python”>
+<步骤>
+<Step title="按元数据过滤 + 重新排序">```python
 matches = await memory.search(
     "Any food alerts?",
     user_id="traveler-42",
@@ -127,21 +122,19 @@ matches = await memory.search(
     include_vectors=False,
 )
 ```
-</Step>
-<Step title="Update a memory inline">
-```python
+</步骤>
+<Step title="更新内联内存">```python
 await memory.update(
     memory_id=matches["results"][0]["id"],
     content="Morgan avoids shellfish and prefers boutique hotels in central Tokyo.",
 )
 ```
-</Step>
-</Steps>
-  </Tab>
-  <Tab title="TypeScript">
-<Steps>
-<Step title="Search with metadata filters">
-```typescript
+</步骤>
+</步骤>
+  </标签>
+  <选项卡标题=“TypeScript”>
+<步骤>
+<Step title="使用元数据过滤器搜索">```typescript
 const matches = await memory.search("Any food alerts?", {
   userId: "traveler-42",
   filters: { "metadata.trip": "japan-2025" },
@@ -149,60 +142,57 @@ const matches = await memory.search("Any food alerts?", {
   includeVectors: false,
 });
 ```
-</Step>
-<Step title="Apply an update">
-```typescript
+</步骤>
+<步骤标题=“应用更新”>```typescript
 await memory.update(matches.results[0].id, {
   content: "Morgan avoids shellfish and prefers boutique hotels in central Tokyo.",
 });
 ```
-</Step>
-</Steps>
-  </Tab>
-</Tabs>
+</步骤>
+</步骤>
+  </标签>
+</标签>
 
-## Clean up
+## 清理
 
-<Tabs>
-  <Tab title="Python">
-<Steps>
-<Step title="Delete scoped memories">
-```python
+<标签>
+  <标签标题=“Python”>
+<步骤>
+<Step title="删除范围内存">```python
 await memory.delete_all(user_id="traveler-42", run_id="planning-call-1")
 ```
-</Step>
-</Steps>
-  </Tab>
-  <Tab title="TypeScript">
-<Steps>
-<Step title="Remove the run">
-```typescript
+</步骤>
+</步骤>
+  </标签>
+  <选项卡标题=“TypeScript”>
+<步骤>
+<Step title="删除运行">```typescript
 await memory.deleteAll({ userId: "traveler-42", runId: "planning-call-1" });
 ```
-</Step>
-</Steps>
-  </Tab>
-</Tabs>
+</步骤>
+</步骤>
+  </标签>
+</标签>
 
-## Quick recovery
+## 快速恢复
 
-- Empty results with filters: log `filters` values and confirm metadata keys match (case-sensitive).
+- 带过滤器的空结果：记录“过滤器”值并确认元数据键匹配（区分大小写）。
 
-<Warning>
-  Metadata keys become part of your filtering schema. Stick to lowercase snake_case (`trip_id`, `preferences`) to avoid collisions down the road.
-</Warning>
+<警告>
+  元数据键成为过滤架构的一部分。坚持使用小写的snake_case（`trip_id`，`preferences`）以避免路上发生碰撞。
+</警告>
 
-<CardGroup cols={2}>
-  <Card
-    title="Tune Metadata Filtering"
-    description="Layer field-level filters on top of advanced operations."
-    icon="funnel"
+<卡组列={2}>
+  <卡片
+    title="调整元数据过滤"
+    description="在高级操作之上分层字段级过滤器。"
+    图标=“漏斗”
     href="/open-source/features/metadata-filtering"
   />
-  <Card
-    title="Explore Reranker Search"
-    description="See how rerankers boost accuracy after vector + graph retrieval."
-    icon="sparkles"
+  <卡片
+    title="探索重排器搜索"
+    description="了解重新排序器如何在矢量+图形检索后提高准确性。"
+    图标=“闪闪发光”
     href="/open-source/features/reranker-search"
   />
-</CardGroup>
+</卡组>

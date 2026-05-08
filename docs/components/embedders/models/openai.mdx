@@ -3,12 +3,15 @@ title: OpenAI
 description: "Configure OpenAI as an embedding provider in Mem0 using models like text-embedding-3-large for vector generation."
 ---
 
-To use OpenAI embedding models, set the `OPENAI_API_KEY` environment variable. You can obtain the OpenAI API key from the [OpenAI Platform](https://platform.openai.com/account/api-keys).
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Usage
 
-<CodeGroup>
-```python Python
+
+要使用 OpenAI 嵌入模型，请设置“OPENAI_API_KEY”环境变量。您可以从[OpenAI Platform](https://platform.openai.com/account/api-keys)获取OpenAI API密钥。
+
+### 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -49,25 +52,25 @@ const config = {
 const memory = new Memory(config);
 await memory.add("I'm visiting Paris", { userId: "john" });
 ```
-</CodeGroup>
+</代码组>
 
-### Config
+### 配置
 
-Here are the parameters available for configuring OpenAI embedder:
+以下是可用于配置 OpenAI 嵌入器的参数：
 
-<Tabs>
-<Tab title="Python">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `model` | The name of the embedding model to use | `text-embedding-3-small` |
-| `embedding_dims` | Dimensions of the embedding model | `1536` |
-| `api_key` | The OpenAI API key | `None` |
-</Tab>
-<Tab title="TypeScript">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `model` | The name of the embedding model to use | `text-embedding-3-small` |
-| `embeddingDims` | Dimensions of the embedding model | `1536` |
-| `apiKey` | The OpenAI API key | `None` |
-</Tab>
-</Tabs>
+<标签>
+<标签标题=“Python”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `模型` |要使用的嵌入模型的名称 | `文本嵌入-3-小` |
+| `embedding_dims` |嵌入模型的尺寸| `1536` |
+| `api_key` | OpenAI API 密钥 | `无` |
+</标签>
+<选项卡标题=“TypeScript”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `模型` |要使用的嵌入模型的名称 | `文本嵌入-3-小` |
+| `embeddingDims` |嵌入模型的尺寸| `1536` |
+| `apiKey` | OpenAI API 密钥 | `无` |
+</标签>
+</标签>

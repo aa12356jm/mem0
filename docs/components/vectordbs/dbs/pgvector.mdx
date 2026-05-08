@@ -2,12 +2,16 @@
 title: "pgvector"
 description: "Use pgvector as a vector store in Mem0 for PostgreSQL-based vector similarity search with open-source simplicity."
 ---
-[pgvector](https://github.com/pgvector/pgvector) is an open-source vector similarity search extension for Postgres. After connecting to Postgres, run `CREATE EXTENSION IF NOT EXISTS vector;` to create the vector extension.
 
-### Usage
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<CodeGroup>
-```python Python
+
+
+[pgvector](https://github.com/pgvector/pgvector) 是 Postgres 的开源向量相似性搜索扩展。连接到 Postgres 后，运行“CREATE EXTENSION IF NOT EXISTS vector;”来创建向量扩展。
+
+### 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -64,30 +68,28 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-### Config
+### 配置
 
-Here are the parameters available for configuring pgvector:
+以下是可用于配置 pgvector 的参数：
 
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `dbname` | The name of the database | `postgres` |
-| `collection_name` | The name of the collection | `mem0` |
-| `embedding_model_dims` | Dimensions of the embedding model | `1536` |
-| `user` | User name to connect to the database | `None` |
-| `password` | Password to connect to the database | `None` |
-| `host` | The host where the Postgres server is running | `None` |
-| `port` | The port where the Postgres server is running | `None` |
-| `diskann` | Whether to use diskann for vector similarity search (requires pgvectorscale) | `True` |
-| `hnsw` | Whether to use hnsw for vector similarity search | `False` |
-| `sslmode` | SSL mode for PostgreSQL connection (e.g., 'require', 'prefer', 'disable') | `None` |
-| `connection_string` | PostgreSQL connection string (overrides individual connection parameters) | `None` |
-| `connection_pool` | psycopg2 connection pool object (overrides connection string and individual parameters) | `None` |
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `数据库名称` |数据库名称 | `postgres` |
+| `集合名称` |作品集名称| `mem0` |
+| `embedding_model_dims` |嵌入模型的尺寸| `1536` |
+| `用户` |连接数据库的用户名 | `无` |
+| `密码` |连接数据库的密码 | `无` |
+| `主机` |运行 Postgres 服务器的主机 | `无` |
+| `端口` | Postgres 服务器运行的端口 | `无` |
+| `diskann` |是否使用diskann进行向量相似度搜索（需要pgvectorscale） | '真实' |
+| `hnsw` |是否使用hnsw进行向量相似度搜索 | ‘假’|
+| `ssl 模式` |用于 PostgreSQL 连接的 SSL 模式（例如、“要求”、“首选”、“禁用”）| `无` |
+| `连接字符串` | PostgreSQL 连接字符串（覆盖各个连接参数）| `无` |
+| `连接池` | psycopg2 连接池对象（覆盖连接字符串和各个参数）| `无` |**注意（TypeScript OSS）：** 如果省略 `dbname`，TypeScript 客户端将使用数据库名称 `vector_store`。 Python 默认使用“postgres”作为“dbname”，如上表所示。
 
-**Note (TypeScript OSS):** If you omit `dbname`, the TypeScript client uses the database name `vector_store`. Python defaults to `postgres` for `dbname`, as in the table above.
-
-**Note**: The connection parameters have the following priority:
+**注意**：连接参数具有以下优先级：
 1. `connection_pool` (highest priority)
-2. `connection_string`
-3. Individual connection parameters (`user`, `password`, `host`, `port`, `sslmode`)
+2.`连接字符串`
+3. 单独的连接参数（`user`、`password`、`host`、`port`、`sslmode`）

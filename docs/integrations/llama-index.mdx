@@ -3,29 +3,28 @@ title: LlamaIndex
 description: "Use Mem0 as a memory store in LlamaIndex with support for ReAct and FunctionCalling agent types."
 ---
 
-LlamaIndex supports Mem0 as a [memory store](https://llamahub.ai/l/memory/llama-index-memory-mem0). In this guide, we'll show you how to use it.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Note type="info">
-  [**Mem0Memory**](https://docs.llamaindex.ai/en/stable/examples/memory/Mem0Memory/) now supports **ReAct** and **FunctionCalling** agents.
-</Note>
 
-### Installation
 
-To install the required package, run:
+LlamaIndex 支持 Mem0 作为[内存存储](https://llamahub.ai/l/memory/llama-index-memory-mem0)。在本指南中，我们将向您展示如何使用它。
 
-```bash
+<注释类型=“信息”>
+  [**Mem0Memory**](https://docs.llamaindex.ai/en/stable/examples/memory/Mem0Memory/) 现在支持 **ReAct** 和 **FunctionCalling** 代理。
+</注>
+
+### 安装
+
+要安装所需的包，请运行：```bash
 pip install llama-index-core llama-index-memory-mem0 python-dotenv
 ```
+### 使用 Mem0 平台进行设置
 
-### Setup with Mem0 Platform
+将 Mem0 平台 API 密钥设置为环境变量。您可以将 `<your-mem0-api-key>` 替换为您的实际 API 密钥：
 
-Set your Mem0 Platform API key as an environment variable. You can replace `<your-mem0-api-key>` with your actual API key:
-
-<Note type="info">
-  You can obtain your Mem0 Platform API key from the <a href="https://app.mem0.ai/login?utm_source=oss&utm_medium=integration-llama-index" rel="nofollow">Mem0 Platform</a>.
-</Note>
-
-```python
+<注释类型=“信息”>
+  您可以从 <a href="https://app.mem0.ai/login?utm_source=oss&utm_medium=integration-llama-index" rel="nofollow">Mem0 平台</a>获取 Mem0 平台 API 密钥。
+</注>```python
 from dotenv import load_dotenv
 import os
 
@@ -33,9 +32,7 @@ load_dotenv()
 
 # os.environ["MEM0_API_KEY"] = "<your-mem0-api-key>"
 ```
-
-Import the necessary modules and create a Mem0Memory instance:
-```python
+导入必要的模块并创建 Mem0Memory 实例：```python
 from llama_index.memory.mem0 import Mem0Memory
 
 context = {"user_id": "alice"}
@@ -44,32 +41,26 @@ memory_from_client = Mem0Memory.from_client(
     search_msg_limit=4,  # optional, default is 5
 )
 ```
-
-Context is used to identify the user, agent or the conversation in the Mem0. It is required to be passed in the at least one of the fields in the `Mem0Memory` constructor. It can be any of the following:
-
-```python
+上下文用于识别 Mem0 中的用户、代理或对话。需要在 `Mem0Memory` 构造函数中至少传递一个字段。它可以是以下任何一个：```python
 context = {
     "user_id": "alice", 
     "agent_id": "llama_agent_1",
     "run_id": "run_1",
 }
 ```
+`search_msg_limit` 是可选的，默认为 5。它是用于从 Mem0 进行内存检索的聊天历史记录中的消息数。更多数量的消息将导致更多的上下文用于检索，但也会增加检索时间，并可能导致一些不需要的结果。
 
-`search_msg_limit` is optional, default is 5. It is the number of messages from the chat history to be used for memory retrieval from Mem0. More number of messages will result in more context being used for retrieval but will also increase the retrieval time and might result in some unwanted results.
+<注释类型=“信息”>
+  `search_msg_limit` 与 `limit` 不同。 “limit”是从 Mem0 检索的消息数量，用于搜索。
+</注>
 
-<Note type="info">
-  `search_msg_limit` is different from `limit`. `limit` is the number of messages to be retrieved from Mem0 and is used in search.
-</Note>
+### 使用 Mem0 OSS 设置
 
-### Setup with Mem0 OSS
+通过提供配置详细信息来设置 Mem0 OSS：
 
-Set your Mem0 OSS by providing configuration details:
-
-<Note type="info">
-  To know more about Mem0 OSS, read [Mem0 OSS Quickstart](https://docs.mem0.ai/open-source/overview).
-</Note>
-
-```python
+<注释类型=“信息”>
+  要了解有关 Mem0 OSS 的更多信息，请阅读 [Mem0 OSS 快速入门](https://docs.mem0.ai/open-source/overview)。
+</注>```python
 config = {
     "vector_store": {
         "provider": "qdrant",
@@ -94,10 +85,7 @@ config = {
     },
 }
 ```
-
-Create a Mem0Memory instance:
-
-```python
+创建Mem0Memory实例：```python
 memory_from_config = Mem0Memory.from_config(
     context=context,
     config=config,
@@ -105,10 +93,7 @@ memory_from_config = Mem0Memory.from_config(
     # Remove deprecation warnings
 )
 ```
-
-Initialize the LLM
-
-```python
+初始化LLM```python
 from llama_index.llms.openai import OpenAI
 from dotenv import load_dotenv
 
@@ -117,11 +102,8 @@ load_dotenv()
 # os.environ["OPENAI_API_KEY"] = "<your-openai-api-key>"
 llm = OpenAI(model="gpt-5-mini")
 ```
-
 ### SimpleChatEngine
-Use the `SimpleChatEngine` to start a chat with the agent with the memory.
-
-```python
+使用“SimpleChatEngine”通过内存开始与客服人员聊天。```python
 from llama_index.core.chat_engine import SimpleChatEngine
 
 agent = SimpleChatEngine.from_defaults(
@@ -132,11 +114,9 @@ agent = SimpleChatEngine.from_defaults(
 response = agent.chat("Hi, My name is Alice")
 print(response)
 ```
-Now we will learn how to use Mem0 with FunctionCalling and ReAct agents.
+现在我们将学习如何将 Mem0 与 FunctionCalling 和 ReAct 代理一起使用。
 
-Initialize the tools:
-
-```python
+初始化工具：```python
 from llama_index.core.tools import FunctionTool
 
 
@@ -159,9 +139,7 @@ def email_fn(name: str):
 call_tool = FunctionTool.from_defaults(fn=call_fn)
 email_tool = FunctionTool.from_defaults(fn=email_fn)
 ```
-### FunctionCallingAgent
-
-```python
+### 函数调用代理```python
 from llama_index.core.agent import FunctionCallingAgent
 
 agent = FunctionCallingAgent.from_tools(
@@ -175,10 +153,7 @@ agent = FunctionCallingAgent.from_tools(
 response = agent.chat("Hi, My name is Alice")
 print(response)
 ```
-
-### ReActAgent
-
-```python
+### 反应代理```python
 from llama_index.core.agent import ReActAgent
 
 agent = ReActAgent.from_tools(
@@ -192,24 +167,20 @@ agent = ReActAgent.from_tools(
 response = agent.chat("Hi, My name is Alice")
 print(response)
 ```
+## 主要特点
 
-## Key Features
+1. **内存集成**：使用 Mem0 存储和检索过去交互的相关信息。
+2. **个性化**：根据用户历史记录和偏好提供上下文感知代理响应。
+3. **灵活的架构**：LlamaIndex 允许轻松地将内存与代理集成。
+4. **持续学习**：每次交互都会被存储，以改善未来的响应。
 
-1. **Memory Integration**: Uses Mem0 to store and retrieve relevant information from past interactions.
-2. **Personalization**: Provides context-aware agent responses based on user history and preferences.
-3. **Flexible Architecture**: LlamaIndex allows for easy integration of the memory with the agent.
-4. **Continuous Learning**: Each interaction is stored, improving future responses.
+## 结论
 
-## Conclusion
-
-By integrating LlamaIndex with Mem0, you can build a personalized agent that can maintain context across interactions with the agent and provide tailored recommendations and assistance.
-
-<CardGroup cols={2}>
+通过将 LlamaIndex 与 Mem0 集成，您可以构建个性化代理，该代理可以在与代理交互时维护上下文，并提供量身定制的建议和帮助。<卡组列={2}>
   <Card title="LlamaIndex Multiagent Cookbook" icon="brain" href="/cookbooks/frameworks/llamaindex-multiagent">
-    Build multi-agent systems with LlamaIndex and Mem0
-  </Card>
+    使用 LlamaIndex 和 Mem0 构建多代理系统
+  </卡>
   <Card title="LlamaIndex ReAct Cookbook" icon="bolt" href="/cookbooks/frameworks/llamaindex-react">
-    Create ReAct agents with LlamaIndex
-  </Card>
-</CardGroup>
-
+    使用 LlamaIndex 创建 ReAct 代理
+  </卡>
+</卡组>

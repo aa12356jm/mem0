@@ -3,11 +3,13 @@ title: Hugging Face
 description: "Configure Hugging Face as an embedding provider in Mem0 for local embedding generation with open-source models."
 ---
 
-You can use embedding models from Huggingface to run Mem0 locally.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Usage
 
-```python
+
+您可以使用 Huggingface 中的嵌入模型在本地运行 Mem0。
+
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -31,12 +33,9 @@ messages = [
 ]
 m.add(messages, user_id="john")
 ```
+### 使用文本嵌入推理 (TEI)
 
-### Using Text Embeddings Inference (TEI)
-
-You can also use Hugging Face's Text Embeddings Inference service for faster and more efficient embeddings:
-
-```python
+您还可以使用 Hugging Face 的文本嵌入推理服务来实现更快、更高效的嵌入：```python
 import os
 from mem0 import Memory
 
@@ -55,22 +54,18 @@ config = {
 m = Memory.from_config(config)
 m.add("This text will be embedded using the TEI service.", user_id="john")
 ```
-
-To run the TEI service, you can use Docker:
-
-```bash
+要运行 TEI 服务，您可以使用 Docker：```bash
 docker run -d -p 3000:80 -v huggingfacetei:/data --platform linux/amd64 \
     ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 \
     --model-id BAAI/bge-small-en-v1.5
 ```
+### 配置
 
-### Config
+以下是可用于配置 Huggingface 嵌入器的参数：
 
-Here are the parameters available for configuring Huggingface embedder:
-
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `model` | The name of the model to use | `multi-qa-MiniLM-L6-cos-v1` |
-| `embedding_dims` | Dimensions of the embedding model | `selected_model_dimensions` |
-| `model_kwargs` | Additional arguments for the model | `None` |
-| `huggingface_base_url` | URL to connect to Text Embeddings Inference (TEI) API | `None` |
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `模型` |要使用的模型名称 | `multi-qa-MiniLM-L6-cos-v1` |
+| `embedding_dims` |嵌入模型的尺寸| `选定的模型尺寸` |
+| `model_kwargs` |该模型的其他参数 | `无` |
+| `huggingface_base_url` |连接到文本嵌入推理 (TEI) API 的 URL | `无` |

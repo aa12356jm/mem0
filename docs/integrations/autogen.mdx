@@ -3,25 +3,24 @@ title: AutoGen
 description: "Build conversational AI agents with AutoGen and Mem0 for context-aware, personalized interactions."
 ---
 
-Build conversational AI agents with memory capabilities. This integration combines AutoGen for creating AI agents with Mem0 for memory management, enabling context-aware and personalized interactions.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-This guide demonstrates creating a conversational AI system with memory. We'll build a customer service bot that can recall previous interactions and provide personalized responses.
 
-## Setup and Configuration
+构建具有记忆功能的对话式人工智能代理。这种集成将用于创建 AI 代理的 AutoGen 与用于内存管理的 Mem0 相结合，从而实现上下文感知和个性化交互。
 
-Install necessary libraries:
+## 概述
 
-```bash
+本指南演示了如何创建具有记忆的对话式人工智能系统。我们将构建一个客户服务机器人，它可以回忆以前的交互并提供个性化的响应。
+
+## 设置和配置
+
+安装必要的库：```bash
 pip install autogen mem0ai openai python-dotenv
 ```
-
 First, we'll import the necessary libraries and set up our configurations.
 
-<Note>Remember to get the Mem0 API key from <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-autogen" rel="nofollow">Mem0 Platform</a>.</Note>
-
-```python
+<Note>记得从<a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-autogen" rel="nofollow">Mem0 Platform</a>获取Mem0 API密钥。</Note>```python
 import os
 from autogen import ConversableAgent
 from mem0 import MemoryClient
@@ -48,12 +47,9 @@ agent = ConversableAgent(
     human_input_mode="NEVER",
 )
 ```
+## 将对话存储在内存中
 
-## Storing Conversations in Memory
-
-Add conversation history to Mem0 for future reference:
-
-```python
+将对话历史记录添加到 Mem0 以供将来参考：```python
 conversation = [
     {"role": "assistant", "content": "Hi, I'm Best Buy's chatbot! How can I help you?"},
     {"role": "user", "content": "I'm seeing horizontal lines on my TV."},
@@ -65,12 +61,9 @@ conversation = [
 memory_client.add(messages=conversation, user_id=USER_ID)
 print("Conversation added to memory.")
 ```
+## 检索和使用内存
 
-## Retrieving and Using Memory
-
-Create a function to get context-aware responses based on user's question and previous interactions:
-
-```python
+创建一个函数来根据用户的问题和之前的交互获取上下文感知响应：```python
 def get_context_aware_response(question):
     relevant_memories = memory_client.search(question, filters={"user_id": USER_ID})
     context = "\n".join([m["memory"] for m in relevant_memories.get('results', [])])
@@ -90,12 +83,9 @@ question = "What was the issue with my TV?"
 answer = get_context_aware_response(question)
 print("Context-aware answer:", answer)
 ```
+## 多代理对话
 
-## Multi-Agent Conversation
-
-For more complex scenarios, you can create multiple agents:
-
-```python
+For more complex scenarios, you can create multiple agents:```python
 manager = ConversableAgent(
     "manager",
     system_message="You are a manager who helps in resolving complex customer issues.",
@@ -124,19 +114,17 @@ complex_question = "I'm not satisfied with the troubleshooting steps. What else 
 manager_answer = escalate_to_manager(complex_question)
 print("Manager's response:", manager_answer)
 ```
+## 结论
 
-## Conclusion
+By integrating AutoGen with Mem0, you've created a conversational AI system with memory capabilities.此示例演示了一个客户服务机器人，它可以回忆以前的交互并提供上下文感知响应，并且能够将复杂问题上报给经理代理。
 
-By integrating AutoGen with Mem0, you've created a conversational AI system with memory capabilities. This example demonstrates a customer service bot that can recall previous interactions and provide context-aware responses, with the ability to escalate complex issues to a manager agent.
+这种集成可以为各种应用程序创建更加智能和个性化的人工智能代理，例如客户支持、虚拟助理和交互式聊天机器人。
 
-This integration enables the creation of more intelligent and personalized AI agents for various applications, such as customer support, virtual assistants, and interactive chatbots.
-
-<CardGroup cols={2}>
+<卡组列={2}>
   <Card title="CrewAI Integration" icon="users" href="/integrations/crewai">
-    Build multi-agent systems with CrewAI and Mem0
-  </Card>
+    使用 CrewAI 和 Mem0 构建多代理系统
+  </卡>
   <Card title="LangGraph Integration" icon="diagram-project" href="/integrations/langgraph">
-    Create stateful workflows with LangGraph
-  </Card>
-</CardGroup>
-
+    使用 LangGraph 创建有状态工作流程
+  </卡>
+</卡组>

@@ -2,14 +2,18 @@
 title: "Supabase"
 description: "Use Supabase as a vector store in Mem0, powered by PostgreSQL and pgvector with HNSW indexing support."
 ---
-[Supabase](https://supabase.com/) is an open-source Firebase alternative that provides a PostgreSQL database with pgvector extension for vector similarity search. It offers a powerful and scalable solution for storing and querying vector embeddings.
 
-Create a [Supabase](https://supabase.com/dashboard/projects) account and project, then get your connection string from Project Settings > Database. See the [docs](https://supabase.github.io/vecs/hosting/) for details.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Usage
 
-<CodeGroup>
-```python Python
+
+[Supabase](https://supabase.com/) 是一个开源 Firebase 替代方案，它提供带有 pgvector 扩展的 PostgreSQL 数据库，用于矢量相似性搜索。它为存储和查询向量嵌入提供了强大且可扩展的解决方案。
+
+创建 [Supabase](https://supabase.com/dashboard/projects) 帐户和项目，然后从项目设置 > 数据库获取连接字符串。有关详细信息，请参阅[文档](https://supabase.github.io/vecs/hosting/)。
+
+### 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -64,13 +68,11 @@ const messages = [
 
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-### SQL Migrations for TypeScript Implementation
+### TypeScript 实现的 SQL 迁移
 
-The following SQL migrations are required to enable the vector extension and create the memories table:
-
-```sql
+需要以下 SQL 迁移来启用向量扩展并创建内存表：```sql
 -- Enable the vector extension
 create extension if not exists vector;
 
@@ -112,63 +114,56 @@ begin
 end;
 $$;
 ```
+转到 [Supabase](https://supabase.com/dashboard/projects) 并在 SQL 编辑器中运行上述 SQL 迁移。### 配置
 
-Go to [Supabase](https://supabase.com/dashboard/projects) and run the above SQL migrations in the SQL Editor.
+以下是可用于配置 Supabase 的参数：
 
-### Config
+<标签>
+<标签标题=“Python”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `连接字符串` | PostgreSQL 连接字符串（必需）|无 |
+| `集合名称` |矢量集合的名称 | `mem0` |
+| `embedding_model_dims` |嵌入模型的尺寸| `1536` |
+| `索引方法` |向量索引方法的使用| `自动` |
+| `index_measure` |相似性搜索的距离度量 | `余弦距离` |
+</标签>
+<选项卡标题=“TypeScript”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |矢量集合的名称 | `mem0` |
+| `embeddingModelDims` |嵌入模型的尺寸| `1536` |
+| `supabaseUrl` |苏帕基网址 |无 |
+| `supabaseKey` |苏帕基钥匙|无 |
+| `表名` |向量表的名称 | `回忆` |
+</标签>
+</标签>
 
-Here are the parameters available for configuring Supabase:
+### 索引方法
 
-<Tabs>
-<Tab title="Python">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `connection_string` | PostgreSQL connection string (required) | None |
-| `collection_name` | Name for the vector collection | `mem0` |
-| `embedding_model_dims` | Dimensions of the embedding model | `1536` |
-| `index_method` | Vector index method to use | `auto` |
-| `index_measure` | Distance measure for similarity search | `cosine_distance` |
-</Tab>
-<Tab title="TypeScript">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collectionName` | Name for the vector collection | `mem0` |
-| `embeddingModelDims` | Dimensions of the embedding model | `1536` |
-| `supabaseUrl` | Supabase URL | None |
-| `supabaseKey` | Supabase key | None |
-| `tableName` | Name for the vector table | `memories` |
-</Tab>
-</Tabs>
+支持以下索引方法：- `auto`：自动选择最佳可用索引方法
+- `hnsw`：分层可导航小世界图索引（更快的搜索，更多的内存使用）
+- `ivfflat`：倒排文件平面索引（速度和内存的良好平衡）
 
-### Index Methods
+### 距离测量
 
-The following index methods are supported:
+用于相似性搜索的可用距离度量：
 
-- `auto`: Automatically selects the best available index method
-- `hnsw`: Hierarchical Navigable Small World graph index (faster search, more memory usage)
-- `ivfflat`: Inverted File Flat index (good balance of speed and memory)
+- `cosine_distance`：余弦相似度（推荐用于大多数嵌入模型）
+- `l2_distance`：欧氏距离
+- `l1_distance`：曼哈顿距离
+- `max_inner_product`：最大内积相似度
 
-### Distance Measures
+### 最佳实践
 
-Available distance measures for similarity search:
+1. **索引方法选择**：
+   - 当内存不受限制时，使用“hnsw”可获得最快的搜索性能
+   - 使用“ivfflat”在搜索速度和内存使用之间取得良好的平衡
+   - 如果不确定，请使用“auto”，它将根据您的数据选择最佳方法
 
-- `cosine_distance`: Cosine similarity (recommended for most embedding models)
-- `l2_distance`: Euclidean distance
-- `l1_distance`: Manhattan distance
-- `max_inner_product`: Maximum inner product similarity
-
-### Best Practices
-
-1. **Index Method Selection**:
-   - Use `hnsw` for fastest search performance when memory is not a constraint
-   - Use `ivfflat` for a good balance of search speed and memory usage
-   - Use `auto` if unsure, it will select the best method based on your data
-
-2. **Distance Measure Selection**:
-   - Use `cosine_distance` for most embedding models (OpenAI, Hugging Face, etc.)
-   - Use `max_inner_product` if your vectors are normalized
-   - Use `l2_distance` or `l1_distance` if working with raw feature vectors
-
-3. **Connection String**:
-   - Always use environment variables for sensitive information in the connection string
-   - Format: `postgresql://user:password@host:port/database`
+2.**距离测量选择**：
+   - 对大多数嵌入模型（OpenAI、Hugging Face 等）使用 `cosine_distance`
+   - 如果您的向量已标准化，请使用“max_inner_product”
+   - 如果使用原始特征向量，请使用“l2_distance”或“l1_distance”3. **连接字符串**：
+   - 始终对连接字符串中的敏感信息使用环境变量
+   - 格式：`postgresql://用户:密码@主机:端口/数据库`

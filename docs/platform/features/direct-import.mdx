@@ -3,15 +3,16 @@ title: Direct Import
 description: 'Bypass the memory deduction phase and directly store pre-defined memories for efficient retrieval'
 ---
 
-## How to Use Direct Import
-
-The Direct Import feature allows users to skip the memory deduction phase and directly input pre-defined memories into the system for storage and retrieval. To enable this feature, set the `infer` parameter to `False` in the `add` method.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
 
-<CodeGroup>
+
+## 如何使用直接导入
+
+直接导入功能允许用户跳过内存扣除阶段，直接将预定义的内存输入系统中进行存储和检索。要启用此功能，请在“add”方法中将“infer”参数设置为“False”。
 
 
-```python Python
+<代码组>```python Python
 messages = [
     {"role": "user", "content": "Alice loves playing badminton"},
     {"role": "assistant", "content": "That's great! Alice is a fitness freak"},
@@ -25,23 +26,21 @@ client.add(messages, user_id="alice", infer=False)
 ```markdown Output
 []
 ```
-</CodeGroup>
+</代码组>
 
-You can see that the output of the add call is an empty list.
+您可以看到 add 调用的输出是一个空列表。
 
-<Note>Only messages with the role "user" will be used for storage. Messages with roles such as "assistant" or "system" will be ignored during the storage process.</Note>
+<注意>只有角色为“user”的消息才会被用于存储。具有“助理”、“系统”等角色的消息在存储过程中将被忽略。</Note>
 
-<Warning>
-Direct import skips the inference pipeline, so it also skips duplicate detection. If you later send the same fact with `infer=True`, Mem0 will store a second copy. Pick one mode per memory source unless you truly want both versions.
-</Warning>
+<警告>
+直接导入会跳过推理管道，因此也会跳过重复检测。如果您稍后使用“infer=True”发送相同的事实，Mem0 将存储第二个副本。除非您确实需要两个版本，否则为每个内存源选择一种模式。
+</警告>
 
-## How to Retrieve Memories
+## 如何找回记忆
 
-You can retrieve memories using the `search` method.
+您可以使用“搜索”方法检索记忆。
 
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 client.search("What is Alice's favorite sport?", filters={"user_id": "alice"})
 ```
 
@@ -60,20 +59,17 @@ client.search("What is Alice's favorite sport?", filters={"user_id": "alice"})
   ]
 }
 ```
+</代码组>
 
-</CodeGroup>
+## 如何找回所有记忆
 
-## How to Retrieve All Memories
+您可以使用“get_all”方法检索所有记忆。
 
-You can retrieve all memories using the `get_all` method.
+<Callout type="warning" title="需要过滤器">
+`get_all()` 现在需要指定过滤器。
+</标注>
 
-<Callout type="warning" title="Filters Required">
-`get_all()` now requires filters to be specified.
-</Callout>
-
-<CodeGroup>
-
-```python Python
+<代码组>```python Python
 client.get_all(filters={"AND": [{"user_id": "alice"}]})
 ```
 
@@ -101,9 +97,8 @@ client.get_all(filters={"AND": [{"user_id": "alice"}]})
   ]
 }
 ```
+</代码组>
 
-</CodeGroup>
+如果您有任何疑问，请随时通过以下方式之一与我们联系：
 
-If you have any questions, please feel free to reach out to us using one of the following methods:
-
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

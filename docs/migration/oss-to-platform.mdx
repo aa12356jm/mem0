@@ -6,47 +6,44 @@ versionFrom: "Open Source"
 versionTo: "Platform"
 ---
 
-# Migrate from Open Source to Platform
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Move your Mem0 implementation to managed infrastructure with enterprise features.
 
-| Scope                 | Effort         | Downtime                     |
-| --------------------- | -------------- | ---------------------------- |
-| Infrastructure & Code | Low (~30 mins) | None (Parallel run possible) |
 
-<Info>
-  **Why migrate to Platform?**
+# 从开源迁移到平台
 
-  - **Time to Market**: Set up in 5 minutes vs 30+ minutes for OSS configuration
-  - **Enterprise Ready**: SOC2 Type II compliance, GDPR support, audit logs
-  - **Advanced Features**: Webhooks, memory export, analytics dashboard, custom categories
-  - **Multi-tenancy**: Organizations, projects, and team management out of the box
-  - **Zero Infrastructure**: No vector database, LLM provider, or maintenance overhead
-  - **Enhanced Search**: Reranking, keyword expansion, and advanced filters
-  - **Production Grade**: Auto-scaling, high availability, dedicated support
-</Info>
+将您的 Mem0 实施转移到具有企业功能的托管基础设施。
 
-## Plan
+|范围 |努力|停机时间 |
+| -------------------- | -------------- | ---------------------------- |
+|基础设施和代码 |低（约 30 分钟）|无（可以并行运行）|
 
-1. **Sign up**: Create an account on <a href="https://app.mem0.ai?utm_source=oss&utm_medium=migration-oss-to-platform" rel="nofollow">Mem0 Platform</a>.
-2. **Get API Key**: Navigate to **Settings > API Keys** and generate a new key.
-3. **Review Usage**: Identify where you instantiate `Memory` and where you call `search` or `get_all`.
+<信息>
+  **为什么迁移到平台？**
 
-## Migrate
+  - **上市时间**：5 分钟内即可完成设置，而 OSS 配置则需要 30 多分钟
+  - **企业就绪**：SOC2 Type II 合规性、GDPR 支持、审核日志
+  - **高级功能**：Webhooks、内存导出、分析仪表板、自定义类别
+  - **多租户**：开箱即用的组织、项目和团队管理
+  - **零基础设施**：无矢量数据库、LLM 提供商或维护费用
+  - **增强搜索**：重新排名、关键字扩展和高级过滤器
+  - **生产级**：自动扩展、高可用性、专门支持
+</信息>
 
-### 1. Install or Update SDK
+## 计划1. **注册**：在 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=migration-oss-to-platform" rel="nofollow">Mem0 平台</a>上创建一个帐户。
+2. **获取 API 密钥**：导航至 **设置 > API 密钥** 并生成新密钥。
+3. **查看用法**：确定在何处实例化“Memory”以及在何处调用“search”或“get_all”。
 
-Ensure you have the latest version of the SDK, which supports both OSS and Platform clients.
+## 迁移
 
-```bash
+### 1.安装或更新SDK
+
+确保您拥有最新版本的 SDK，它同时支持 OSS 和平台客户端。```bash
 pip install mem0ai --upgrade
 ```
+### 2.更新初始化
 
-### 2. Update Initialization
-
-Switch from the local `Memory` class to the managed `MemoryClient`.
-
-```python Open Source (Old)
+从本地“Memory”类切换到托管“MemoryClient”。```python Open Source (Old)
 from mem0 import Memory
 
 config = {
@@ -70,35 +67,31 @@ import os
 # Set MEM0_API_KEY in environment or pass explicitly
 client = MemoryClient(api_key="m0-...")
 ```
+<信息图标=“检查”>
+  运行 `client.get_all(filters={"user_id": "test_connection"})` 来验证您的 API 密钥是否有效。它应该返回一个空列表或有效结果。
+</信息>
 
-<Info icon="check">
-  Run `client.get_all(filters={"user_id": "test_connection"})` to verify your API key works. It should return an empty list or valid results.
-</Info>
+### 3. 更新检索调用（关键）
 
-### 3. Update Retrieval Calls (Critical)
+<警告>
+  **关键更改**：平台使用 v2 端点，要求将过滤参数嵌套在“filters”字典中。
+</警告>
 
-<Warning>
-  **Critical Change**: Platform uses v2 endpoints that require filtering parameters to be nested inside a `filters` dictionary.
-</Warning>
+<注意>
+  所有 SDK 中的“limit”参数已被删除，取而代之的是“top_k”。使用“limit=”更新任何代码以使用“top_k=”。
+</注>
 
-<Note>
-  The `limit` parameter has been removed in favor of `top_k` across all SDKs. Update any code using `limit=` to use `top_k=` instead.
-</Note>
-
-| Method | Open Source | Platform |
+|方法|开源 |平台|
 | ------ | ----------- | -------- |
-| `search()` | `m.search(query, user_id="alex")` | `client.search(query, filters={"user_id": "alex"})` |
+| `搜索()` | `m.search(query, user_id="alex")` | `client.search(query,filters={"user_id": "alex"})` |
 | `get_all()` | `m.get_all(user_id="alex")` | `client.get_all(filters={"user_id": "alex"})` |
-| `add()` | `m.add(memory, user_id="alex")` | `client.add(memory, user_id="alex")` |
-| `delete()` | `m.delete(memory_id)` | `client.delete(memory_id)` |
+| `添加()` | `m.add(内存, user_id="alex")` | `client.add(内存, user_id="alex")` |
+| `删除()` | `米。删除（内存_id）` | `client.delete(memory_id)` |
 | `delete_all()` | `m.delete_all(user_id="alex")` | `client.delete_all(user_id="alex")` |
 
-Note: `add()` and `delete()` methods remain unchanged. The `update()` method is not available in Platform - use delete + add pattern instead.
-
-<AccordionGroup>
-  <Accordion title="Search Memories">
-    <CodeGroup>
-    ```python Open Source (Old)
+注意：`add()` 和 `delete()` 方法保持不变。 `update()` 方法在平台中不可用 - 请改用删除 + 添加模式。<手风琴组>
+  <手风琴标题=“搜索记忆”>
+    <代码组>    ```python Open Source (Old)
     # Basic search with user filter
     results = m.search("user's preferences", user_id="alex")
 
@@ -118,12 +111,11 @@ Note: `add()` and `delete()` methods remain unchanged. The `update()` method is 
         ]
     })
     ```
-    </CodeGroup>
-  </Accordion>
+</代码组>
+  </手风琴>
 
-  <Accordion title="Get All Memories">
-    <CodeGroup>
-    ```python Open Source (Old)
+  <手风琴标题=“获取所有回忆”>
+    <代码组>    ```python Open Source (Old)
     # Get all memories for a user
     memories = m.get_all(user_id="alex", top_k=10)
 
@@ -138,12 +130,11 @@ Note: `add()` and `delete()` methods remain unchanged. The `update()` method is 
     # Get memories with pagination
     memories = client.get_all(filters={"user_id": "alex"}, top_k=5, offset=10)
     ```
-    </CodeGroup>
-  </Accordion>
+</代码组>
+  </手风琴>
 
-  <Accordion title="Add Memories">
-    <CodeGroup>
-    ```python Open Source (Old)
+  <手风琴标题=“添加回忆”>
+    <代码组>    ```python Open Source (Old)
     # Add a simple memory
     m.add("Loves coffee", user_id="alex")
 
@@ -158,12 +149,11 @@ Note: `add()` and `delete()` methods remain unchanged. The `update()` method is 
     # Add memory with metadata (no change)
     client.add("Completed marathon", user_id="alex", metadata={"category": "achievement"})
     ```
-    </CodeGroup>
-  </Accordion>
+</代码组>
+  </手风琴>
 
-  <Accordion title="Delete Memories">
-    <CodeGroup>
-    ```python Open Source (Old)
+  <Accordion title="删除记忆">
+    <代码组>    ```python Open Source (Old)
     # Delete specific memory
     m.delete(memory_id="mem_123")
 
@@ -178,12 +168,11 @@ Note: `add()` and `delete()` methods remain unchanged. The `update()` method is 
     # Delete all memories for user (no change)
     client.delete_all(user_id="alex")
     ```
-    </CodeGroup>
-  </Accordion>
+</代码组>
+  </手风琴>
 
-  <Accordion title="Update Memory">
-    <CodeGroup>
-    ```python Open Source (Old)
+  <Accordion title="更新内存">
+    <代码组>    ```python Open Source (Old)
     # Update memory content
     m.update(memory_id="mem_123", new_memory="Updated content")
     ```
@@ -194,20 +183,19 @@ Note: `add()` and `delete()` methods remain unchanged. The `update()` method is 
     client.delete(memory_id="mem_123")
     client.add("Updated content", user_id="alex")
     ```
-    </CodeGroup>
-  </Accordion>
-</AccordionGroup>
+</代码组>
+  </手风琴>
+</手风琴组>
 
-## Platform-Exclusive Features
+## 平台独有的功能
 
-The Platform introduces powerful capabilities not available in OSS:
+该平台引入了OSS所不具备的强大功能：
 
-<AccordionGroup>
-  <Accordion title="Organizations & Multi-tenancy">
-    <Info>
-      **Why it matters**: Manage multiple teams and projects with hierarchical access control.
-    </Info>
-    ```python
+<手风琴组>
+  <Accordion title="组织与多租户">
+    <信息>
+      **为什么重要**：通过分层访问控制管理多个团队和项目。
+    </信息>    ```python
     # Create an organization
     org = client.organizations.create(name="Acme Corp")
 
@@ -224,13 +212,12 @@ The Platform introduces powerful capabilities not available in OSS:
         role="admin"
     )
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Webhooks for Real-time Events">
-    <Info>
-      **Why it matters**: Instantly react to memory changes in your application. Build features like notifications, audit logs, or sync with external systems.
-    </Info>
-    ```python
+  <Accordion title="实时事件的 Webhooks">
+    <信息>
+      **为什么重要**：立即对应用程序中的内存变化做出反应。构建通知、审核日志或与外部系统同步等功能。
+    </信息>    ```python
     # Create webhook for memory events
     webhook = client.webhooks.create(
         project_id="proj_123",
@@ -248,13 +235,12 @@ The Platform introduces powerful capabilities not available in OSS:
     #   "timestamp": "2024-01-15T10:30:00Z"
     # }
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Memory Export">
-    <Info>
-      **Why it matters**: Export your data for compliance, analytics, or migration with custom schemas and filters.
-    </Info>
-    ```python
+  <Accordion title="内存导出">
+    <信息>
+      **为什么重要**：使用自定义架构和过滤器导出数据以进行合规性、分析或迁移。
+    </信息>    ```python
     # Export memories with custom schema
     export_job = client.memories.export(
         filters={
@@ -275,13 +261,12 @@ The Platform introduces powerful capabilities not available in OSS:
     if client.memories.get_export(export_job.id).status == "completed":
         data = client.memories.download_export(export_job.id)
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Enhanced Search">
-    <Info>
-      **Why it matters**: Get better search results with AI-powered reranking and keyword expansion.
-    </Info>
-    ```python
+  <Accordion title="增强搜索">
+    <信息>
+      **为什么重要**：通过人工智能驱动的重新排名和关键字扩展获得更好的搜索结果。
+    </信息>    ```python
     # Search with reranking for better results
     results = client.search(
         "user preferences",
@@ -298,13 +283,12 @@ The Platform introduces powerful capabilities not available in OSS:
         expand_keywords=True
     )
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Custom Categories">
-    <Info>
-      **Why it matters**: Use domain-specific categories instead of generic ones for better organization.
-    </Info>
-    ```python
+  <手风琴标题=“自定义类别”>
+    <信息>
+      **为什么重要**：使用特定领域的类别而不是通用的类别可以更好地组织。
+    </信息>    ```python
     # Set custom categories for your project
     client.projects.update_categories(
         project_id="proj_123",
@@ -323,13 +307,12 @@ The Platform introduces powerful capabilities not available in OSS:
         categories=["Customer Preferences"]
     )
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Events API for Analytics">
-    <Info>
-      **Why it matters**: Track all memory operations for audit trails, usage analytics, and debugging.
-    </Info>
-    ```python
+  <Accordion title="用于分析的事件 API">
+    <信息>
+      **为什么重要**：跟踪所有内存操作以进行审计跟踪、使用情况分析和调试。
+    </信息>    ```python
     # Get audit trail of all memory operations
     events = client.events.list(
         filters={
@@ -346,47 +329,45 @@ The Platform introduces powerful capabilities not available in OSS:
     for event in events:
         print(f"{event.timestamp}: {event.event_type} - {event.memory_id}")
     ```
-  </Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
-## Summary of Changes
+## 变更摘要
 
-| Feature | Open Source | Platform | Action Required |
-| ------- | ----------- | -------- | --------------- |
-| **Initialization** | `Memory.from_config(config)` | `MemoryClient(api_key)` | Replace config object with API key |
-| **Search Method** | `m.search(query, user_id="x")` | `client.search(query, filters={"user_id": "x"})` | Move filtering params into `filters` dict |
-| **Get All Method** | `m.get_all(user_id="x")` | `client.get_all(filters={"user_id": "x"})` | Move filtering params into `filters` dict |
-| **Add Method** | `m.add(memory, user_id="x")` | `client.add(memory, user_id="x")` | No change |
-| **Delete Method** | `m.delete(memory_id)` | `client.delete(memory_id)` | No change |
-| **Delete All** | `m.delete_all(user_id="x")` | `client.delete_all(user_id="x")` | No change |
-| **Update Method** | `m.update(memory_id, new_memory)` | Use delete + add pattern | Replace with delete then add |
-| **Config** | Local vector store + LLM config | Managed cloud infrastructure | Remove local config setup |
+|特色 |开源 |平台|需要采取行动|
+| -------- | ----------- | -------- | ---------------- |
+| **初始化** | `Memory.from_config(config)` | `MemoryClient(api_key)` |用 API 密钥替换配置对象 |
+| **搜索方式** | `m.search(query, user_id="x")` | `client.search(query,filters={"user_id": "x"})` |将过滤参数移至“filters”字典中 |
+| **获取全部方法** | `m.get_all(user_id="x")` | `client.get_all(filters={"user_id": "x"})` |将过滤参数移至“filters”字典中 |
+| **添加方法** | `m.add(内存, user_id="x")` | `client.add(内存, user_id="x")` |没有变化|
+| **删除方法** | `m.delete(memory_id)` | `client.delete(memory_id)` |没有变化|
+| **全部删除** | `m.delete_all(user_id="x")` | `client.delete_all(user_id="x")` |没有变化|
+| **更新方法** | `米。更新（内存 ID，新内存）` |使用删除+添加模式 |替换为删除然后添加 |
+| **配置** |本地向量存储 + LLM 配置 |托管云基础设施|删除本地配置设置 |
 
-## Rollback plan
+## 回滚计划
 
-If you encounter issues, you can revert immediately by switching your import back.
+如果遇到问题，您可以通过切换回导入来立即恢复。1. **恢复代码**：将`MemoryClient`更改回`Memory`。
+2. **恢复配置**：取消注释您的本地矢量存储和 LLM 配置。
+3. **验证**：确保您的本地矢量数据库仍在运行且可访问。
 
-1.  **Revert Code**: Change `MemoryClient` back to `Memory`.
-2.  **Restore Config**: Uncomment your local vector store and LLM configuration.
-3.  **Verify**: Ensure your local vector database is still running and accessible.
+## 后续步骤
 
-## Next Steps
+- <a href="https://app.mem0.ai?utm_source=oss&utm_medium=migration-oss-to-platform" rel="nofollow">平台仪表板</a> - 监控使用情况并管理设置。
+- [Webhooks 设置](/platform/features/webhooks) - 配置实时事件通知。
+- [组织和项目](/api-reference/organizations-projects) - 为您的团队设置多租户。
 
-- <a href="https://app.mem0.ai?utm_source=oss&utm_medium=migration-oss-to-platform" rel="nofollow">Platform Dashboard</a> - Monitor usage and manage settings.
-- [Webhooks Setup](/platform/features/webhooks) - Configure real-time event notifications.
-- [Organizations & Projects](/api-reference/organizations-projects) - Set up multi-tenancy for your team.
-
-<CardGroup cols={2}>
-  <Card
-    title="Platform Features"
-    description="Explore capabilities exclusive to the Platform."
-    icon="sparkles"
-    href="/platform/overview"
+<卡组列={2}>
+  <卡片
+    title="平台功能"
+    描述=“探索平台独有的功能。”
+    图标=“闪闪发光”
+    href="/平台/概述"
   />
-  <Card
-    title="API Reference"
-    description="Deep dive into the Platform API endpoints."
-    icon="code"
+  <卡片
+    标题=“API参考”
+    description="深入了解平台 API 端点。”
+    图标=“代码”
     href="/api-reference/memory/add-memories"
   />
-</CardGroup>
+</卡组>

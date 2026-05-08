@@ -3,26 +3,24 @@ title: Personalized AI Tutor
 description: "Keep student progress and preferences persistent across tutoring sessions."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-You can create a personalized AI Tutor using Mem0. This guide will walk you through the necessary steps and provide the complete code to get you started.
 
-## Overview
 
-The Personalized AI Tutor leverages Mem0 to retain information across interactions, enabling a tailored learning experience. By integrating with OpenAI's GPT-4 model, the tutor can provide detailed and context-aware responses to user queries.
+您可以使用Mem0创建个性化的AI导师。本指南将引导您完成必要的步骤，并提供完整的代码以帮助您入门。
 
-## Setup
+## 概述
 
-Before you begin, ensure you have the required dependencies installed. You can install the necessary packages using pip:
+个性化 AI 导师利用 Mem0 在交互过程中保留信息，从而实现量身定制的学习体验。通过与 OpenAI 的 GPT-4 模型集成，导师可以针对用户查询提供详细且上下文感知的响应。
 
-```bash
+## 设置
+
+在开始之前，请确保已安装所需的依赖项。您可以使用 pip 安装必要的软件包：```bash
 pip install openai mem0ai
 ```
+## 完整代码示例
 
-## Full Code Example
-
-Below is the complete code to create and interact with a Personalized AI Tutor using Mem0:
-
-```python
+以下是使用 Mem0 创建个性化 AI 导师并与之交互的完整代码：```python
 import os 
 from openai import OpenAI
 from mem0 import Memory
@@ -92,34 +90,29 @@ user_id = "john_doe"
 # Ask a question
 ai_tutor.ask("I am learning introduction to CS. What is queue? Briefly explain.", user_id=user_id)
 ```
+### 获取记忆
 
-### Fetching Memories
-
-You can fetch all the memories at any point in time using the following code:
-
-```python
+您可以使用以下代码在任何时间点获取所有内存：```python
 memories = ai_tutor.get_memories(user_id=user_id)
 for m in memories['results']:
     print(m['memory'])
 ```
+## 要点
 
-## Key Points
+- **初始化**：使用必要的内存配置和 OpenAI 客户端设置来初始化 PersonalAITutor 类
+- **提问**：ask 方法向 AI 发送问题并将相关信息存储在内存中
+- **检索记忆**：get_memories 方法获取与用户关联的所有存储的记忆
 
-- **Initialization**: The PersonalAITutor class is initialized with the necessary memory configuration and OpenAI client setup
-- **Asking Questions**: The ask method sends a question to the AI and stores the relevant information in memory
-- **Retrieving Memories**: The get_memories method fetches all stored memories associated with a user
+## 结论
 
-## Conclusion
-
-As the conversation progresses, Mem0's memory automatically updates based on the interactions, providing a continuously improving personalized learning experience. This setup ensures that the AI Tutor can offer contextually relevant and accurate responses, enhancing the overall educational process.
+随着对话的进行，Mem0 的内存会根据交互情况自动更新，从而提供不断改进的个性化学习体验。这种设置确保人工智能导师能够提供与情境相关且准确的响应，从而增强整体教育过程。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Build a Mem0 Companion" icon="users" href="/cookbooks/essentials/building-ai-companion">
-    Learn the foundations of memory-powered companions with production-ready patterns.
-  </Card>
-  <Card title="Travel Assistant with Mem0" icon="plane" href="/cookbooks/companions/travel-assistant">
-    Build a travel companion that remembers preferences and past conversations.
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="构建 Mem0 伴侣" icon="users" href="/cookbooks/essentials/building-ai-companion">
+    通过可用于生产的模式了解内存驱动同伴的基础知识。</卡>
+  <Card title="带 Mem0 的旅行助手" icon="plane" href="/cookbooks/companions/travel-assistant">
+    打造一个能记住偏好和过去对话的旅行伴侣。
+  </卡>
+</卡组>

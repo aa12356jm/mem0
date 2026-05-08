@@ -5,104 +5,105 @@ iconType: "solid"
 description: "REST APIs for memory management, search, and entity operations"
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
+
+
+
+
+
+
+
+
 ## Mem0 REST API
 
-Mem0 provides a comprehensive REST API for integrating advanced memory capabilities into your applications. Create, search, update, and manage memories across users, agents, and custom entities with simple HTTP requests.
+Mem0 提供全面的 REST API，用于将高级内存功能集成到您的应用程序中。使用简单的 HTTP 请求跨用户、代理和自定义实体创建、搜索、更新和管理内存。
 
-<Info>
-**Quick start:** Get your API key from the <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=api-reference" rel="nofollow">Mem0 Dashboard</a> and make your first memory operation in minutes.
-</Info>
-
----
-
-## Quick Start Guide
-
-Get started with Mem0 API in three simple steps:
-
-1. **[Add Memories](/api-reference/memory/add-memories)** - Store information and context from user conversations
-2. **[Search Memories](/api-reference/memory/search-memories)** - Retrieve relevant memories using semantic search
-3. **[Get Memories](/api-reference/memory/get-memories)** - Fetch all memories for a specific entity
+<信息>
+**快速开始：** 从 <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=api-reference" rel="nofollow">Mem0 Dashboard</a> 获取 API 密钥，并在几分钟内进行首次内存操作。
+</信息>
 
 ---
 
-## Core Operations
+## 快速入门指南
+
+只需三个简单步骤即可开始使用 Mem0 API：
+
+1. **[Add Memories](/api-reference/memory/add-memories)** - 存储用户对话中的信息和上下文
+2. **[Search Memories](/api-reference/memory/search-memories)** - 使用语义搜索检索相关记忆
+3.**[获取记忆](/api-reference/memory/get-memories)** - 获取特定实体的所有记忆
+
+---
+
+## 核心业务
 
 <CardGroup cols={2}>
   <Card title="Add Memories" icon="plus" href="/api-reference/memory/add-memories">
-    Store new memories from conversations and interactions
-  </Card>
+存储对话和互动中的新记忆
+</卡>
 
   <Card title="Search Memories" icon="magnifying-glass" href="/api-reference/memory/search-memories">
-    Find relevant memories using semantic search with filters
-  </Card>
+使用带过滤器的语义搜索查找相关记忆
+</卡>
 
   <Card title="Update Memory" icon="pen" href="/api-reference/memory/update-memory">
-    Modify existing memory content and metadata
-  </Card>
+修改现有内存内容和元数据
+</卡>
 
   <Card title="Delete Memory" icon="trash" href="/api-reference/memory/delete-memory">
-    Remove specific memories or batch delete operations
-  </Card>
-</CardGroup>
+删除特定内存或批量删除操作
+</卡>
+</卡组>
 
 ---
 
-## API Categories
-
-Explore the full API organized by functionality:
-
-<CardGroup cols={2}>
+## API类别探索按功能组织的完整 API：<CardGroup cols={2}>
   <Card title="Memory APIs" icon="microchip" href="/api-reference/memory/add-memories">
-    Core and advanced operations: CRUD, search, batch updates, history, and exports
-  </Card>
+核心和高级操作：CRUD、搜索、批量更新、历史记录和导出
+</卡>
 
   <Card title="Events APIs" icon="clock" href="/api-reference/events/get-events">
-    Track and monitor the status of asynchronous memory operations
-  </Card>
+跟踪和监视异步内存操作的状态
+</卡>
 
   <Card title="Entities APIs" icon="users" href="/api-reference/entities/get-users">
-    Manage users, agents, and their associated memory data
-  </Card>
+管理用户、代理及其关联的内存数据
+</卡>
 
   <Card title="Organizations & Projects" icon="building" href="/api-reference/organizations-projects">
-    Multi-tenant support, access control, and team collaboration
-  </Card>
+多租户支持、访问控制和团队协作
+</卡>
 
   <Card title="Webhooks" icon="webhook" href="/api-reference/webhook/create-webhook">
-    Real-time notifications for memory events and updates
-  </Card>
-</CardGroup>
+内存事件和更新的实时通知
+</卡>
+</卡组>
 
 <Note>
-**Building multi-tenant apps?** Learn about [Organizations & Projects](/api-reference/organizations-projects) for team isolation and access control.
-</Note>
+**构建多租户应用程序？** 了解用于团队隔离和访问控制的[组织和项目](/api-reference/organizations-projects)。
+</注>
 
 ---
 
-## Authentication
+## 验证
 
-All API requests require authentication using Token-based authentication. Include your API key in the Authorization header:
+所有 API 请求都需要使用基于令牌的身份验证进行身份验证。在授权标头中包含您的 API 密钥：```bash
+Authorization: Token <your-api-key>```
+从 <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=api-reference" rel="nofollow">Mem0 仪表板</a>获取 API 密钥。
 
-```bash
-Authorization: Token <your-api-key>
-```
-
-Get your API key from the <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=api-reference" rel="nofollow">Mem0 Dashboard</a>.
-
-<Warning>
-**Keep your API key secure.** Never expose it in client-side code or public repositories. Use environment variables and server-side requests only.
-</Warning>
+<警告>
+**确保您的 API 密钥安全。**切勿将其暴露在客户端代码或公共存储库中。仅使用环境变量和服务器端请求。
+</警告>
 
 ---
 
-## Next Steps
+## 下一步
 
 <CardGroup cols={2}>
   <Card title="Add Your First Memory" icon="rocket" href="/api-reference/memory/add-memories">
-    Start storing memories via the REST API
-  </Card>
+开始通过 REST API 存储内存
+</卡>
 
   <Card title="Search with Filters" icon="filter" href="/api-reference/memory/search-memories">
-    Learn advanced search and filtering techniques
-  </Card>
-</CardGroup>
+学习高级搜索和过滤技术
+</卡>
+</卡组>

@@ -5,97 +5,80 @@ icon: "question"
 iconType: "solid"
 ---
 
-<AccordionGroup>
-    <Accordion title="How does Mem0 work?">
-        Mem0 utilizes a sophisticated hybrid database system to efficiently manage and retrieve memories for AI agents and assistants. Each memory is linked to a unique identifier, such as a user ID or agent ID, enabling Mem0 to organize and access memories tailored to specific individuals or contexts.
-
-        When a message is added to Mem0 via the `add` method, the system extracts pertinent facts and preferences, distributing them across various data stores: a vector database and a graph database. This hybrid strategy ensures that diverse types of information are stored optimally, facilitating swift and effective searches.
-
-        When an AI agent or LLM needs to access memories, it employs the `search` method. Mem0 conducts a comprehensive search across these data stores, retrieving relevant information from each.
-
-        The retrieved memories can be seamlessly integrated into the system prompt as required, enhancing the personalization and relevance of responses.
-  </Accordion>
-
-    <Accordion title="What are the key features of Mem0?">
-        - **User, Session, and AI Agent Memory**: Retains information across sessions and interactions for users and AI agents, ensuring continuity and context.
-        - **Adaptive Personalization**: Continuously updates memories based on user interactions and feedback.
-        - **Developer-Friendly API**: Offers a straightforward API for seamless integration into various applications.
-        - **Platform Consistency**: Ensures consistent behavior and data across different platforms and devices.
-        - **Managed Service**: Provides a hosted solution for easy deployment and maintenance.
-        - **Cost Savings**: Saves costs by adding relevant memories instead of complete transcripts to context window
-    </Accordion>
-
-    <Accordion title="How is Mem0 different from traditional RAG?">
-        Mem0's memory implementation for Large Language Models (LLMs) offers several advantages over Retrieval-Augmented Generation (RAG):
-
-        - **Entity Relationships**: Mem0 can understand and relate entities across different interactions, unlike RAG which retrieves information from static documents. This leads to a deeper understanding of context and relationships.
-
-        - **Contextual Continuity**: Mem0 retains information across sessions, maintaining continuity in conversations and interactions, which is essential for long-term engagement applications like virtual companions or personalized learning assistants.
-
-        - **Adaptive Learning**: Mem0 improves its personalization based on user interactions and feedback, making the memory more accurate and tailored to individual users over time.
-
-        - **Dynamic Updates**: Mem0 can dynamically update its memory with new information and interactions, unlike RAG which relies on static data. This allows for real-time adjustments and improvements, enhancing the user experience.
-
-        These advanced memory capabilities make Mem0 a powerful tool for developers aiming to create personalized and context-aware AI applications.
-    </Accordion>
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
 
-    <Accordion title="What are the common use-cases of Mem0?">
-        - **Personalized Learning Assistants**: Long-term memory allows learning assistants to remember user preferences, strengths and weaknesses, and progress, providing a more tailored and effective learning experience.
 
-        - **Customer Support AI Agents**: By retaining information from previous interactions, customer support bots can offer more accurate and context-aware assistance, improving customer satisfaction and reducing resolution times.
+<手风琴组>
+    <Accordion title="Mem0 是如何工作的？">
+        Mem0 利用复杂的混合数据库系统来有效地管理和检索人工智能代理和助手的记忆。每个内存都链接到一个唯一的标识符，例如用户 ID 或代理 ID，使 Mem0 能够组织和访问针对特定个人或上下文定制的内存。
 
-        - **Healthcare Assistants**: Long-term memory enables healthcare assistants to keep track of patient history, medication schedules, and treatment plans, ensuring personalized and consistent care.
+        当通过“add”方法将消息添加到 Mem0 时，系统会提取相关事实和偏好，并将它们分布在各种数据存储中：矢量数据库和图形数据库。这种混合策略可确保以最佳方式存储不同类型的信息，从而促进快速有效的搜索。
 
-        - **Virtual Companions**: Virtual companions can use long-term memory to build deeper relationships with users by remembering personal details, preferences, and past conversations, making interactions more delightful.
+        当人工智能代理或法学硕士需要访问内存时，它会采用“搜索”方法。 Mem0 对这些数据存储进行全面搜索，从每个数据存储中检索相关信息。检索到的记忆可以根据需要无缝集成到系统提示中，增强响应的个性化和相关性。
+  </手风琴><Accordion title="Mem0 的主要特点是什么？">
+        - **用户、会话和 AI 代理内存**：保留用户和 AI 代理的会话和交互信息，确保连续性和上下文。
+        - **自适应个性化**：根据用户交互和反馈不断更新记忆。
+        - **开发人员友好的 API**：提供简单的 API，用于无缝集成到各种应用程序中。
+        - **平台一致性**：确保不同平台和设备之间的行为和数据一致。
+        - **托管服务**：提供托管解决方案以方便部署和维护。
+        - **节省成本**：通过将相关记忆而不是完整的转录本添加到上下文窗口来节省成本
+    </手风琴>
 
-        - **Productivity Tools**: Long-term memory helps productivity tools remember user habits, frequently used documents, and task history, streamlining workflows and enhancing efficiency.
+    <Accordion title="Mem0 与传统 RAG 有何不同？” >
+        与检索增强生成 (RAG) 相比，Mem0 的大型语言模型 (LLM) 内存实现具有多个优势：- **实体关系**：Mem0 可以跨不同交互理解和关联实体，这与从静态文档中检索信息的 RAG 不同。这有助于更深入地理解背景和关系。
 
-        - **Gaming AI**: In gaming, AI with long-term memory can create more immersive experiences by remembering player choices, strategies, and progress, adapting the game environment accordingly.
+        - **上下文连续性**：Mem0 保留跨会话的信息，保持对话和交互的连续性，这对于虚拟伴侣或个性化学习助手等长期参与应用程序至关重要。
 
-    </Accordion>
+        - **自适应学习**：Mem0 根据用户交互和反馈改进其个性化，使记忆随着时间的推移变得更加准确并适合个人用户。
 
-    <Accordion title="Why aren't my memories being created?">
-        Mem0 uses a sophisticated classification system to determine which parts of text should be extracted as memories. Not all text content will generate memories, as the system is designed to identify specific types of memorable information.
-        There are several scenarios where mem0 may return an empty list of memories:
+        - **动态更新**：Mem0 可以使用新信息和交互动态更新其内存，这与依赖静态数据的 RAG 不同。这允许实时调整和改进，增强用户体验。
 
-        - When users input definitional questions (e.g., "What is backpropagation?")
-        - For general concept explanations that don't contain personal or experiential information
-        - Technical definitions and theoretical explanations
-        - General knowledge statements without personal context
-        - Abstract or theoretical content
+        这些先进的内存功能使 Mem0 成为开发人员创建个性化和上下文感知 AI 应用程序的强大工具。
+    </手风琴><Accordion title="Mem0 的常见用例是什么？">
+        - **个性化学习助手**：长期记忆使学习助手能够记住用户的偏好、优点和缺点以及进度，从而提供更加量身定制和有效的学习体验。
 
-        Example Scenarios
+        - **客户支持人工智能代理**：通过保留以前交互的信息，客户支持机器人可以提供更准确和上下文感知的帮助，提高客户满意度并减少解决时间。
 
-        ```
+        - **医疗保健助理**：长期记忆使医疗保健助理能够跟踪患者病史、用药时间表和治疗计划，确保个性化和一致的护理。- **虚拟伴侣**：虚拟伴侣可以通过记住个人详细信息、偏好和过去的对话，利用长期记忆与用户建立更深层次的关系，使互动更加愉快。
+
+        - **生产力工具**：长期记忆帮助生产力工具记住用户习惯、常用文档和任务历史记录，简化工作流程并提高效率。- **游戏人工智能**：在游戏中，具有长期记忆的人工智能可以通过记住玩家的选择、策略和进度来创造更身临其境的体验，并相应地适应游戏环境。
+
+    </手风琴>
+
+    <Accordion title="为什么我的记忆没有被创建？">
+        Mem0 使用复杂的分类系统来确定文本的哪些部分应提取为记忆。并非所有文本内容都会产生记忆，因为系统旨在识别特定类型的难忘信息。
+        在几种情况下，mem0 可能会返回空的内存列表：
+
+        - 当用户输入定义性问题时（例如，“什么是反向传播？”）
+        - 对于不包含个人或经验信息的一般概念解释
+        - 技术定义和理论解释
+        - 没有个人背景的一般知识陈述
+        - 摘要或理论内容
+
+        示例场景        ```
         Input: "What is machine learning?"
         No memories extracted - Content is definitional and does not meet memory classification criteria.
 
         Input: "Yesterday I learned about machine learning in class"
         Memory extracted - Contains personal experience and temporal context.
         ```
+最佳实践
 
-        Best Practices
+        为确保内存提取成功：
+        - 包括时间标记（事件发生时）
+        - 添加个人背景或经历
+        - 根据现实世界的应用或经验构建信息
+        - 包括具体的例子或案例，而不是一般的定义
+    </手风琴>
 
-        To ensure successful memory extraction:
-        - Include temporal markers (when events occurred)
-        - Add personal context or experiences
-        - Frame information in terms of real-world applications or experiences
-        - Include specific examples or cases rather than general definitions
-    </Accordion>
+    <Accordion title="如何为 AWS Lambda 配置 Mem0？">
+        在 AWS Lambda 上部署 Mem0 时，由于 Lambda 的文件系统限制，您需要修改存储目录配置。默认情况下，Lambda 仅允许写入“/tmp”目录。
 
-    <Accordion title="How do I configure Mem0 for AWS Lambda?">
-        When deploying Mem0 on AWS Lambda, you'll need to modify the storage directory configuration due to Lambda's file system restrictions. By default, Lambda only allows writing to the `/tmp` directory.
-
-        To configure Mem0 for AWS Lambda, set the `MEM0_DIR` environment variable to point to a writable directory in `/tmp`:
-
-        ```bash
+        要为 AWS Lambda 配置 Mem0，请将“MEM0_DIR”环境变量设置为指向“/tmp”中的可写目录：        ```bash
         MEM0_DIR=/tmp/.mem0
         ```
-
-        If you're not using environment variables, you'll need to modify the storage path in your code:
-
-        ```python
+如果您不使用环境变量，则需要修改代码中的存储路径：        ```python
         # Change from
         home_dir = os.path.expanduser("~")
         mem0_dir = os.environ.get("MEM0_DIR") or os.path.join(home_dir, ".mem0")
@@ -103,46 +86,34 @@ iconType: "solid"
         # To
         mem0_dir = os.environ.get("MEM0_DIR", "/tmp/.mem0")
         ```
+请注意，Lambda 中的“/tmp”目录的大小限制为 512MB，并且其内容在函数调用之间不会持久。
+    </手风琴>
 
-        Note that the `/tmp` directory in Lambda has a size limit of 512MB and its contents are not persistent between function invocations.
-    </Accordion>
+    <Accordion title="如何将元数据与 Mem0 一起使用？">
+        元数据是将附加信息与 Mem0 合并的推荐方法。您可以在“add”方法期间将任何类型的结构化数据存储为元数据，例如位置、时间戳、天气条件、用户状态或应用程序上下文。这可以通过有价值的上下文信息来丰富您的记忆，这些信息可用于更精确的检索和过滤。
 
-    <Accordion title="How can I use metadata with Mem0?">
-        Metadata is the recommended approach for incorporating additional information with Mem0. You can store any type of structured data as metadata during the `add` method, such as location, timestamp, weather conditions, user state, or application context. This enriches your memories with valuable contextual information that can be used for more precise retrieval and filtering.
+        在检索过程中，您有两种使用元数据的主要方法：
 
-        During retrieval, you have two main approaches for using metadata:
+        1. **预过滤**：在初始搜索查询中包含元数据参数以缩小内存池范围
+        2.**后处理**：根据查询检索更广泛的记忆集，然后应用元数据过滤器来细化结果
 
-        1. **Pre-filtering**: Include metadata parameters in your initial search query to narrow down the memory pool
-        2. **Post-processing**: Retrieve a broader set of memories based on query, then apply metadata filters to refine the results
+        您可能存储的有用元数据的示例：- **上下文信息**：位置、时间、设备类型、应用程序状态
+        - **用户属性**：偏好、技能水平、人口统计信息
+        - **交互细节**：对话主题、情绪、紧急程度
+        - **自定义标签**：与您的应用程序相关的任何特定于域的分类
 
-        Examples of useful metadata you might store:
+        这种灵活性使您能够创建高度上下文感知的 AI 应用程序，可以适应特定的用户需求和情况。元数据为记忆检索提供了额外的维度，从而实现更精确和相关的响应。
+    </手风琴>
 
-        - **Contextual information**: Location, time, device type, application state
-        - **User attributes**: Preferences, skill levels, demographic information
-        - **Interaction details**: Conversation topics, sentiment, urgency levels
-        - **Custom tags**: Any domain-specific categorization relevant to your application
-
-        This flexibility allows you to create highly contextually aware AI applications that can adapt to specific user needs and situations. Metadata provides an additional dimension for memory retrieval, enabling more precise and relevant responses.
-    </Accordion>
-
-    <Accordion title="How do I disable telemetry in Mem0?">
-        To disable telemetry in Mem0, you can set the `MEM0_TELEMETRY` environment variable to `False`:
-
-        ```bash
+    <Accordion title="如何禁用 Mem0 中的遥测？">
+        要禁用 Mem0 中的遥测，您可以将“MEM0_TELEMETRY”环境变量设置为“False”：        ```bash
         MEM0_TELEMETRY=False
         ```
-
-        You can also disable telemetry programmatically in your code:
-
-        ```python
+您还可以在代码中以编程方式禁用遥测：        ```python
         import os
         os.environ["MEM0_TELEMETRY"] = "False"
         ```
+设置此环境变量将阻止 Mem0 收集和发送任何使用数据，从而确保您的应用程序的完全隐私。
+    </手风琴>
 
-        Setting this environment variable will prevent Mem0 from collecting and sending any usage data, ensuring complete privacy for your application.
-    </Accordion>
-
-</AccordionGroup>
-
-
-
+</手风琴组>

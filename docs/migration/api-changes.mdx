@@ -5,16 +5,19 @@ icon: "code"
 iconType: "solid"
 ---
 
-## Overview
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-This page documents all API changes between Mem0 v0.x and v1.0.0 Beta, organized by component and method.
 
-## Memory Class Changes
 
-### Constructor
+## 概述
 
-#### v0.x
-```python
+此页面记录了 Mem0 v0.x 和 v1.0.0 Beta 之间的所有 API 更改，按组件和方法组织。
+
+## 内存类别更改
+
+### 构造函数
+
+#### v0.x```python
 from mem0 import Memory
 
 # Basic initialization
@@ -27,9 +30,7 @@ config = {
 }
 m = Memory.from_config(config)
 ```
-
-#### v1.0.0 
-```python
+#### v1.0.0```python
 from mem0 import Memory
 
 # Basic initialization (same)
@@ -47,11 +48,9 @@ config = {
 }
 m = Memory.from_config(config)
 ```
+### add() 方法
 
-### add() Method
-
-#### v0.x Signature
-```python
+#### v0.x 签名```python
 def add(
     self,
     messages,
@@ -64,9 +63,7 @@ def add(
     version: str = None         # ❌ REMOVED
 ) -> Union[List[dict], dict]
 ```
-
-#### v1.0.0  Signature
-```python
+#### v1.0.0 签名```python
 def add(
     self,
     messages,
@@ -78,25 +75,23 @@ def add(
     infer: bool = True          # ✅ NEW: Control memory inference
 ) -> dict  # Always returns dict with "results" key
 ```
+#### 变更摘要
 
-#### Changes Summary
+|参数| v0.x | v1.0.0 |改变 |
+|------------|------|------------|------|
+| `消息` | ✅ | ✅ |不变 |
+| `用户 ID` | ✅ | ✅ |不变 |
+| `agent_id` | ✅ | ✅ |不变 |
+| `run_id` | ✅ | ✅ |不变 |
+| `元数据` | ✅ | ✅ |不变 |
+| `过滤器` | ✅ | ✅ |不变 |
+| `输出格式` | ✅ | ❌ | **已删除** |
+| `版本` | ✅ | ❌ | **已删除** |
+| `推断` | ❌ | ✅ | **新** |
 
-| Parameter | v0.x | v1.0.0  | Change |
-|-----------|------|-----------|---------|
-| `messages` | ✅ | ✅ | Unchanged |
-| `user_id` | ✅ | ✅ | Unchanged |
-| `agent_id` | ✅ | ✅ | Unchanged |
-| `run_id` | ✅ | ✅ | Unchanged |
-| `metadata` | ✅ | ✅ | Unchanged |
-| `filters` | ✅ | ✅ | Unchanged |
-| `output_format` | ✅ | ❌ | **REMOVED** |
-| `version` | ✅ | ❌ | **REMOVED** |
-| `infer` | ❌ | ✅ | **NEW** |
+#### 响应格式更改
 
-#### Response Format Changes
-
-**v0.x Response (variable format):**
-```python
+**v0.x 响应（可变格式）：**```python
 # With output_format="v1.0"
 [
     {
@@ -117,9 +112,7 @@ def add(
     ]
 }
 ```
-
-**v1.0.0  Response (standardized):**
-```python
+**v1.0.0 响应（标准化）：**```python
 # Always returns this format
 {
     "results": [
@@ -132,11 +125,9 @@ def add(
     ]
 }
 ```
+### search() 方法
 
-### search() Method
-
-#### v0.x Signature
-```python
+#### v0.x 签名```python
 def search(
     self,
     query: str,
@@ -149,9 +140,7 @@ def search(
     version: str = None         # ❌ REMOVED
 ) -> Union[List[dict], dict]
 ```
-
-#### v1.0.0  Signature
-```python
+#### v1.0.0 签名```python
 def search(
     self,
     query: str,
@@ -163,20 +152,16 @@ def search(
     rerank: bool = True         # ✅ NEW: Reranking support
 ) -> dict  # Always returns dict with "results" key
 ```
+#### 增强过滤
 
-#### Enhanced Filtering
-
-**v0.x Filters (basic):**
-```python
+**v0.x 过滤器（基本）：**```python
 # Simple key-value filtering only
 filters = {
     "category": "food",
     "user_id": "alice"
 }
 ```
-
-**v1.0.0  Filters (enhanced):**
-```python
+**v1.0.0 过滤器（增强）：**```python
 # Advanced filtering with operators
 filters = {
     "AND": [
@@ -203,11 +188,9 @@ filters = {
     "category": {"nin": ["spam", "deleted"]}  # Not in list
 }
 ```
+### get_all() 方法
 
-### get_all() Method
-
-#### v0.x Signature
-```python
+#### v0.x 签名```python
 def get_all(
     self,
     user_id: str = None,
@@ -218,9 +201,7 @@ def get_all(
     version: str = None         # ❌ REMOVED
 ) -> Union[List[dict], dict]
 ```
-
-#### v1.0.0  Signature
-```python
+#### v1.0.0 签名```python
 def get_all(
     self,
     user_id: str = None,
@@ -229,11 +210,9 @@ def get_all(
     filters: dict = None        # ✅ ENHANCED: Advanced operators
 ) -> dict  # Always returns dict with "results" key
 ```
+### update() 方法
 
-### update() Method
-
-#### No Breaking Changes
-```python
+#### 没有重大变化```python
 # Same signature in both versions
 def update(
     self,
@@ -241,33 +220,28 @@ def update(
     data: str
 ) -> dict
 ```
+###删除()方法
 
-### delete() Method
-
-#### No Breaking Changes
-```python
+#### 没有重大变化```python
 # Same signature in both versions
 def delete(
     self,
     memory_id: str
 ) -> dict
 ```
+### delete_all() 方法
 
-### delete_all() Method
+#### 重大更改 - 空过滤器不再默默地删除所有内容
 
-#### Breaking Change — Empty filter no longer silently deletes everything
+**之前：** 在没有过滤器的情况下调用 `delete_all()` 默默删除 **项目中的所有内存**。
 
-**Before:** calling `delete_all()` with no filters silently deleted **all memories in the project**.
+**之后：**
+- 无过滤器 → 引发验证错误（防止意外的整个项目擦除）。
+- 具体ID（例如`user_id =“alice”`）→删除该实体的记忆（不变）。
+- 过滤器的“*”→删除整个项目中该实体类型的所有记忆（新）。
+- 所有四个过滤器设置为“*”→ 显式完整项目擦除（新功能，需要选择每个参数）。
 
-**After:**
-- No filters → raises a validation error (prevents accidental full-project wipe).
-- Concrete ID (e.g. `user_id="alice"`) → deletes memories for that entity (unchanged).
-- `"*"` for a filter → deletes all memories for that entity type across the project (new).
-- All four filters set to `"*"` → explicit full project wipe (new, requires opt-in on every parameter).
-
-This change replaces the silent full-project delete (triggered by an empty or missing filter) with a validation error, and introduces `"*"` wildcards as the intentional path for bulk deletion.
-
-```python
+此更改将静默完整项目删除（由空或缺失的过滤器触发）替换为验证错误，并引入“*”通配符作为批量删除的有意路径。```python
 # v0.x — no filter silently wiped all project memories
 m.delete_all()                      # DANGER: deleted everything
 m.delete_all(user_id="alice")       # deleted alice's memories
@@ -278,13 +252,11 @@ m.delete_all(user_id="alice")                                        # unchanged
 m.delete_all(user_id="*")                                            # NEW — delete all users' memories
 m.delete_all(user_id="*", agent_id="*", app_id="*", run_id="*")     # NEW — full project wipe
 ```
+## 平台客户端 (MemoryClient) 更改
 
-## Platform Client (MemoryClient) Changes
+### async_mode 默认值已更改
 
-### async_mode Default Changed
-
-#### v0.x
-```python
+#### v0.x```python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your-key")
@@ -292,9 +264,7 @@ client = MemoryClient(api_key="your-key")
 # async_mode had to be explicitly set or had different default
 result = client.add("content", user_id="alice", async_mode=True)
 ```
-
-#### v1.0.0
-```python
+#### v1.0.0```python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="your-key")
@@ -305,13 +275,11 @@ result = client.add("content", user_id="alice")  # Uses async_mode=True by defau
 # Can still override if needed
 result = client.add("content", user_id="alice", async_mode=False)
 ```
+## 配置更改
 
-## Configuration Changes
+### 内存配置
 
-### Memory Configuration
-
-#### v0.x Config Options
-```python
+#### v0.x 配置选项```python
 config = {
     "vector_store": {...},
     "llm": {...},
@@ -322,9 +290,7 @@ config = {
     "custom_instructions": "..."
 }
 ```
-
-#### v1.0.0  Config Options
-```python
+#### v1.0.0 配置选项```python
 config = {
     "vector_store": {...},
     "llm": {...},
@@ -340,11 +306,9 @@ config = {
     "custom_update_memory_prompt": "..."  # ✅ NEW: Custom update prompt
 }
 ```
+### 新配置选项
 
-### New Configuration Options
-
-#### Reranker Configuration
-```python
+#### 重新排序器配置```python
 # Cohere reranker
 "reranker": {
     "provider": "cohere",
@@ -387,22 +351,18 @@ config = {
     }
 }
 ```
+## 错误处理更改
 
-## Error Handling Changes
+### 新错误类型
 
-### New Error Types
-
-#### v0.x Errors
-```python
+#### v0.x 错误```python
 # Generic exceptions
 try:
     result = m.add("content", user_id="alice", version="v1.0")
 except Exception as e:
     print(f"Error: {e}")
 ```
-
-#### v1.0.0  Errors
-```python
+#### v1.0.0 错误```python
 # More specific error handling
 try:
     result = m.add("content", user_id="alice")
@@ -420,32 +380,26 @@ except Exception as e:
     # Handle unexpected errors
     pass
 ```
+### 验证更改
 
-### Validation Changes
+#### 更严格的参数验证
 
-#### Stricter Parameter Validation
-
-**v0.x (Lenient):**
-```python
+**v0.x（宽松）：**```python
 # Unknown parameters might be ignored
 result = m.add("content", user_id="alice", unknown_param="value")
 ```
-
-**v1.0.0  (Strict):**
-```python
+**v1.0.0（严格）：**```python
 # Unknown parameters raise TypeError
 try:
     result = m.add("content", user_id="alice", unknown_param="value")
 except TypeError as e:
     print(f"Invalid parameter: {e}")
 ```
+## 响应架构更改
 
-## Response Schema Changes
+### 内存对象架构
 
-### Memory Object Schema
-
-#### v0.x Schema
-```python
+#### v0.x 架构```python
 {
     "id": "mem_123",
     "memory": "User loves pizza",
@@ -456,9 +410,7 @@ except TypeError as e:
     "score": 0.95  # In search results
 }
 ```
-
-#### v1.0.0  Schema (Enhanced)
-```python
+#### v1.0.0 架构（增强）```python
 {
     "id": "mem_123",
     "memory": "User loves pizza",
@@ -474,13 +426,11 @@ except TypeError as e:
     "rerank_score": 0.98        # ✅ NEW: If reranking used
 }
 ```
+## 迁移代码示例
 
-## Migration Code Examples
+### 简单迁移
 
-### Simple Migration
-
-#### Before (v0.x)
-```python
+#### 之前 (v0.x)```python
 from mem0 import Memory
 
 m = Memory()
@@ -502,9 +452,7 @@ else:
 for memory in memories:
     print(memory["memory"])
 ```
-
-#### After (v1.0.0 )
-```python
+#### (v1.0.0 ) 之后```python
 from mem0 import Memory
 
 m = Memory()
@@ -519,11 +467,9 @@ result = m.add(
 for memory in result["results"]:
     print(memory["memory"])
 ```
+### 高级迁移
 
-### Advanced Migration
-
-#### Before (v0.x)
-```python
+#### 之前 (v0.x)```python
 # Basic filtering
 results = m.search(
     "food preferences",
@@ -532,9 +478,7 @@ results = m.search(
     output_format="v1.1"
 )
 ```
-
-#### After (v1.0.0 )
-```python
+#### (v1.0.0 ) 之后```python
 # Enhanced filtering with reranking
 results = m.search(
     "food preferences",
@@ -548,19 +492,18 @@ results = m.search(
     rerank=True
 )
 ```
+## 总结
 
-## Summary
+|组件| v0.x | v1.0.0 |状态 |
+|------------|------|------------|------|
+| `add()` 方法 |可变响应|标准化回应 | ⚠️打破|
+| `search()` 方法 |基本过滤 |增强过滤+重新排名| ⚠️打破|
+| `get_all()` 方法 |可变响应|标准化回应 | ⚠️打破|
+|回复格式 |变量|始终 `{"results": [...]}` | ⚠️打破|
+|重新排名 | ❌ 不可用 | ✅ 全力支持 | ✅ 新功能 |
+|高级过滤 | ❌ 仅限基本 | ✅ 全员运营 | ✅ 增强 |
+|错误处理 |通用|具体错误类型| ✅ 改善 |
 
-| Component | v0.x | v1.0.0  | Status |
-|-----------|------|-----------|---------|
-| `add()` method | Variable response | Standardized response | ⚠️ Breaking |
-| `search()` method | Basic filtering | Enhanced filtering + reranking | ⚠️ Breaking |
-| `get_all()` method | Variable response | Standardized response | ⚠️ Breaking |
-| Response format | Variable | Always `{"results": [...]}` | ⚠️ Breaking |
-| Reranking | ❌ Not available | ✅ Full support | ✅ New feature |
-| Advanced filtering | ❌ Basic only | ✅ Full operators | ✅ Enhancement |
-| Error handling | Generic | Specific error types | ✅ Improvement |
-
-<Info>
-Use this reference to systematically update your codebase. Test each change thoroughly before deploying to production.
-</Info>
+<信息>
+使用此参考系统地更新您的代码库。在部署到生产之前彻底测试每个更改。
+</信息>

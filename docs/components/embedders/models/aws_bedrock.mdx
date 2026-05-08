@@ -3,22 +3,23 @@ title: AWS Bedrock
 description: "Configure AWS Bedrock as an embedding provider in Mem0 with IAM credentials and boto3 authentication."
 ---
 
-To use AWS Bedrock embedding models, you need to have the appropriate AWS credentials and permissions. The embeddings implementation relies on the `boto3` library.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Setup
-- Ensure you have model access from the [AWS Bedrock Console](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess)
-- Authenticate the boto3 client using a method described in the [AWS documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html)
-- Set up environment variables for authentication:
-  ```bash
+
+
+
+要使用 AWS Bedrock 嵌入模型，您需要拥有适当的 AWS 凭证和权限。嵌入实现依赖于“boto3”库。
+
+### 设置
+- 确保您可以从 [AWS Bedrock 控制台](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess) 访问模型
+- 使用 [AWS 文档](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html) 中描述的方法对 boto3 客户端进行身份验证
+- 设置用于身份验证的环境变量：  ```bash
   export AWS_REGION=us-east-1
   export AWS_ACCESS_KEY_ID=your-access-key
-  export AWS_SECRET_ACCESS_KEY=your-secret-key
-  ```
+  export AWS_SECRET_ACCESS_KEY=your-secret-key  ```
+### 用法
 
-### Usage
-
-<CodeGroup>
-```python Python
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -48,16 +49,16 @@ messages = [
 ]
 m.add(messages, user_id="alice")
 ```
-</CodeGroup>
+</代码组>
 
-### Config
+### 配置
 
-Here are the parameters available for configuring AWS Bedrock embedder:
+以下是可用于配置 AWS Bedrock 嵌入器的参数：
 
-<Tabs>
-<Tab title="Python">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `model` | The name of the embedding model to use | `amazon.titan-embed-text-v1` |
-</Tab>
-</Tabs>
+<标签>
+<标签标题=“Python”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `模型` |要使用的嵌入模型的名称 | `amazon.titan-embed-text-v1` |
+</标签>
+</标签>

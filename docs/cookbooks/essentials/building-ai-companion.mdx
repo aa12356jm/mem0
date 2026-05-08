@@ -3,57 +3,51 @@ title: Build a Companion with Mem0
 description: "Spin up a fitness coach that remembers goals, adapts tone, and keeps sessions personal."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Essentially, creating a companion out of LLMs is as simple as a loop. But these loops work great for one type of character without personalization and fall short as soon as you restart the chat.
 
-Problem: LLMs are stateless. GPT doesn't remember conversations. You could stuff everything inside the context window, but that becomes slow, expensive, and breaks at scale.
 
-The solution: Mem0. It extracts and stores what matters from conversations, then retrieves it when needed. Your companion remembers user preferences, past events, and history.
+本质上，从 LLM 中创建一个同伴就像一个循环一样简单。但这些循环对于一种没有个性化的角色非常有效，但一旦重新启动聊天就会失效。
 
-<Tabs>
-  <Tab title="Platform">
-  </Tab>
-  <Tab title="Open Source">
-    Here we use **Mem0 open source** (`Memory`): all local, no API keys needed for memory. Vectors in **Qdrant**, LLM and embeddings via **Ollama**. The **OpenAI** Python SDK calls Ollama's **OpenAI-compatible** `/v1` endpoint for Ray's chat replies.
+问题：法学硕士是无国籍的。 GPT 不记得对话。您可以将所有内容填充到上下文窗口中，但这会变得缓慢、昂贵，并且会大规模中断。
 
-    ## Installation
+解决办法：Mem0.它提取并存储对话中重要的内容，然后在需要时检索它。您的同伴会记住用户偏好、过去的事件和历史。
 
-    Install the required dependencies:
+<标签>
+  <选项卡标题=“平台”>
+  </标签>
+  <选项卡标题=“开源”>
+    这里我们使用**Mem0开源**（`Memory`）：全部本地，内存不需要API密钥。 **Qdrant**、LLM 中的向量和通过 **Ollama** 嵌入。 **OpenAI** Python SDK 调用 Ollama 的 **OpenAI 兼容** `/v1` 端点来进行 Ray 的聊天回复。## 安装
 
-    ```bash
+    安装所需的依赖项：    ```bash
     pip install mem0ai qdrant-client openai ollama
     ```
-
-    Then start Qdrant and pull the Ollama models:
-
-    ```bash
+然后启动 Qdrant 并拉取 Ollama 模型：    ```bash
     docker run -d -p 6333:6333 qdrant/qdrant
     ollama pull llama3.1:latest
     ollama pull nomic-embed-text:latest
     ```
+<注意>您可以将 `nomic-embed-text` 替换为任何 Ollama 支持的嵌入模型（例如，`snowflake-arctic-embed`、`mxbai-embed-large`）。只需更新“embedder”配置中的“model”，并在 Qdrant 配置中设置“embedding_model_dims”以匹配模型的输出尺寸（“nomic-embed-text”为 768）。</Note>
+  </标签>
+</标签>
 
-    <Note>You can swap `nomic-embed-text` for any Ollama-supported embedding model (e.g., `snowflake-arctic-embed`, `mxbai-embed-large`). Just update the `model` in the `embedder` config and set `embedding_model_dims` in the Qdrant config to match the model's output dimensions (768 for `nomic-embed-text`).</Note>
-  </Tab>
-</Tabs>
+在这本食谱中，我们将打造一个**健身伴侣**，它：
 
-In this cookbook we'll build a **fitness companion** that:
+- 记住跨会话的用户目标
+- 回忆过去的锻炼和进步
+- 根据用户偏好调整其个性
+- 处理短期上下文（今天的聊天）和长期记忆（几个月的历史）
 
-- Remembers user goals across sessions
-- Recalls past workouts and progress
-- Adapts its personality based on user preferences
-- Handles both short-term context (today's chat) and long-term memory (months of history)
-
-By the end, you'll have a working fitness companion and know how to handle common production challenges.
+最后，您将拥有一个工作健身伙伴，并知道如何应对常见的生产挑战。
 
 ---
 
-## The Basic Loop with Memory
+## 带内存的基本循环
 
-Max wants to train for a marathon. He starts chatting with Ray, an AI running coach.
+马克斯想要参加马拉松训练。他开始与人工智能跑步教练雷聊天。
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 from openai import OpenAI
 from mem0 import MemoryClient
 
@@ -82,9 +76,8 @@ def chat(user_input, user_id):
 
     return response
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 from openai import OpenAI
 from mem0 import Memory
 
@@ -146,62 +139,51 @@ def chat(user_input, user_id):
 
     return response
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-**Session 1:**
-
-```python
+**第 1 节：**```python
 chat("I want to run a marathon in under 4 hours", user_id="max")
 # Output: "That's a solid goal. What's your current weekly mileage?"
 # Stored in Mem0: "Max wants to run sub-4 marathon"
 ```
-
-**Session 2 (next day, app restarted):**
-
-```python
+**会话 2（第二天，应用程序重新启动）：**```python
 chat("What should I focus on today?", user_id="max")
 # Output: "Based on your sub-4 marathon goal, let's work on building your aerobic base..."
 ```
+<信息>
+雷（Ray）记得麦克斯（Max）在各个会议中的目标。应用程序重新启动，但内存仍然存在。这是核心模式：检索记忆，将它们作为上下文传递，存储新的交换。
+</信息>
 
-<Info>
-Ray remembers Max's goal across sessions. The app restarted, but the memory persisted. This is the core pattern: retrieve memories, pass them as context, store new exchanges.
-</Info>
-
-Ray remembers. Restart the app, and the goal persists. From here on, we'll focus on just the Mem0 API calls.
+雷记得。重新启动应用程序，目标仍然存在。从这里开始，我们将只关注 Mem0 API 调用。
 
 ---
 
-## Organizing Memory by Type
+## 按类型组织内存
 
-### Separating Temporary from Permanent
+### 将临时与永久分开
 
-Max mentions his knee hurts. That's different from his marathon goal - one is temporary, the other is long-term.
+马克斯提到他的膝盖很痛。这与他的马拉松目标不同——一个是暂时的，另一个是长期的。
 
-<Tabs>
-  <Tab title="Platform">
-**Categories vs Metadata:**
+<标签>
+  <选项卡标题=“平台”>
+**类别与元数据：**
 
-- **Categories**: AI-assigned by Mem0 based on content (you can't force them)
-- **Metadata**: Manually set by you for forced tagging
+- **类别**：由 Mem0 根据内容 AI 分配（你不能强迫它们）
+- **元数据**：由您手动设置以进行强制标记
 
-Define custom categories at the project level. Mem0 will automatically tag memories with relevant categories based on content:
-
-```python
+在项目级别定义自定义类别。 Mem0 会根据内容自动为内存标记相关类别：```python
 mem0_client.project.update(custom_categories=[
     {"goals": "Race targets and training objectives"},
     {"constraints": "Injuries, limitations, recovery needs"},
     {"preferences": "Training style, surfaces, schedules"}
 ])
 ```
+<注意>
+**类别与元数据：** 类别是由 Mem0 根据内容语义 AI 分配的。您定义调色板，Mem0 选择适用的调色板。如果您需要有保证的标记，请改用“元数据”。
+</注>
 
-<Note>
-**Categories vs Metadata:** Categories are AI-assigned by Mem0 based on content semantics. You define the palette, Mem0 picks which ones apply. If you need guaranteed tagging, use `metadata` instead.
-</Note>
-
-Now when you add memories, Mem0 automatically assigns the appropriate categories:
-
-```python
+现在，当您添加内存时，Mem0 会自动分配适当的类别：```python
 # Add goal - Mem0 automatically tags it as "goals"
 mem0_client.add(
     [{"role": "user", "content": "Sub-4 marathon is my A-race"}],
@@ -214,12 +196,9 @@ mem0_client.add(
     user_id="max"
 )
 ```
+Mem0 读取内容并智能地选择适用的类别。您定义调色板，它处理标记。
 
-Mem0 reads the content and intelligently picks which categories apply. You define the palette, it handles the tagging.
-
-**Important:** You cannot force specific categories. Mem0's platform decides which categories are relevant based on content. If you need to force-tag something, use `metadata` instead:
-
-```python
+**重要提示：** 您不能强制指定特定类别。 Mem0 的平台根据内容决定哪些类别是相关的。如果您需要强制标记某些内容，请使用“元数据”：```python
 # Force tag using metadata (not categories)
 mem0_client.add(
     [{"role": "user", "content": "Some workout note"}],
@@ -227,13 +206,11 @@ mem0_client.add(
     metadata={"workout_type": "speed", "forced_tag": "custom_label"}
 )
 ```
-  </Tab>
-  <Tab title="Open Source">
-**Categories via Metadata:**
+</标签>
+  <选项卡标题=“开源”>
+**通过元数据分类：**
 
-In open source, model categories with a stable field in `metadata`—here we use `memory_bucket`:
-
-```python
+在开源中，模型类别在“元数据”中具有稳定的字段——这里我们使用“memory_bucket”：```python
 # Add goal
 memory.add(
     [{"role": "user", "content": "Sub-4 marathon is my A-race"}],
@@ -248,12 +225,9 @@ memory.add(
     metadata={"memory_bucket": "constraints"},
 )
 ```
-
-<Note>
-**Categories vs Metadata:** In open source, categories are modeled as `metadata` fields you set on each `add`. Filters only see what you put on `add`.
-</Note>
-
-```python
+<注意>
+**类别与元数据：** 在开源中，类别被建模为您在每个“添加”上设置的“元数据”字段。过滤器只能看到您在“add”上添加的内容。
+</注>```python
 # Force tag using metadata
 memory.add(
     [{"role": "user", "content": "Some workout note"}],
@@ -261,16 +235,15 @@ memory.add(
     metadata={"memory_bucket": "goals", "workout_type": "speed", "forced_tag": "custom_label"},
 )
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-### Filtering by Category
+### 按类别过滤
 
-Retrieve just constraints for workout planning:
+仅检索锻炼计划的约束：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 constraints = mem0_client.search(
     query="injury concerns",
     filters={
@@ -284,9 +257,8 @@ constraints = mem0_client.search(
 print([m["memory"] for m in constraints["results"]])
 # Output: ["Max's right knee flares up on downhills"]
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 constraints = memory.search(
     query="injury concerns",
     user_id="max",
@@ -296,49 +268,45 @@ constraints = memory.search(
 print([m["memory"] for m in constraints["results"]])
 # Output: ["Max's right knee flares up on downhills"]
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-Ray can plan workouts that avoid aggravating Max's knee, without pulling in race goals or other unrelated memories.
+雷可以计划锻炼以避免加重马克斯的膝盖，而无需拉扯比赛目标或其他不相关的记忆。
 
 ---
 
-## Filtering What Gets Stored
+## 过滤存储的内容
 
-### The Problem
+### 问题
 
-Run the basic loop for a week and check what's stored:
+运行基本循环一周并检查存储的内容：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 memories = mem0_client.get_all(filters={"AND": [{"user_id": "max"}]})
 print([m["memory"] for m in memories["results"]])
 # Output: ["Max wants to run marathon under 4 hours", "hey", "lol ok", "cool thanks", "gtg bye"]
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 memories = memory.get_all(filters={"user_id": "max"})
 print([m["memory"] for m in memories["results"]])
 # Output: ["Max wants to run marathon under 4 hours", "hey", "lol ok", "cool thanks", "gtg bye"]
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-<Warning>
-Without filters, Mem0 stores everything—greetings, filler, and casual chat. This pollutes retrieval: instead of pulling "marathon goal," you get "lol ok." Set custom instructions to keep memory clean.
-</Warning>
+<警告>
+没有过滤器，Mem0 会存储所有内容——问候语、填充语和休闲聊天。这会污染检索：你得到的不是“马拉松目标”，而是“哈哈，好吧”。设置自定义指令以保持内存清洁。
+</警告>
 
-Noise. Greetings and filler clutter the memory.
+噪音。问候和填充物使记忆变得混乱。
 
-### Custom Instructions
+### 自定义说明
 
-<Tabs>
-  <Tab title="Platform">
-Tell Mem0 what matters:
-
-```python
+<标签>
+  <选项卡标题=“平台”>
+告诉 Mem0 重要的事情：```python
 mem0_client.project.update(custom_instructions="""
 Extract from running coach conversations:
 - Training goals and race targets
@@ -352,11 +320,9 @@ Exclude:
 - Hypotheticals unless planning related
 """)
 ```
-  </Tab>
-  <Tab title="Open Source">
-Tell Mem0 what matters by including `custom_instructions` in the config dict:
-
-```python
+</标签>
+  <选项卡标题=“开源”>
+通过在配置字典中包含 `custom_instructions` 来告诉 Mem0 重要的事情：```python
 MEMORY_CONFIG["custom_instructions"] = """
 Extract from running coach conversations:
 - Training goals and race targets
@@ -374,16 +340,14 @@ Return JSON with key "facts" as a list of strings (use [] if nothing to store).
 
 memory = Memory.from_config(MEMORY_CONFIG)
 ```
+<注意>`custom_instructions`是传递给`Memory.from_config()`的配置字典中的顶级键。确保在创建 Memory 实例之前设置它 - 而不是之后。</Note>
+  </标签>
+</标签>
 
-<Note>`custom_instructions` is a top-level key in the config dictionary passed to `Memory.from_config()`. Make sure it's set before creating the Memory instance — not after.</Note>
-  </Tab>
-</Tabs>
+现在再聊一下：
 
-Now chat again:
-
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 chat("hey how's it going", user_id="max")
 chat("I prefer trail running over roads", user_id="max")
 
@@ -391,9 +355,8 @@ memories = mem0_client.get_all(filters={"AND": [{"user_id": "max"}]})
 print([m["memory"] for m in memories["results"]])
 # Output: ["Max wants to run marathon under 4 hours", "Max prefers trail running over roads"]
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 chat("hey how's it going", user_id="max")
 chat("I prefer trail running over roads", user_id="max")
 
@@ -401,50 +364,47 @@ memories = memory.get_all(filters={"user_id": "max"})
 print([m["memory"] for m in memories["results"]])
 # Output: ["Max wants to run marathon under 4 hours", "Max prefers trail running over roads"]
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-<Info>
-**Expected output:** Only 2 memories stored—the marathon goal and trail preference. The greeting "hey how's it going" was filtered out automatically. Custom instructions are working.
-</Info>
+<信息>
+**预期输出：** 仅存储 2 个记忆 - 马拉松目标和路线偏好。 “嘿，怎么样”的问候语被自动过滤掉了。自定义指令正在运行。
+</信息>
 
-Only meaningful facts. Filler gets dropped automatically.
+只有有意义的事实。填充物会自动掉落。
 
 ---
 
-## Agent Memory for Personality
+## 个性记忆代理
 
-### Why Agents Need Memory Too
+### 为什么代理也需要内存
 
-Max prefers direct feedback, not motivational fluff. Ray needs to remember how to communicate - that's agent memory, separate from user memory.
+马克斯更喜欢直接反馈，而不是激励性的废话。雷需要记住如何通信——这是代理记忆，与用户记忆分开。
 
-Store agent personality:
+专卖店代理性格：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 mem0_client.add(
     [{"role": "system", "content": "Max wants direct, data-driven feedback. Skip motivational language."}],
     agent_id="ray_coach"
 )
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 memory.add(
     [{"role": "user", "content": "Max wants direct, data-driven feedback. Skip motivational language."}],
     agent_id="ray_coach",
     infer=False,
 )
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-Retrieve agent style alongside user memories:
+检索代理风格以及用户记忆：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 # Get coach personality
 agent_memories = mem0_client.search("coaching style", filters={"agent_id": "ray_coach"})
 # Output: ["Max wants direct, data-driven feedback. Skip motivational language."]
@@ -455,9 +415,8 @@ mem0_client.add([
     {"role": "assistant", "content": "Pace was 8:15/mile. Heart rate 152, zone 2."}
 ], user_id="max", agent_id="ray_coach")
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 # Get coach personality
 agent_memories = memory.search("coaching style", filters={"agent_id": "ray_coach"})
 # Output: ["Max wants direct, data-driven feedback. Skip motivational language."]
@@ -472,26 +431,25 @@ memory.add(
     agent_id="ray_coach",
 )
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-<Info>
-**Expected behavior:** Ray's responses are now data-driven and direct. The agent memory stored the coaching style preference, so future responses adapt automatically without Max having to repeat his preference.
-</Info>
+<信息>
+**预期行为：** Ray 的响应现在是数据驱动且直接的。座席内存存储了教练风格偏好，因此未来的响应会自动适应，而 Max 无需重复他的偏好。
+</信息>
 
-No "Great job!" or "Keep it up!" - just data. Ray adapts to Max's preference.
+没有“干得好！”或“坚持下去！” - 只是数据。雷适应了麦克斯的喜好。
 
 ---
 
-## Managing Short-Term Context
+## 管理短期环境
 
-### When to Store in Mem0
+### 何时存储在 Mem0 中
 
-Don't send every single message to Mem0. Keep recent context in memory, let Mem0 handle the important long-term facts.
+不要将每条消息都发送到 Mem0。将最近的上下文保留在内存中，让 Mem0 处理重要的长期事实。
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 # Store only meaningful exchanges in Mem0
 mem0_client.add([
     {"role": "user", "content": "I want to run a marathon"},
@@ -504,9 +462,8 @@ mem0_client.add([
 
 # Or rely on custom_instructions to filter automatically
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 # Store only meaningful exchanges in Mem0
 memory.add(
     [
@@ -522,22 +479,21 @@ memory.add(
 
 # Or rely on custom_instructions to filter automatically
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-Last 10 messages in your app's buffer. Important facts in Mem0. Faster, cheaper, still works.
+应用缓冲区中的最后 10 条消息。 Mem0 中的重要事实。更快、更便宜，但仍然有效。
 
 ---
 
-## Time-Bound Memories
+## 限时记忆
 
-### Auto-Expiring Facts
+### 自动过期事实
 
-Max tweaks his ankle. It'll heal in two weeks - the memory should expire too.
+马克斯扭动脚踝。两周后就会痊愈——记忆也会消失。
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 from datetime import datetime, timedelta
 
 expiration = (datetime.now() + timedelta(days=14)).strftime("%Y-%m-%d")
@@ -548,11 +504,9 @@ mem0_client.add(
     metadata={"memory_bucket": "constraints", "expires_on": expiration}
 )
 ```
-
-Store `expires_on` in metadata and periodically clean up expired memories. Ray stops asking about the ankle once it's removed.
-  </Tab>
-  <Tab title="Open Source">
-```python
+将“expires_on”存储在元数据中并定期清理过期的内存。一旦脚踝被移除，雷就不再询问有关脚踝的事情。
+  </标签>
+  <选项卡标题=“开源”>```python
 from datetime import datetime, timedelta
 
 expiration = (datetime.now() + timedelta(days=14)).strftime("%Y-%m-%d")
@@ -563,20 +517,18 @@ memory.add(
     metadata={"memory_bucket": "constraints", "expires_on": expiration},
 )
 ```
-
-Store `expires_on` in metadata and prune expired memories in your app. Ray stops asking about the ankle once it's removed.
-  </Tab>
-</Tabs>
+将“expires_on”存储在元数据中，并修剪应用程序中过期的内存。一旦脚踝被移除，雷就不再询问有关脚踝的事情。
+  </标签>
+</标签>
 
 ---
 
-## Putting It All Together
+## 将它们放在一起
 
-Here's the Mem0 setup combining everything:
+这是结合了所有内容的 Mem0 设置：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 from mem0 import MemoryClient
 from datetime import datetime, timedelta
 
@@ -595,9 +547,8 @@ mem0_client.project.update(
     ]
 )
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 from mem0 import Memory
 from datetime import datetime, timedelta
 
@@ -636,14 +587,13 @@ MEMORY_CONFIG = {
 
 memory = Memory.from_config(MEMORY_CONFIG)
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-**Week 1 - Store goals and preferences:**
+**第 1 周 - 存储目标和偏好：**
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 mem0_client.add([
     {"role": "user", "content": "I want to run a sub-4 marathon"},
     {"role": "assistant", "content": "Got it. Let's build a training plan."}
@@ -653,9 +603,8 @@ mem0_client.add([
     {"role": "user", "content": "I prefer trail running over roads"}
 ], user_id="max", categories=["preferences"])
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 memory.add(
     [
         {"role": "user", "content": "I want to run a sub-4 marathon"},
@@ -672,14 +621,13 @@ memory.add(
     metadata={"memory_bucket": "preferences"},
 )
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-**Week 3 - Temporary injury with expiration:**
+**第 3 周 - 临时伤害到期：**
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 expiration = (datetime.now() + timedelta(days=14)).strftime("%Y-%m-%d")
 mem0_client.add(
     [{"role": "user", "content": "Rolled ankle, need light workouts"}],
@@ -687,9 +635,8 @@ mem0_client.add(
     metadata={"memory_bucket": "constraints", "expires_on": expiration}
 )
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 expiration = (datetime.now() + timedelta(days=14)).strftime("%Y-%m-%d")
 memory.add(
     [{"role": "user", "content": "Rolled ankle, need light workouts"}],
@@ -697,27 +644,25 @@ memory.add(
     metadata={"memory_bucket": "constraints", "expires_on": expiration},
 )
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-**Retrieve for context:**
+**检索上下文：**
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 memories = mem0_client.search("training plan", filters={"user_id": "max"}, top_k=5)
 # Gets: marathon goal, trail preference, ankle injury (if still valid)
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 memories = memory.search("training plan", filters={"user_id": "max"}, top_k=5)
 # Gets: marathon goal, trail preference, ankle injury (if still valid / not pruned)
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-Ray remembers goals, preferences, and personality. Handles temporary injuries. Works across sessions.
+雷记得目标、偏好和个性。 Handles temporary injuries.跨会话工作。
 
 ---
 
@@ -725,11 +670,10 @@ Ray remembers goals, preferences, and personality. Handles temporary injuries. W
 
 ### Episodic Stories with run_id
 
-Training for Boston is different from training for New York. Separate the memory threads:
+波士顿的训练与纽约的训练不同。 Separate the memory threads:
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 mem0_client.add(messages, user_id="max", run_id="boston-2025")
 mem0_client.add(messages, user_id="max", run_id="nyc-2025")
 
@@ -740,9 +684,8 @@ boston_memories = mem0_client.search(
     run_id="boston-2025"
 )
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 memory.add(messages, user_id="max", run_id="boston-2025")
 memory.add(messages, user_id="max", run_id="nyc-2025")
 
@@ -753,18 +696,17 @@ boston_memories = memory.search(
     run_id="boston-2025",
 )
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-Each race gets its own episodic boundary. No cross-contamination.
+Each race gets its own episodic boundary.无交叉污染。
 
 ### Importing Historical Data
 
 Max has 6 months of training logs to backfill:
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 old_logs = [
     [{"role": "user", "content": "Completed 20-mile long run"}],
     [{"role": "user", "content": "Hit 8:00 pace on tempo run"}],
@@ -773,9 +715,8 @@ old_logs = [
 for log in old_logs:
     mem0_client.add(log, user_id="max")
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 old_logs = [
     [{"role": "user", "content": "Completed 20-mile long run"}],
     [{"role": "user", "content": "Hit 8:00 pace on tempo run"}],
@@ -784,16 +725,15 @@ old_logs = [
 for log in old_logs:
     memory.add(log, user_id="max")
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-### Handling Contradictions
+### 处理矛盾
 
-Max changes his goal from sub-4 to sub-3:45:
+Max 将他的目标从 4 分以下改为 3 分 45 秒以下：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 # Find the old memory
 memories = mem0_client.get_all(filters={"AND": [{"user_id": "max"}]})
 goal_memory = [m for m in memories["results"] if "sub-4" in m["memory"]][0]
@@ -801,9 +741,8 @@ goal_memory = [m for m in memories["results"] if "sub-4" in m["memory"]][0]
 # Update it
 mem0_client.update(goal_memory["id"], "Max wants to run sub-3:45 marathon")
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 # Find the old memory
 memories = memory.get_all(filters={"user_id": "max"})
 goal_memory = [m for m in memories["results"] if "sub-4" in m["memory"]][0]
@@ -811,48 +750,44 @@ goal_memory = [m for m in memories["results"] if "sub-4" in m["memory"]][0]
 # Update it
 memory.update(goal_memory["id"], "Max wants to run sub-3:45 marathon")
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-Update instead of creating duplicates.
+更新而不是创建重复项。
 
-### Multiple Agents
+### 多个代理
 
-Max works with Ray for running and Jordan for strength training:
+Max 与 Ray 一起跑步，与 Jordan 一起进行力量训练：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 chat("easy run today", user_id="max", agent_id="ray")
 chat("leg day workout", user_id="max", agent_id="jordan")
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 chat("easy run today", user_id="max", agent_id="ray")
 chat("leg day workout", user_id="max", agent_id="jordan")
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-Each coach maintains separate personality memory while sharing user context.
+每个教练在共享用户上下文的同时保持单独的个性记忆。
 
-### Filtering by Date
+### 按日期过滤
 
-Prioritize recent training over old data:
+优先考虑最近的训练而不是旧的数据：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 recent = mem0_client.search(
     "training progress",
     user_id="max",
     filters={"created_at": {"gte": "2025-10-01"}}
 )
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 # Qdrant range filters require numbers — store an epoch timestamp in metadata
 from datetime import datetime
 
@@ -870,16 +805,15 @@ recent = memory.search(
     filters={"logged_epoch": {"gte": cutoff}},
 )
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-### Metadata Tagging
+### 元数据标记
 
-Tag workouts by type:
+按类型标记锻炼：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 mem0_client.add(
     [{"role": "user", "content": "10x400m intervals"}],
     user_id="max",
@@ -893,9 +827,8 @@ speed_sessions = mem0_client.search(
     filters={"metadata": {"workout_type": "speed"}}
 )
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 memory.add(
     [{"role": "user", "content": "10x400m intervals"}],
     user_id="max",
@@ -909,74 +842,69 @@ speed_sessions = memory.search(
     filters={"workout_type": "speed"},
 )
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-### Pruning Old Memories
+### 修剪旧记忆
 
-Delete irrelevant memories:
+删除不相关的记忆：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 mem0_client.delete(memory_id="mem_xyz")
 
 # Or clear an entire run_id
 mem0_client.delete_all(user_id="max", run_id="old-training-cycle")
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 memory.delete(memory_id="mem_xyz")
 
 # Or clear an entire run_id
 memory.delete_all(user_id="max", run_id="old-training-cycle")
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
 ---
 
-## What You Built
+## 你构建了什么
 
-A companion that:
+一个同伴：
 
-- **Persists across sessions** - Mem0 storage
-- **Filters noise** - custom instructions
-- **Organizes by type** - categories
-- **Adapts personality** - **`agent_id`**
-- **Stays fast** - short-term buffer
-- **Handles temporal facts** - expiration
-- **Scales to production** - batching, metadata, pruning
+- **跨会话持续** - Mem0 存储
+- **过滤噪音** - 自定义说明
+- **按类型组织** - 类别
+- **适应个性** - **`agent_id`**
+- **保持快速** - 短期缓冲
+- **处理时间事实** - 过期
+- **扩展到生产** - 批处理、元数据、修剪
 
-This pattern works for any companion: fitness coaches, tutors, roleplay characters, therapy bots, creative writing partners.
-
----
-
-<Tip>
-Start with 2-3 categories max (e.g., goals, constraints, preferences). More categories dilute tagging accuracy. You can always add more later after seeing what Mem0 extracts.
-</Tip>
+这种模式适用于任何同伴：健身教练、导师、角色扮演角色、治疗机器人、创意写作伙伴。
 
 ---
 
-## Production Checklist
-
-Before launching:
-
-- Set custom instructions for your domain
-- Define 2-3 categories (goals, constraints, preferences)
-- Add expiration strategy for time-bound facts
-- Implement error handling for API calls
-- Monitor memory quality (Mem0 dashboard or `get_all` / Qdrant when local)
-- Clear test data from production project
+<提示>
+从最多 2-3 个类别开始（例如，目标、约束、偏好）。更多类别会降低标记的准确性。在看到 Mem0 提取的内容后，您可以随时添加更多内容。</提示>
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Partition Memories by Entity" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
-    Keep companions from leaking context by combining user, agent, and session scopes.
-  </Card>
-  <Card title="Tag Support Memories" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
-    Organize customer context to keep assistants responsive at scale.
-  </Card>
-</CardGroup>
+## 生产清单
+
+启动前：
+
+- 为您的域设置自定义说明
+- 定义 2-3 个类别（目标、约束、偏好）
+- 添加有时限事实的过期策略
+- 实现 API 调用的错误处理
+- 监控内存质量（Mem0 仪表板或本地时的“get_all”/Qdrant）
+- 清除生产项目的测试数据
+
+---<卡组列={2}>
+  <Card title="按实体划分记忆" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
+    通过组合用户、代理和会话范围，防止同伴泄露上下文。
+  </卡>
+  <Card title="标签支持记忆" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
+    组织客户背景，让助理能够大规模响应。
+  </卡>
+</卡组>

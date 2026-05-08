@@ -3,19 +3,20 @@ title: Azure OpenAI
 description: "Configure Azure OpenAI as an LLM provider in Mem0 with Azure Identity authentication and deployment settings."
 ---
 
-<Note> Mem0 Now Supports Azure OpenAI Models in TypeScript SDK </Note>
-
-To use Azure OpenAI models, you have to set the `LLM_AZURE_OPENAI_API_KEY`, `LLM_AZURE_ENDPOINT`, `LLM_AZURE_DEPLOYMENT` and `LLM_AZURE_API_VERSION` environment variables. You can obtain the Azure API key from the [Azure](https://azure.microsoft.com/).
-
-Optionally, you can use Azure Identity to authenticate with Azure OpenAI, which allows you to use managed identities or service principals for production and Azure CLI login for development instead of an API key. If an Azure Identity is to be used, ***do not*** set the `LLM_AZURE_OPENAI_API_KEY` environment variable or the api_key in the config dictionary.
-
-> **Note**: The following are currently unsupported with reasoning models `Parallel tool calling`,`temperature`, `top_p`, `presence_penalty`, `frequency_penalty`, `logprobs`, `top_logprobs`, `logit_bias`, `max_tokens`
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
 
-## Usage
 
-<CodeGroup>
-```python Python
+<Note> Mem0 现在支持 TypeScript SDK 中的 Azure OpenAI 模型 </Note>
+
+要使用 Azure OpenAI 模型，必须设置“LLM_AZURE_OPENAI_API_KEY”、“LLM_AZURE_ENDPOINT”、“LLM_AZURE_DEPLOYMENT”和“LLM_AZURE_API_VERSION”环境变量。您可以从[Azure](https://azure.microsoft.com/)获取Azure API密钥。
+
+或者，您可以使用 Azure Identity 通过 Azure OpenAI 进行身份验证，这允许您使用托管标识或服务主体进行生产，使用 Azure CLI 登录进行开发，而不是使用 API 密钥。如果要使用 Azure 身份，***不要***在配置字典中设置“LLM_AZURE_OPENAI_API_KEY”环境变量或 api_key。> **注意**：推理模型目前不支持以下内容`并行工具调用`、`温度`、`top_p`、`presence_penalty`、`frequity_penalty`、`logprobs`、`top_logprobs`、`logit_bias`、`max_tokens`
+
+
+## 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -84,12 +85,10 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
 
-We also support the new [OpenAI structured-outputs](https://platform.openai.com/docs/guides/structured-outputs/introduction) model. Typescript SDK does not support the `azure_openai_structured` model yet.
-
-```python
+我们还支持新的 [OpenAI 结构化输出](https://platform.openai.com/docs/guides/structed-outputs/introduction) 模型。 Typescript SDK 尚不支持“azure_openai_structured”模型。```python
 import os
 from mem0 import Memory
 
@@ -118,14 +117,11 @@ config = {
     }
 }
 ```
+作为使用 API 密钥的替代方法，Azure Identity 凭据链可用于通过 [Azure OpenAI 基于角色的安全性](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/role-based-access-control) 进行身份验证。 
 
-As an alternative to using an API key, the Azure Identity credential chain can be used to authenticate with [Azure OpenAI role-based security](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/role-based-access-control). 
+<Note> 如果提供了 API 密钥，它将用于通过 Azure Identity 进行身份验证 </Note>
 
-<Note> If an API key is provided, it will be used for authentication over an Azure Identity </Note>
-
-Below is a sample configuration for using Mem0 with Azure OpenAI and Azure Identity:
-
-```python
+以下是将 Mem0 与 Azure OpenAI 和 Azure Identity 结合使用的示例配置：```python
 import os
 from mem0 import Memory
 # You can set the values directly in the config dictionary or use environment variables
@@ -153,10 +149,9 @@ config = {
     }
 }
 ```
+请参阅[Azure Identity 故障排除提示](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/TROUBLESHOOTING.md#troubleshoot-environmentcredential-authentication-issues) 设置 Azure Identity 凭据。
 
-Refer to [Azure Identity troubleshooting tips](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/TROUBLESHOOTING.md#troubleshoot-environmentcredential-authentication-issues) for setting up an Azure Identity credential.
 
+## 配置
 
-## Config
-
-All available parameters for the `azure_openai` config are present in [Master List of All Params in Config](../config).
+`azure_openai` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

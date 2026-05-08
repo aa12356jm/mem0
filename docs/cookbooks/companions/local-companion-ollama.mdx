@@ -3,22 +3,23 @@ title: Self-Hosted AI Companion
 description: "Run Mem0 end-to-end on your machine using Ollama-powered LLMs and embedders."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0 can be utilized entirely locally by leveraging Ollama for both the embedding model and the language model (LLM). This guide will walk you through the necessary steps and provide the complete code to get you started.
 
-## Overview
 
-By using Ollama, you can run Mem0 locally, which allows for greater control over your data and models. This setup uses Ollama for both the embedding model and the language model, providing a fully local solution.
+通过将 Ollama 用于嵌入模型和语言模型 (LLM)，Mem0 可以完全在本地使用。本指南将引导您完成必要的步骤，并提供完整的代码以帮助您入门。
 
-## Setup
+## 概述
 
-Before you begin, ensure you have Mem0 and Ollama installed and properly configured on your local machine.
+通过使用 Ollama，您可以在本地运行 Mem0，这可以更好地控制您的数据和模型。此设置将 Ollama 用于嵌入模型和语言模型，提供完全本地的解决方案。
 
-## Full Code Example
+## 设置
 
-Below is the complete code to set up and use Mem0 locally with Ollama:
+开始之前，请确保您已在本地计算机上安装并正确配置了 Mem0 和 Ollama。
 
-```python
+## 完整代码示例
+
+以下是通过 Ollama 在本地设置和使用 Mem0 的完整代码：```python
 from mem0 import Memory
 
 config = {
@@ -59,25 +60,23 @@ m.add("I'm visiting Paris", user_id="john")
 # Retrieve memories
 memories = m.get_all(filters={"user_id": "john"})
 ```
+## 要点
 
-## Key Points
+- **配置**：设置涉及配置向量存储、语言模型和嵌入模型以使用本地资源
+- **矢量存储**：Qdrant 用作矢量存储，在本地主机上运行
+- **语言模型**：Ollama 用作 LLM 提供者，采用 `llama3.1:latest` 模型
+- **嵌入模型**：Ollama 也用于嵌入，具有 `nomic-embed-text:latest` 模型
 
-- **Configuration**: The setup involves configuring the vector store, language model, and embedding model to use local resources
-- **Vector Store**: Qdrant is used as the vector store, running on localhost
-- **Language Model**: Ollama is used as the LLM provider, with the `llama3.1:latest` model
-- **Embedding Model**: Ollama is also used for embeddings, with the `nomic-embed-text:latest` model
+## 结论
 
-## Conclusion
-
-This local setup of Mem0 using Ollama provides a fully self-contained solution for memory management and AI interactions. It allows for greater control over your data and models while still leveraging the powerful capabilities of Mem0.
+使用 Ollama 的 Mem0 本地设置为内存管理和 AI 交互提供了完全独立的解决方案。它允许更好地控制您的数据和模型，同时仍然利用 Mem0 的强大功能。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Configure Open Source" icon="gear" href="/open-source/configuration">
-    Explore advanced configuration options for vector stores, LLMs, and embedders.
-  </Card>
-  <Card title="Build a Mem0 Companion" icon="users" href="/cookbooks/essentials/building-ai-companion">
-    Learn core companion patterns that work with any LLM provider.
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="配置开源" icon="gear" href="/open-source/configuration">
+    探索矢量存储、LLM 和嵌入器的高级配置选项。</卡>
+  <Card title="构建 Mem0 伴侣" icon="users" href="/cookbooks/essentials/building-ai-companion">
+    了解与任何 LLM 提供商合作的核心伴侣模式。
+  </卡>
+</卡组>

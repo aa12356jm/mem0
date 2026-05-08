@@ -3,33 +3,33 @@ title: OpenAI Agents SDK
 description: "Integrate Mem0 with the OpenAI Agents SDK for persistent memory across multi-agent workflows."
 ---
 
-Integrate [**Mem0**](https://github.com/mem0ai/mem0) with [OpenAI Agents SDK](https://github.com/openai/openai-agents-python), a lightweight framework for building multi-agent workflows. This integration enables agents to access persistent memory across conversations, enhancing context retention and personalization.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-1. Store and retrieve memories from Mem0 within OpenAI agents
-2. Multi-agent workflows with shared memory
-3. Retrieve relevant memories for past conversations
-4. Personalized responses based on user history
 
-## Prerequisites
+将 [**Mem0**](https://github.com/mem0ai/mem0) 与 [OpenAI Agents SDK](https://github.com/openai/openai-agents-python) 集成，这是一个用于构建多代理工作流程的轻量级框架。这种集成使代理能够跨对话访问持久内存，从而增强上下文保留和个性化。
 
-Before setting up Mem0 with OpenAI Agents SDK, ensure you have:
+## 概述
 
-1. Installed the required packages:
-```bash
+1. 在 OpenAI 代理中存储和检索 Mem0 中的内存
+2. 具有共享内存的多代理工作流程
+3. 检索过去对话的相关记忆
+4. 基于用户历史记录的个性化响应
+
+## 先决条件
+
+在使用 OpenAI Agents SDK 设置 Mem0 之前，请确保您拥有：
+
+1.安装所需的包：```bash
 pip install openai-agents mem0ai
 ```
+2. 有效的 API 密钥：
+   - <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-openai-agents-sdk" rel="nofollow">Mem0 API 密钥</a>
+   - [OpenAI API 密钥](https://platform.openai.com/api-keys)
 
-2. Valid API keys:
-   - <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-openai-agents-sdk" rel="nofollow">Mem0 API Key</a>
-   - [OpenAI API Key](https://platform.openai.com/api-keys)
+## 基本集成示例
 
-## Basic Integration Example
-
-The following example demonstrates how to create an OpenAI agent with Mem0 memory integration:
-
-```python
+以下示例演示了如何创建具有 Mem0 内存集成的 OpenAI 代理：```python
 import os
 from agents import Agent, Runner, function_tool
 from mem0 import MemoryClient
@@ -100,12 +100,9 @@ if __name__ == "__main__":
     )
     print(response_2)
 ```
+## 具有切换的多代理工作流程
 
-## Multi-Agent Workflow with Handoffs
-
-Create multiple specialized agents with proper handoffs and shared memory:
-
-```python
+创建多个具有适当切换和共享内存的专用代理：```python
 from agents import Agent, Runner, handoffs, function_tool
 
 # Specialized agents
@@ -165,12 +162,9 @@ def chat_with_handoffs(user_input: str, user_id: str) -> str:
 response = chat_with_handoffs("Plan a healthy meal for my Italy trip", user_id="alex")
 print(response)
 ```
+## 快速启动聊天界面
 
-## Quick Start Chat Interface
-
-Simple interactive chat with memory:
-
-```python
+简单的记忆互动聊天：```python
 def interactive_chat():
     """Interactive chat interface with memory and handoffs"""
     user_id = input("Enter your user ID: ") or "demo_user"
@@ -188,29 +182,26 @@ def interactive_chat():
 if __name__ == "__main__":
     interactive_chat()
 ```
+## 主要特点
 
-## Key Features
+### 1. 自动内存集成
+- **基于工具的记忆**：代理使用功能工具来搜索和保存记忆
+- **对话存储**：所有交互都会自动存储
+- **上下文检索**：代理可以访问相关的过去对话
 
-### 1. Automatic Memory Integration
-- **Tool-Based Memory**: Agents use function tools to search and save memories
-- **Conversation Storage**: All interactions are automatically stored
-- **Context Retrieval**: Agents can access relevant past conversations
+### 2. 多代理内存共享
+- **共享上下文**：多个代理访问同一内存存储
+- **专业代理**：使用共享内存创建特定于域的代理
+- **无缝切换**：代理在切换过程中维护上下文
 
-### 2. Multi-Agent Memory Sharing
-- **Shared Context**: Multiple agents access the same memory store
-- **Specialized Agents**: Create domain-specific agents with shared memory
-- **Seamless Handoffs**: Agents maintain context across handoffs
+### 3.灵活的内存操作
+- **检索能力**：从之前的对话中检索相关记忆
+- **用户细分**：按用户 ID 组织记忆
+- **内存管理**：用于保存和检索信息的内置工具
 
-### 3. Flexible Memory Operations
-- **Retrieve Capabilities**: Retrieve relevant memories from previous conversations
-- **User Segmentation**: Organize memories by user ID
-- **Memory Management**: Built-in tools for saving and retrieving information
+## 配置选项
 
-## Configuration Options
-
-Customize memory behavior:
-
-```python
+自定义内存行为：```python
 # Configure memory search
 memories = mem0.search(
     query="travel preferences",
@@ -225,13 +216,11 @@ mem0.add(
     metadata={"category": "travel", "importance": "high"}
 )
 ```
-
-<CardGroup cols={2}>
+<卡组列={2}>
   <Card title="OpenAI Tool Calls Cookbook" icon="wrench" href="/cookbooks/integrations/openai-tool-calls">
-    Learn how to integrate Mem0 with OpenAI function calling
-  </Card>
+    了解如何将 Mem0 与 OpenAI 函数调用集成
+  </卡>
   <Card title="Agents SDK Tool Cookbook" icon="cube" href="/cookbooks/integrations/agents-sdk-tool">
-    Build agents with OpenAI SDK tools
-  </Card>
-</CardGroup>
-
+    使用 OpenAI SDK 工具构建代理
+  </卡>
+</卡组>

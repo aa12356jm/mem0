@@ -3,22 +3,24 @@ title: Content Creation Workflow
 description: "Store voice guidelines once and apply them across every draft."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-This guide demonstrates how to leverage **Mem0** to streamline content writing by applying your unique writing style and preferences using persistent memory.
 
-## Why Use Mem0?
 
-Integrating Mem0 into your writing workflow helps you:
+本指南演示如何利用 **Mem0** 通过使用持久内存应用您独特的写作风格和偏好来简化内容编写。
 
-1. **Store persistent writing preferences** ensuring consistent tone, formatting, and structure.
-2. **Automate content refinement** by retrieving preferences when rewriting or reviewing content.
-3. **Scale your writing style** so it applies consistently across multiple documents or sessions.
+## 为什么使用Mem0？
 
-## Setup
+将 Mem0 集成到您的写作工作流程中可以帮助您：
 
-<Tabs>
-  <Tab title="Platform">
-```python
+1. **存储持久的写作偏好** 确保一致的语气、格式和结构。
+2. **通过在重写或审阅内容时检索首选项来自动优化内容**。
+3. **调整您的写作风格**，使其在多个文档或会话中一致应用。
+
+## 设置
+
+<标签>
+  <选项卡标题=“平台”>```python
 import os
 from openai import OpenAI
 from mem0 import MemoryClient
@@ -34,29 +36,21 @@ openai = OpenAI()
 USER_ID = "content_writer"
 RUN_ID = "smart_editing_session"
 ```
-  </Tab>
-  <Tab title="Open Source">
-Here we use **Mem0 open source** (`Memory`): all local, no API keys needed for memory. Vectors in **Qdrant**, LLM and embeddings via **Ollama**. The **OpenAI** Python SDK calls Ollama's **OpenAI-compatible** `/v1` endpoint for content rewriting.
+</标签>
+  <选项卡标题=“开源”>
+这里我们使用**Mem0开源**（`Memory`）：全部本地，内存不需要API密钥。 **Qdrant**、LLM 中的向量和通过 **Ollama** 嵌入。 **OpenAI** Python SDK 调用 Ollama 的 **OpenAI 兼容** `/v1` 端点进行内容重写。
 
-### Installation
+### 安装
 
-Install the required dependencies:
-
-```bash
+安装所需的依赖项：```bash
 pip install mem0ai qdrant-client openai ollama
 ```
-
-Then start Qdrant and pull the Ollama models:
-
-```bash
+然后启动 Qdrant 并拉取 Ollama 模型：```bash
 docker run -d -p 6333:6333 qdrant/qdrant
 ollama pull llama3.1:latest
 ollama pull nomic-embed-text:latest
 ```
-
-<Note>You can swap `nomic-embed-text` for any Ollama-supported embedding model (e.g., `snowflake-arctic-embed`, `mxbai-embed-large`). Just update the `model` in the `embedder` config and set `embedding_model_dims` in the Qdrant config to match the model's output dimensions (768 for `nomic-embed-text`).</Note>
-
-```python
+<注意>您可以将 `nomic-embed-text` 替换为任何 Ollama 支持的嵌入模型（例如，`snowflake-arctic-embed`、`mxbai-embed-large`）。只需更新“embedder”配置中的“model”，并在 Qdrant 配置中设置“embedding_model_dims”以匹配模型的输出尺寸（“nomic-embed-text”为 768）。</Note>```python
 from openai import OpenAI
 from mem0 import Memory
 
@@ -98,14 +92,13 @@ ollama_chat = OpenAI(base_url=f"{OLLAMA_URL}/v1", api_key="ollama")
 USER_ID = "content_writer"
 RUN_ID = "smart_editing_session"
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-## Storing Your Writing Preferences in Mem0
+## 将您的写作偏好存储在 Mem0 中
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 def store_writing_preferences():
     """Store your writing preferences in Mem0."""
 
@@ -131,9 +124,8 @@ def store_writing_preferences():
 
     return response
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 def store_writing_preferences():
     """Store your writing preferences in Mem0."""
 
@@ -159,14 +151,13 @@ def store_writing_preferences():
 
     return response
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-## Editing Content Using Stored Preferences
+## 使用存储的首选项编辑内容
 
-<Tabs>
-  <Tab title="Platform">
-```python
+<标签>
+  <选项卡标题=“平台”>```python
 def apply_writing_style(original_content):
     """Use preferences stored in Mem0 to guide content rewriting."""
 
@@ -209,9 +200,8 @@ Preferences:
 
     return clean_response
 ```
-  </Tab>
-  <Tab title="Open Source">
-```python
+</标签>
+  <选项卡标题=“开源”>```python
 def apply_writing_style(original_content):
     """Use preferences stored in Mem0 to guide content rewriting."""
 
@@ -251,12 +241,10 @@ Preferences:
 
     return clean_response
 ```
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
-## Complete Workflow: Content Editing
-
-```python
+## 完整工作流程：内容编辑```python
 def content_writing_workflow(content):
     """Automated workflow for editing a document based on writing preferences."""
 
@@ -278,10 +266,7 @@ def content_writing_workflow(content):
 
     return edited_content
 ```
-
-## Example Usage
-
-```python
+## 用法示例```python
 # Define your document
 original_content = """Project Proposal
 
@@ -298,13 +283,11 @@ We plan to launch the campaign in July and continue through September.
 # Run the workflow
 result = content_writing_workflow(original_content)
 ```
+## 预期输出
 
-## Expected Output
+您的文档将根据您的喜好转换为结构化、格式良好的版本。
 
-Your document will be transformed into a structured, well-formatted version based on your preferences.
-
-### Original Document
-```
+### 原始文件```
 Project Proposal
 
 The following proposal outlines our strategy for the Q3 marketing campaign.
@@ -316,10 +299,7 @@ Expand our social media following
 
 We plan to launch the campaign in July and continue through September.
 ```
-
-### Edited Document
-
-```
+### 编辑文档```
 # Project Proposal
 
 ## Q3 Marketing Campaign Strategy
@@ -352,16 +332,15 @@ This proposal outlines our strategy for the Q3 marketing campaign. We aim to sig
 
 We believe this strategy will effectively increase our market share. To achieve these goals, we need your support and collaboration. Let's work together to make this campaign a success. Please review the proposal and provide your feedback by the end of the week.
 ```
-
-Mem0 enables a seamless, intelligent content-writing workflow, perfect for content creators, marketers, and technical writers looking to scale their personal tone and structure across work.
+Mem0 支持无缝、智能的内容编写工作流程，非常适合希望在工作中扩展个人语气和结构的内容创建者、营销人员和技术作家。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Control Memory Ingestion" icon="filter" href="/cookbooks/essentials/controlling-memory-ingestion">
-    Filter and curate content examples to maintain consistent writing style.
-  </Card>
-  <Card title="Email Automation with Mem0" icon="envelope" href="/cookbooks/operations/email-automation">
-    Automate email drafting with memory-powered context and tone matching.
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="控制内存摄入" icon="filter" href="/cookbooks/essentials/controlling-memory-ingestion">
+    过滤和整理内容示例以保持一致的写作风格。
+  </卡>
+  <Card title="使用 Mem0 进行电子邮件自动化" icon="envelope" href="/cookbooks/operations/email-automation">
+    通过内存驱动的上下文和语气匹配自动起草电子邮件。
+  </卡>
+</卡组>

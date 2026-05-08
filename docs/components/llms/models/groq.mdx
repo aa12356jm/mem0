@@ -3,14 +3,17 @@ title: Groq
 description: "Configure Groq as an LLM provider in Mem0 for high-speed inference using LPU-powered language models."
 ---
 
-[Groq](https://groq.com/) is the creator of the world's first Language Processing Unit (LPU), providing exceptional speed performance for AI workloads running on their LPU Inference Engine.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-In order to use LLMs from Groq, go to their [platform](https://console.groq.com/keys) and get the API key. Set the API key as `GROQ_API_KEY` environment variable to use the model as given below in the example.
 
-## Usage
 
-<CodeGroup>
-```python Python
+[Groq](https://groq.com/) 是世界上第一个语言处理单元 (LPU) 的创建者，为在其 LPU 推理引擎上运行的 AI 工作负载提供卓越的速度性能。
+
+为了使用 Groq 的 LLM，请访问他们的[平台](https://console.groq.com/keys) 并获取 API 密钥。将 API 密钥设置为“GROQ_API_KEY”环境变量以使用下面示例中给出的模型。
+
+## 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -62,8 +65,8 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-## Config
+## 配置
 
-All available parameters for the `groq` config are present in [Master List of All Params in Config](../config).
+`groq` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

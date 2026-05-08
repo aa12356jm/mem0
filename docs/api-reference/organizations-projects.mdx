@@ -4,191 +4,184 @@ icon: "building"
 description: "Manage multi-tenant applications with organization and project APIs"
 ---
 
-## Overview
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Organizations and projects provide multi-tenant support, access control, and team collaboration capabilities for Mem0 Platform. Use these APIs to build applications that support multiple teams, customers, or isolated environments.
 
-<Info>
-Organizations and projects are **optional** features. You can use Mem0 without them for single-user or simple multi-user applications.
-</Info>
 
-## Key Capabilities
 
-- **Multi-org/project Support**: Specify organization and project when initializing the Mem0 client to attribute API usage appropriately
-- **Member Management**: Control access to data through organization and project membership
-- **Access Control**: Only members can access memories and data within their organization/project scope
-- **Team Isolation**: Maintain data separation between different teams and projects for secure collaboration
+
+
+
+
+## 概述
+
+组织和项目为 Mem0 平台提供多租户支持、访问控制和团队协作功能。使用这些 API 构建支持多个团队、客户或隔离环境的应用程序。
+
+<信息>
+组织和项目是**可选**功能。对于单用户或简单的多用户应用程序，您可以在没有它们的情况下使用 Mem0。
+</信息>
+
+## 关键能力
+
+- **多组织/项目支持**：在初始化 Mem0 客户端时指定组织和项目，以适当地归因 API 使用情况
+- **成员管理**：通过组织和项目成员身份控制对数据的访问
+- **访问控制**：只有成员可以访问其组织/项目范围内的内存和数据
+- **团队隔离**：保持不同团队和项目之间的数据分离，以实现安全协作
 
 ---
 
-## Using Organizations & Projects
+## 使用组织和项目
 
-### Initialize with Org/Project Context
+### 使用组织/项目上下文进行初始化
 
-Example with the mem0 Python package:
+mem0 Python 包的示例：
 
 <Tabs>
-  <Tab title="Python">
-
-```python
+  <Tab title="Python">```python
 from mem0 import MemoryClient
-client = MemoryClient(api_key="your-api-key")
-```
+client = MemoryClient(api_key="your-api-key")```
+</标签>
 
-  </Tab>
-
-  <Tab title="Node.js">
-
-```javascript
+  <Tab title="Node.js">```javascript
 import { MemoryClient } from "mem0ai";
 const client = new MemoryClient({ apiKey: "your-api-key" });
 ```
-
-  </Tab>
-</Tabs>
+</标签>
+</标签>
 
 ---
 
-## Project Management
+## 项目管理
 
-The Mem0 client provides comprehensive project management through the `client.project` interface:
+Mem0 客户端通过“client.project”接口提供全面的项目管理：
 
-### Get Project Details
+### 获取项目详情
 
-Retrieve information about the current project:
-
-```python
+检索有关当前项目的信息：```python
 # Get all project details
 project_info = client.project.get()
 
 # Get specific fields only
-project_info = client.project.get(fields=["name", "description", "custom_categories"])
-```
+project_info = client.project.get(fields=["name", "description", "custom_categories"])```
 
-### Create a New Project
+### 创建一个新项目
 
-Create a new project within your organization:
+在您的组织内创建一个新项目：
 
 ```python
-# Create a project with name and description
+# 创建一个项目并指定名称和描述
 new_project = client.project.create(
-    name="My New Project",
-    description="A project for managing customer support memories"
-)
-```
+    name="我的新项目",
+    描述=“管理客户支持记忆的项目”
+）```
 
-### Update Project Settings
+### 更新项目设置
 
-Modify project configuration including custom instructions, categories, graph settings, and language preferences:
+修改项目配置，包括自定义说明、类别、图形设置和语言首选项：
 
 ```python
-# Update project with custom categories
-client.project.update(
-    custom_categories=[
-        {"customer_preferences": "Customer likes, dislikes, and preferences"},
-        {"support_history": "Previous support interactions and resolutions"}
+# 使用自定义类别更新项目
+客户端.项目.更新（
+    自定义类别=[
+        {"customer_preferences": "客户喜欢、不喜欢和偏好"},
+        {"support_history": "以前的支持互动和解决方案"}
     ]
-)
+）
 
-# Update project with custom instructions
-client.project.update(
-    custom_instructions="..."
-)
+# 使用自定义指令更新项目
+客户端.项目.更新(
+    自定义指令=“...”
+）
 
-# Use the input language for memory storage and retrieval
-client.project.update(multilingual=True)
+# 使用输入语言进行内存存储和检索
+client.project.update(多语言=True)
 
-# Update multiple settings at once
-client.project.update(
-    custom_instructions="...",
-    custom_categories=[
-        {"personal_info": "User personal information and preferences"},
-        {"work_context": "Professional context and work-related information"}
+# 一次更新多个设置
+客户端.项目.更新(
+    自定义指令=“...”，
+    自定义类别=[
+        {"personal_info": "用户个人信息和偏好"},
+        {"work_context": "专业背景和工作相关信息"}
     ],
-    multilingual=True
-)
-```
+    多语言=正确
+）```
 
-### Delete Project
+### 删除项目
 
-<Warning>
-This action will remove all memories, messages, and other related data in the project. **This operation is irreversible.**
-</Warning>
+<警告>
+此操作将删除项目中的所有记忆、消息和其他相关数据。 **此操作是不可逆的。**
+</警告>
 
-Remove a project and all its associated data:
+删除项目及其所有关联数据：
 
 ```python
-# Delete the current project (irreversible)
-result = client.project.delete()
-```
+# 删除当前项目（不可逆）
+结果 = client.project.delete()```
 
 ---
 
-## Member Management
+## 会员管理
 
-Manage project members and their access levels:
+管理项目成员及其访问级别：
 
 ```python
-# Get all project members
-members = client.project.get_members()
+# 获取所有项目成员
+成员= client.project.get_members()
 
-# Add a new member as a reader
+# 添加一个新成员作为读者
 client.project.add_member(
-    email="colleague@company.com",
-    role="READER"  # or "OWNER"
-)
+    电子邮件=“colleague@company.com”，
+    角色=“READER”#或“OWNER”
+）
 
-# Update a member's role
+# 更新成员角色
 client.project.update_member(
-    email="colleague@company.com",
-    role="OWNER"
-)
+    电子邮件=“colleague@company.com”，
+    角色=“所有者”
+）
 
-# Remove a member from the project
-client.project.remove_member(email="colleague@company.com")
-```
+# 从项目中删除成员
+client.project.remove_member（电子邮件=“colleague@company.com”）```
 
-### Member Roles
+### 会员角色
 
-| Role | Permissions |
+| 角色 |权限|
 |------|-------------|
-| **READER** | Can view and search memories, but cannot modify project settings or manage members |
-| **OWNER** | Full access including project modification, member management, and all reader permissions |
+| **读者** |可以查看和搜索记忆，但不能修改项目设置或管理成员 |
+| **所有者** |完全访问权限，包括项目修改、成员管理和所有读者权限 |
 
 ---
 
-## Async Support
+## 异步支持
 
-All project methods are available in async mode:
+所有项目方法都可以在异步模式下使用：
 
 ```python
-from mem0 import AsyncMemoryClient
+从 mem0 导入 AsyncMemoryClient
 
-async def manage_project():
-    client = AsyncMemoryClient(api_key="your-api-key")
+异步定义管理项目（）：
+    客户端 = AsyncMemoryClient(api_key="your-api-key")
 
-    # All methods support async/await
-    project_info = await client.project.get()
-    await client.project.update(multilingual=True)
-    members = await client.project.get_members()
+    # 所有方法都支持async/await
+    项目信息 = 等待 client.project.get()
+    等待 client.project.update(多语言=True)
+    成员 = 等待 client.project.get_members()
 
-# To call the async function properly
-import asyncio
-asyncio.run(manage_project())
-```
-
+# 正确调用异步函数
+导入异步
+asyncio.run（管理项目（））```
 ---
 
-## API Reference
+## API参考
 
-For complete API specifications and additional endpoints, see:
+有关完整的 API 规范和其他端点，请参阅：
 
 <CardGroup cols={2}>
   <Card title="Organizations APIs" icon="building" href="/api-reference/organization/create-org">
-    Create, get, and manage organizations
-  </Card>
+创建、获取和管理组织
+</卡>
 
   <Card title="Project APIs" icon="folder" href="/api-reference/project/create-project">
-    Full project CRUD and member management endpoints
-  </Card>
-</CardGroup>
+完整的项目 CRUD 和成员管理端点
+</卡>
+</卡组>

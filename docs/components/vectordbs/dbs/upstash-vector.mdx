@@ -2,13 +2,16 @@
 title: "Upstash Vector"
 description: "Use Upstash Vector as a serverless vector database in Mem0 with optional built-in embedding models."
 ---
-[Upstash Vector](https://upstash.com/docs/vector) is a serverless vector database with built-in embedding models.
 
-### Usage with Upstash embeddings
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-You can enable the built-in embedding models by setting `enable_embeddings` to `True`. This allows you to use Upstash's embedding models for vectorization.
 
-```python
+
+[Upstash Vector](https://upstash.com/docs/vector) 是一个具有内置嵌入模型的无服务器矢量数据库。
+
+### Upstash 嵌入的用法
+
+您可以通过将“enable_embeddings”设置为“True”来启用内置嵌入模型。这允许您使用 Upstash 的嵌入模型进行矢量化。```python
 import os
 from mem0 import Memory
 
@@ -25,14 +28,11 @@ config = {
 m = Memory.from_config(config)
 m.add("Likes to play cricket on weekends", user_id="alice", metadata={"category": "hobbies"})
 ```
+<注意>
+    将“enable_embeddings”设置为“True”将绕过您配置的任何外部嵌入提供程序。
+</注>
 
-<Note>
-    Setting `enable_embeddings` to `True` will bypass any external embedding provider you have configured.
-</Note>
-
-### Usage with external embedding providers
-
-```python
+### 与外部嵌入提供程序一起使用```python
 import os
 from mem0 import Memory
 
@@ -55,20 +55,19 @@ config = {
 m = Memory.from_config(config)
 m.add("Likes to play cricket on weekends", user_id="alice", metadata={"category": "hobbies"})
 ```
+### 配置
 
-### Config
+以下是可用于配置 Upstash Vector 的参数：
 
-Here are the parameters available for configuring Upstash Vector:
-
-| Parameter           | Description                        | Default Value |
+|参数|描述 |默认值 |
 | ------------------- | ---------------------------------- | ------------- |
-| `url`               | URL for the Upstash Vector index   | `None`        |
-| `token`             | Token for the Upstash Vector index | `None`        |
-| `client`            | An `upstash_vector.Index` instance | `None`        |
-| `collection_name`   | The default namespace used         | `""`          |
-| `enable_embeddings` | Whether to use Upstash embeddings  | `False`       |
+| `网址` | Upstash 向量索引的 URL | `无` |
+| `令牌` | Upstash Vector 索引的代币 | `无` |
+| `客户` |一个 `upstash_vector.Index` 实例 | `无` |
+| `集合名称` |使用的默认命名空间 | `""` |
+| `启用嵌入` |是否使用 Upstash 嵌入 | ‘假’|
 
-<Note>
-  When `url` and `token` are not provided, the `UPSTASH_VECTOR_REST_URL` and
-  `UPSTASH_VECTOR_REST_TOKEN` environment variables are used.
-</Note>
+<注意>
+  当未提供“url”和“token”时，“UPSTASH_VECTOR_REST_URL”和
+  使用“UPSTASH_VECTOR_REST_TOKEN”环境变量。
+</注>

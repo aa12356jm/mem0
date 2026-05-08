@@ -2,11 +2,14 @@
 title: "Databricks"
 description: "Use Databricks Vector Search as a serverless vector store in Mem0 with auto-updating indexes from Delta tables."
 ---
-[Databricks Vector Search](https://docs.databricks.com/en/generative-ai/vector-search.html) is a serverless similarity search engine that allows you to store a vector representation of your data, including metadata, in a vector database. With Vector Search, you can create auto-updating vector search indexes from Delta tables managed by Unity Catalog and query them with a simple API to return the most similar vectors.
 
-### Usage
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-```python
+
+
+[Databricks 矢量搜索](https://docs.databricks.com/en/generative-ai/vector-search.html) 是一个无服务器相似性搜索引擎，可让您在矢量数据库中存储数据的矢量表示（包括元数据）。通过矢量搜索，您可以从 Unity Catalog 管理的 Delta 表创建自动更新的矢量搜索索引，并使用简单的 API 查询它们以返回最相似的矢量。
+
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -35,38 +38,32 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+### 配置
 
-### Config
+以下是可用于配置 Databricks 矢量搜索的参数：|参数|描述 |默认值 |
+| ---| ---| ---|
+| `workspace_url` | Databricks 工作区的 URL | **必填** |
+| `access_token` |用于身份验证的个人访问令牌 | `无` |
+| `client_id` |服务主体客户端 ID（access_token 的替代方案）| `无` |
+| `client_secret` |服务主体客户端密钥（需要与 client_id 一起使用）| `无` |
+| `azure_client_id` | Azure AD 应用程序客户端 ID（用于 Azure Databricks）| `无` |
+| `azure_client_secret` | Azure AD 应用程序客户端密钥（用于 Azure Databricks） | `无` |
+| `端点名称` |矢量搜索端点的名称 | **必填** |
+| `目录` | Unity Catalog 目录名称 | **必填** |
+| `模式` | Unity 目录架构名称 | **必填** |
+| `表名` |源 Delta 表名称 | **必填** |
+| `集合名称` |矢量搜索索引名称 | `mem0` |
+| `索引类型` |索引类型：`DELTA_SYNC` 或 `DIRECT_ACCESS` | `DELTA_SYNC` |
+| `embedding_model_endpoint_name` |用于嵌入的 Databricks 服务端点 | `无` |
+| `嵌入维度` |自我管理嵌入的维度 | `1536` |
+| `端点类型` |端点类型（“STANDARD”或“STORAGE_OPTIMIZED”）| `标准` |
+| `管道类型` |同步管道类型：`TRIGGERED` 或 `CONTINUOUS` | ‘触发’ |
+| `仓库名称` | Databricks SQL 仓库名称（如果使用 SQL 仓库）| `无` |
+| `查询类型` |查询类型：`ANN` 或 `HYBRID` | `安` |### 身份验证
 
-Here are the parameters available for configuring Databricks Vector Search:
+Databricks 矢量搜索支持两种身份验证方法：
 
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `workspace_url` | The URL of your Databricks workspace | **Required** |
-| `access_token` | Personal Access Token for authentication | `None` |
-| `client_id` | Service principal client ID (alternative to access_token) | `None` |
-| `client_secret` | Service principal client secret (required with client_id) | `None` |
-| `azure_client_id` | Azure AD application client ID (for Azure Databricks) | `None` |
-| `azure_client_secret` | Azure AD application client secret (for Azure Databricks) | `None` |
-| `endpoint_name` | Name of the Vector Search endpoint | **Required** |
-| `catalog` | Unity Catalog catalog name | **Required** |
-| `schema` | Unity Catalog schema name | **Required** |
-| `table_name` | Source Delta table name | **Required** |
-| `collection_name` | Vector search index name | `mem0` |
-| `index_type` | Index type: `DELTA_SYNC` or `DIRECT_ACCESS` | `DELTA_SYNC` |
-| `embedding_model_endpoint_name` | Databricks serving endpoint for embeddings | `None` |
-| `embedding_dimension` | Dimension of self-managed embeddings | `1536` |
-| `endpoint_type` | Type of endpoint (`STANDARD` or `STORAGE_OPTIMIZED`) | `STANDARD` |
-| `pipeline_type` | Sync pipeline type: `TRIGGERED` or `CONTINUOUS` | `TRIGGERED` |
-| `warehouse_name` | Databricks SQL warehouse name (if using SQL warehouse) | `None` |
-| `query_type` | Query type: `ANN` or `HYBRID` | `ANN` |
-
-### Authentication
-
-Databricks Vector Search supports two authentication methods:
-
-#### Service Principal (Recommended for Production)
-```python
+#### 服务主体（推荐用于生产）```python
 config = {
     "vector_store": {
         "provider": "databricks",
@@ -83,9 +80,7 @@ config = {
     }
 }
 ```
-
-#### Personal Access Token (for Development)
-```python
+#### 个人访问令牌（用于开发）```python
 config = {
     "vector_store": {
         "provider": "databricks",
@@ -101,13 +96,10 @@ config = {
     }
 }
 ```
+### 嵌入选项
 
-### Embedding Options
-
-#### Self-Managed Embeddings (Default)
-Use your own embedding model and provide vectors directly:
-
-```python
+#### 自管理嵌入（默认）
+使用您自己的嵌入模型并直接提供向量：```python
 config = {
     "vector_store": {
         "provider": "databricks",
@@ -118,11 +110,8 @@ config = {
     }
 }
 ```
-
-#### Databricks-Computed Embeddings
-Let Databricks compute embeddings from text using a serving endpoint:
-
-```python
+#### Databricks 计算嵌入
+让 Databricks 使用服务端点计算文本的嵌入：```python
 config = {
     "vector_store": {
         "provider": "databricks",
@@ -133,11 +122,10 @@ config = {
     }
 }
 ```
+### 重要提示
 
-### Important Notes
-
-- **Index Types**: This implementation supports both `DELTA_SYNC` (auto-syncs with source Delta table) and `DIRECT_ACCESS` (manage vectors directly) index types.
-- **Unity Catalog**: The source table and index are created under the specified `catalog.schema` namespace.
-- **Endpoint Auto-Creation**: If the specified endpoint doesn't exist, it will be created automatically.
-- **Index Auto-Creation**: If the specified index doesn't exist, it will be created automatically with the provided configuration.
-- **Filter Support**: Supports filtering by metadata fields, with different syntax for STANDARD vs STORAGE_OPTIMIZED endpoints.
+- **索引类型**：此实现支持“DELTA_SYNC”（与源增量表自动同步）和“DIRECT_ACCESS”（直接管理向量）索引类型。
+- **Unity Catalog**：源表和索引在指定的 `catalog.schema` 命名空间下创建。
+- **端点自动创建**：如果指定的端点不存在，则会自动创建。
+- **索引自动创建**：如果指定的索引不存在，它将使用提供的配置自动创建。
+- **过滤器支持**：支持按元数据字段进行过滤，STANDARD 与 STORAGE_OPTIMIZED 端点具有不同的语法。

@@ -3,24 +3,23 @@ title: Zero Entropy
 description: "Configure Zero Entropy neural reranking models in Mem0 with zerank-1 and zerank-1-small support."
 ---
 
-[Zero Entropy](https://www.zeroentropy.dev) provides neural reranking models that significantly improve search relevance with fast performance.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Models
 
-Zero Entropy offers two reranking models:
 
-- **`zerank-1`**: Flagship state-of-the-art reranker (non-commercial license)
-- **`zerank-1-small`**: Open-source model (Apache 2.0 license)
+[零熵](https://www.zeroentropy.dev) 提供神经重新排序模型，可显着提高搜索相关性和快速性能。
 
-## Installation
+## 型号
 
-```bash
+零熵提供两种重新排序模型：
+
+- **`zerank-1`**：旗舰最先进的重新排名器（非商业许可）
+- **`zerank-1-small`**：开源模型（Apache 2.0 许可证）
+
+## 安装```bash
 pip install zeroentropy
 ```
-
-## Configuration
-
-```python Python
+＃＃ 配置```python Python
 from mem0 import Memory
 
 config = {
@@ -49,18 +48,12 @@ config = {
 
 memory = Memory.from_config(config)
 ```
+## 环境变量
 
-## Environment Variables
-
-Set your API key as an environment variable:
-
-```bash
+将您的 API 密钥设置为环境变量：```bash
 export ZERO_ENTROPY_API_KEY="your-api-key"
 ```
-
-## Usage Example
-
-```python Python
+## 使用示例```python Python
 import os
 from mem0 import Memory
 
@@ -94,24 +87,23 @@ for result in results['results']:
     print(f"Rerank Score: {result['rerank_score']:.3f}")
     print()
 ```
+## 配置参数
 
-## Configuration Parameters
+|参数|描述 |类型 |默认|
+|------------|-------------|------|---------|
+| `模型` |使用的模型：“zerank-1”或“zerank-1-small”| `str` | `“zerank-1”` |
+| `api_key` |零熵 API 密钥 | `str` | `无` |
+| `top_k` |重新排序后返回的最大文档数 | `int` | `无` |
 
-| Parameter | Description | Type | Default |
-|-----------|-------------|------|---------|
-| `model` | Model to use: `"zerank-1"` or `"zerank-1-small"` | `str` | `"zerank-1"` |
-| `api_key` | Zero Entropy API key | `str` | `None` |
-| `top_k` | Maximum documents to return after reranking | `int` | `None` |
+## 性能
 
-## Performance
+- **快速**：优化的神经架构可实现低延迟
+- **准确**：最先进的相关性评分
+- **具有成本效益**：处理约 0.025 美元/100 万代币
 
-- **Fast**: Optimized neural architecture for low latency
-- **Accurate**: State-of-the-art relevance scoring
-- **Cost-effective**: ~$0.025/1M tokens processed
+## 最佳实践
 
-## Best Practices
-
-1. **Model Selection**: Use `zerank-1` for best quality, `zerank-1-small` for faster processing
-2. **Batch Size**: Process multiple queries together when possible
-3. **Top-k Limiting**: Set reasonable `top_k` values (5-20) for best performance
-4. **API Key Management**: Use environment variables for secure key storage
+1. **模型选择**：使用 `zerank-1` 获得最佳质量，使用 `zerank-1-small` 获得更快的处理速度
+2. **批量大小**：尽可能一起处理多个查询
+3. **Top-k Limiting**：设置合理的`top_k`值（5-20）以获得最佳性能
+4. **API密钥管理**：使用环境变量进行安全密钥存储

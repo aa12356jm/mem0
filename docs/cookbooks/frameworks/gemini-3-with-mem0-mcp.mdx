@@ -3,70 +3,60 @@ title: "Gemini 3 with Mem0 MCP"
 description: "Create snappy, smart, memory-aware agents by pairing Gemini 3 with Mem0 MCP server."
 ---
 
-Gemini 3, when paired with Mem0's cloud MCP server, works in synergy to create snappy, smart, memory-aware agents.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
+
+
+
+Gemini 3 与 Mem0 的云 MCP 服务器配合使用时，可以协同工作，创建敏捷、智能、内存感知的代理。
 
 <Callout type="info" icon="sparkles" color="#8B5CF6">
-  This is the primary example of MCP integration - the same patterns work with Claude Desktop, Cursor, or any MCP-compatible client.
-</Callout>
+  这是 MCP 集成的主要示例 - 相同的模式适用于 Claude Desktop、Cursor 或任何 MCP 兼容客户端。</标注>
 
-## MCP Server Tools
+## MCP 服务器工具
 
-The Mem0 MCP server provides these tools to Gemini:
+Mem0 MCP 服务器向 Gemini 提供以下工具：
 
-| Tool                  | Description                              |
-| --------------------- | ---------------------------------------- |
-| `add_memory`          | Store new information in memory          |
-| `search_memories`     | Find relevant memories                   |
-| `get_memories`        | Retrieve specific memories by ID         |
-| `get_memory`          | Retrieve one memory by its `memory_id`   |
-| `update_memory`       | Modify existing memory content           |
-| `delete_memory`       | Remove specific memories                 |
-| `delete_all_memories` | Clear all memories for a user            |
-| `delete_entities`     | Delete all memories related to an entity |
-| `list_entities`       | Enumerate users/agents/apps/runs stored  |
+|工具|描述 |
+| -------------------- | ---------------------------------------------------- |
+| `添加内存` | Store new information in memory          |
+| `搜索记忆` | Find relevant memories                   |
+| `获取记忆` | Retrieve specific memories by ID         |
+| `获取内存` | Retrieve one memory by its `memory_id`   |
+| `更新内存` | Modify existing memory content           |
+| `删除内存` | Remove specific memories                 |
+| `删除所有记忆` | Clear all memories for a user            |
+| `删除实体` | Delete all memories related to an entity |
+| `列表实体` | Enumerate users/agents/apps/runs stored  |
 
-## Setup
+## 设置
 
-### Configure Mem0 MCP
-
-Add Mem0 MCP to your MCP client:
-
-```bash
+### 配置 Mem0 MCP将 Mem0 MCP 添加到您的 MCP 客户端：```bash
 npx mcp-add \
   --name mem0-mcp \
   --type http \
   --url "https://mcp.mem0.ai/mcp" \
   --clients "claude,claude code,cursor,windsurf,vscode,opencode"
 ```
-
-### Install dependencies
-
-```bash
+### 安装依赖项```bash
 pip install pydantic-ai nest-asyncio python-dotenv google-genai
 ```
+### 环境设置
 
-### Environment Setup
-
-Create a file named `.env`:
-
-```bash
+创建一个名为“.env”的文件：```bash
 MEM0_API_KEY=m0-xxxxxxxxxxxxxxxxx
 GEMINI_API_KEY=your-gemini-api-key-here
 ```
+<注意>
+确保您拥有 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=cookbook-gemini-3" rel="nofollow">Mem0 Dashboard</a> 中的 Mem0 API 密钥以及 [Google AI Studio](https://ai.studio/app/api-keys) 中的 Gemini API 密钥。
+</注>
 
-<Note>
-Ensure you have your Mem0 API key from the <a href="https://app.mem0.ai?utm_source=oss&utm_medium=cookbook-gemini-3" rel="nofollow">Mem0 Dashboard</a> and your Gemini API key from the [Google AI Studio](https://ai.studio/app/api-keys).
-</Note>
+## 双子座记忆剂
 
-## Gemini Memory Agent
+此示例演示如何通过代理循环使用 Gemini 3 创建内存增强代理。
 
-This example shows how to create a memory-augmented agent using Gemini 3 through an agent loop.
-
-<Info icon="document">
-Save this as <strong>gemini_agent.py</strong>:
-</Info>
-
-```python
+<信息图标=“文档”>
+将其另存为 <strong>gemini_agent.py</strong>：
+</信息>```python
 import asyncio
 import os
 from dotenv import load_dotenv
@@ -143,27 +133,20 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 ```
+## 运行代理
 
-## Running the Agent
-
-To run the interactive agent:
-
-```bash
+要运行交互式代理：```bash
 python gemini_agent.py
 ```
+## 交互示例
 
-## Example Interactions
+### 多工具功能
+*显示 Gemini 生成合成数据，同时在一个请求中存储和搜索*
 
-### Multi-Tool Capabilities
-*Shows Gemini generating synthetic data while simultaneously storing and searching in one request*
-
-**Prompt:**
-```
+**提示：**```
 I need player statistics for a basketball team dashboard demo. Generate 5 synthetic player profiles with different positions, ages, and performance metrics, then store all of them. Also check if we have any existing player data in memory.
 ```
-
-**Response:**
-```
+**回复：**```
 I've created and stored 5 synthetic player profiles for your basketball team dashboard demo:
 - Marcus Chen (32, Point Guard) - 12.5 PPG, 8.2 APG, 45% FG, 3 seasons with team
 - Jamal Williams (28, Center) - 18.7 PPG, 10.5 RPG, 2.3 BPG, rookie season
@@ -173,17 +156,13 @@ I've created and stored 5 synthetic player profiles for your basketball team das
 
 I searched for existing player data in your memory but found none. All synthetic player profiles have been stored with appropriate basketball statistics for demo purposes.
 ```
+### 智能查询生成
+*演示 Gemini 如何将模糊的人类输入转化为最佳搜索查询*
 
-### Smart Query Generation
-*Demonstrates how Gemini transforms vague human input into optimal search queries*
-
-**Prompt:**
-```
+**提示：**```
 Anything about my health I should know about?
 ```
-
-**Response:**
-```
+**回复：**```
 Based on your memory history, I searched for health-related information using these queries: "medical", "allergies", "dietary restrictions", "exercise", "wellness", "doctor visits", "health conditions".
 
 **Health Information Found:**
@@ -194,62 +173,53 @@ Based on your memory history, I searched for health-related information using th
 
 I don't see any medical conditions or recent doctor visits in your stored information.
 ```
+### 记忆归因
+*展示双子座如何区分存储的记忆和一般知识*
 
-### Memory Attribution
-*Shows how Gemini distinguishes between stored memories and general knowledge*
-
-**Prompt:**
-```
+**提示：**```
 What's my coffee order again?
 ```
-
-**Response:**
-```
+**回复：**```
 Based on your stored memories, your coffee order is an oat milk cappuccino with one sugar.
 
 This information was retrieved from your memory history where you previously mentioned this preference. I don't have any information about whether you've changed this preference recently.
 ```
+## 为什么将 Gemini 与 Mem0 MCP 一起使用？### Mem0 如何增强您的应用程序
 
-## Why Use Gemini with Mem0 MCP?
+- **智能内存管理** - 将内存组织成可搜索的信息*无需设置矢量数据库*
+- **快速检索** - 使用*亚毫秒 ping* 进行即时查找，处理大型数据集
+- **图形功能** - 当您推送信息时*自动*构建知识
+- **简单集成** - 在后端使用 Mem0 API，只需几行代码即可与*任何 MCP 客户端*配合使用
 
-### How Mem0 Enhances Your Application
+### Gemini 3 + Mem0 的好处
 
-- **Smart Memory Management** - Organizes memories into searchable information *without setting up vector databases*
-- **Fast Retrieval** - Instant lookups with *sub-millisecond ping*, handles large datasets
-- **Graph Capabilities** - Builds knowledge *automatically* as you push information
-- **Simple Integration** - Uses Mem0 API in the backend, works with *any MCP client* with just a few lines of code
+- **原生函数调用**：内置支持 Mem0 的内存工具
+- **大上下文窗口**：支持多达 1M 个令牌以实现广泛的内存上下文
+- **并行执行**：可以同时调用多个内存工具
+- **成本效益**：内存密集型应用程序的有竞争力的价格
 
-### Gemini 3 + Mem0 Benefits
+## 你构建了什么
 
-- **Native function calling**: Built-in support for Mem0's memory tools
-- **Large context window**: Supports up to 1M tokens for extensive memory context
-- **Parallel execution**: Can call multiple memory tools simultaneously
-- **Cost-effective**: Competitive pricing for memory-intensive applications
+- **记忆增强人工智能代理** - Gemini 具有跨会话持久记忆
+- **自动上下文管理** - 代理自动存储和检索相关信息
+- **多工具并行执行** - 同时进行内存操作以提高效率
+- **自然内存接口** - 用户正常交互，而代理在幕后管理内存## 结论
 
-## What You Built
+您已使用 Mem0 的 MCP 服务器成功构建了具有持久内存的 Gemini 3 代理。代理现在可以记住用户偏好，维护跨会话的上下文，并提供更加个性化的交互。
 
-- **Memory-augmented AI agent** - Gemini with persistent memory across sessions
-- **Automatic context management** - Agent automatically stores and retrieves relevant information
-- **Multi-tool parallel execution** - Simultaneous memory operations for efficiency
-- **Natural memory interface** - Users interact normally while agent manages memory behind the scenes
+## 后续步骤
 
-## Conclusion
-
-You've successfully built a Gemini 3 agent with persistent memory using Mem0's MCP server. The agent can now remember user preferences, maintain context across sessions, and provide more personalized interactions.
-
-## Next Steps
-
-<CardGroup cols={2}>
-  <Card
+<卡组列={2}>
+  <卡片
     title="MCP Integration Feature"
-    description="Learn about MCP configuration options and deployment methods"
-    icon="plug"
+    description="了解 MCP 配置选项和部署方法"
+    图标=“插头”
     href="/platform/features/mcp-integration"
   />
-  <Card
-    title="MCP Quickstart"
-    description="Get started with MCP for any AI client in minutes"
-    icon="rocket"
+  <卡片
+    title="MCP 快速入门"
+    description="几分钟内即可开始为任何 AI 客户端使用 MCP"
+    图标=“火箭”
     href="/platform/mem0-mcp"
   />
-</CardGroup>
+</卡组>

@@ -3,28 +3,27 @@ title: Langchain
 description: "Build personalized AI agents using LangChain for conversation flow and Mem0 for long-term memory retention."
 ---
 
-Build a personalized Travel Agent AI using LangChain for conversation flow and Mem0 for memory retention. This integration enables context-aware and efficient travel planning experiences.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-In this guide, we'll create a Travel Agent AI that:
-1. Uses LangChain to manage conversation flow
-2. Leverages Mem0 to store and retrieve relevant information from past interactions
-3. Provides personalized travel recommendations based on user history
 
-## Setup and Configuration
+使用 LangChain 实现对话流程，使用 Mem0 实现记忆保留，构建个性化旅行社 AI。这种集成可实现情境感知和高效的旅行规划体验。
 
-Install necessary libraries:
+## 概述
 
-```bash
+在本指南中，我们将创建一个旅行社 AI：
+1.使用LangChain管理会话流程
+2. 利用 Mem0 存储和检索过去交互的相关信息
+3.根据用户历史记录提供个性化旅游推荐
+
+## 设置和配置
+
+安装必要的库：```bash
 pip install langchain langchain_openai mem0ai python-dotenv
 ```
+导入所需模块并设置配置：
 
-Import required modules and set up configurations:
-
-<Note>Remember to get the Mem0 API key from <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-langchain" rel="nofollow">Mem0 Platform</a>.</Note>
-
-```python
+<Note>记得从<a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-langchain" rel="nofollow">Mem0 Platform</a>获取Mem0 API密钥。</Note>```python
 import os
 from typing import List, Dict
 from langchain_openai import ChatOpenAI
@@ -43,12 +42,9 @@ load_dotenv()
 llm = ChatOpenAI(model="gpt-5-mini")
 mem0 = MemoryClient()
 ```
+## 创建提示模板
 
-## Create Prompt Template
-
-Set up the conversation prompt template:
-
-```python
+设置对话提示模板：```python
 prompt = ChatPromptTemplate.from_messages([
     SystemMessage(content="""You are a helpful travel agent AI. Use the provided context to personalize your responses and remember user preferences and past interactions. 
     Provide travel recommendations, itinerary suggestions, and answer questions about destinations. 
@@ -57,12 +53,9 @@ prompt = ChatPromptTemplate.from_messages([
     HumanMessage(content="{input}")
 ])
 ```
+## 定义辅助函数
 
-## Define Helper Functions
-
-Create functions to handle context retrieval, response generation, and addition to Mem0:
-
-```python
+创建函数来处理上下文检索、响应生成以及向 Mem0 添加：```python
 def retrieve_context(query: str, user_id: str) -> List[Dict]:
     """Retrieve relevant context from Mem0"""
     try:
@@ -113,12 +106,9 @@ def save_interaction(user_id: str, user_input: str, assistant_response: str):
     except Exception as e:
         print(f"Error saving interaction: {e}")
 ```
+## 创建聊天转功能
 
-## Create Chat Turn Function
-
-Implement the main function to manage a single turn of conversation:
-
-```python
+实现管理单轮对话的主要功能：```python
 def chat_turn(user_input: str, user_id: str) -> str:
     # Retrieve context
     context = retrieve_context(user_input, user_id)
@@ -131,12 +121,9 @@ def chat_turn(user_input: str, user_id: str) -> str:
     
     return response
 ```
+## 主交互循环
 
-## Main Interaction Loop
-
-Set up the main program loop for user interaction:
-
-```python
+设置用户交互的主程序循环：```python
 if __name__ == "__main__":
     print("Welcome to your personal Travel Agent Planner! How can I assist you with your travel plans today?")
     user_id = "alice"
@@ -150,25 +137,20 @@ if __name__ == "__main__":
         response = chat_turn(user_input, user_id)
         print(f"Travel Agent: {response}")
 ```
+## 主要特点
 
-## Key Features
+1. **内存集成**：使用 Mem0 存储和检索过去交互的相关信息。
+2. **个性化**：根据用户历史记录和偏好提供上下文感知响应。
+3. **灵活的架构**：LangChain结构可以轻松扩展会话流程。
+4. **持续学习**：每次交互都会被存储，以改善未来的响应。
 
-1. **Memory Integration**: Uses Mem0 to store and retrieve relevant information from past interactions.
-2. **Personalization**: Provides context-aware responses based on user history and preferences.
-3. **Flexible Architecture**: LangChain structure allows for easy expansion of the conversation flow.
-4. **Continuous Learning**: Each interaction is stored, improving future responses.
+## 结论
 
-## Conclusion
-
-By integrating LangChain with Mem0, you can build a personalized Travel Agent AI that can maintain context across interactions and provide tailored travel recommendations and assistance.
-
-<CardGroup cols={2}>
+通过将 LangChain 与 Mem0 集成，您可以构建个性化的旅行社 AI，它可以在交互过程中维护上下文并提供量身定制的旅行建议和帮助。<卡组列={2}>
   <Card title="LangGraph Integration" icon="diagram-project" href="/integrations/langgraph">
-    Build stateful agents with LangGraph and Mem0
-  </Card>
+    使用 LangGraph 和 Mem0 构建有状态代理
+  </卡>
   <Card title="LangChain Tools" icon="wrench" href="/integrations/langchain-tools">
-    Use Mem0 as LangChain tools for agent workflows
-  </Card>
-</CardGroup>
-
-
+    使用Mem0作为代理工作流程的LangChain工具
+  </卡>
+</卡组>

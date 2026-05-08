@@ -3,12 +3,16 @@ title: Azure OpenAI
 description: "Configure Azure OpenAI as an embedding provider in Mem0 with API key, deployment, and endpoint settings."
 ---
 
-To use Azure OpenAI embedding models, set the `EMBEDDING_AZURE_OPENAI_API_KEY`, `EMBEDDING_AZURE_DEPLOYMENT`, `EMBEDDING_AZURE_ENDPOINT` and `EMBEDDING_AZURE_API_VERSION` environment variables. You can obtain the Azure OpenAI API key from the Azure.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Usage
 
-<CodeGroup>
-```python Python
+
+
+要使用 Azure OpenAI 嵌入模型，请设置“EMBEDDING_AZURE_OPENAI_API_KEY”、“EMBEDDING_AZURE_DEPLOYMENT”、“EMBEDDING_AZURE_ENDPOINT”和“EMBEDDING_AZURE_API_VERSION”环境变量。您可以从 Azure 获取 Azure OpenAI API 密钥。
+
+### 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -17,74 +21,68 @@ os.environ["EMBEDDING_AZURE_DEPLOYMENT"] = "your-deployment-name"
 os.environ["EMBEDDING_AZURE_ENDPOINT"] = "your-api-base-url"
 os.environ["EMBEDDING_AZURE_API_VERSION"] = "version-to-use"
 
-os.environ["OPENAI_API_KEY"] = "your_api_key" # For LLM
+os.environ["OPENAI_API_KEY"] = "your_api_key" # 对于法学硕士
 
 
-config = {
-    "embedder": {
-        "provider": "azure_openai",
-        "config": {
+配置={
+    “嵌入器”：{
+        “提供商”：“azure_openai”，
+        “配置”：{
             "model": "text-embedding-3-large",
-            "azure_kwargs": {
-                  "api_version": "",
-                  "azure_deployment": "",
-                  "azure_endpoint": "",
-                  "api_key": "",
-                  "default_headers": {
-                    "CustomHeader": "your-custom-header",
+            “azure_kwargs”：{
+                  “api_版本”：“”，
+                  “azure_deployment”：“”，
+                  “azure_endpoint”：“”，
+                  “api_key”：“”，
+                  “默认标头”：{
+                    "CustomHeader": "您的自定义标头",
                   }
               }
         }
     }
-}
-
-m = Memory.from_config(config)
-messages = [
-    {"role": "user", "content": "I'm planning to watch a movie tonight. Any recommendations?"},
-    {"role": "assistant", "content": "How about thriller movies? They can be quite engaging."},
-    {"role": "user", "content": "I’m not a big fan of thriller movies but I love sci-fi movies."},
-    {"role": "assistant", "content": "Got it! I'll avoid thriller recommendations and suggest sci-fi movies in the future."}
+}m = Memory.from_config(config)
+消息 = [
+    {"role": "user", "content": "我今晚打算看电影。有什么推荐吗？"},
+    {"role": "assistant", "content": "惊悚片怎么样？它们会很吸引人。"},
+    {"role": "user", "content": "我不太喜欢惊悚片，但我喜欢科幻片。"},
+    {"role": "assistant", "content": "明白了！以后我会避免推荐惊悚片，推荐科幻片。"}
 ]
-m.add(messages, user_id="john")
-```
+m.add（消息，user_id =“约翰”）```
 
 ```typescript TypeScript
-import { Memory } from 'mem0ai/oss';
+从'mem0ai/oss'导入{内存}；
 
-const config = {
-    embedder: {
-        provider: "azure_openai",
-        config: {
-            model: "text-embedding-3-large",
-            modelProperties: {
-                endpoint: "your-api-base-url",
-                deployment: "your-deployment-name",
-                apiVersion: "version-to-use",
+常量配置= {
+    嵌入器：{
+        提供商：“azure_openai”，
+        配置：{
+            模型：“文本嵌入-3-large”，
+            模型属性：{
+                端点：“your-api-base-url”，
+                部署：“您的部署名称”，
+                apiVersion: "要使用的版本",
             }
         }
     }
 }
 
-const memory = new Memory(config);
+const 内存 = 新内存（配置）；
 
-const messages = [
-    {"role": "user", "content": "I'm planning to watch a movie tonight. Any recommendations?"},
-    {"role": "assistant", "content": "How about thriller movies? They can be quite engaging."},
-    {"role": "user", "content": "I’m not a big fan of thriller movies but I love sci-fi movies."},
-    {"role": "assistant", "content": "Got it! I'll avoid thriller recommendations and suggest sci-fi movies in the future."}
+常量消息 = [
+    {"role": "user", "content": "我今晚打算看电影。有什么推荐吗？"},
+    {"role": "assistant", "content": "惊悚片怎么样？它们会很吸引人。"},
+    {"role": "user", "content": "我不太喜欢惊悚片，但我喜欢科幻片。"},
+    {"role": "assistant", "content": "明白了！以后我会避免推荐惊悚片，推荐科幻片。"}
 ]
 
-await memory.add(messages, { userId: "john" });
-```
-</CodeGroup>
+等待内存.add(messages, { userId: "john" });```
+</代码组>
 
-As an alternative to using an API key, the Azure Identity credential chain can be used to authenticate with [Azure OpenAI role-based security](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/role-based-access-control). 
+作为使用 API 密钥的替代方法，Azure Identity 凭据链可用于通过 [Azure OpenAI 基于角色的安全性](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/role-based-access-control) 进行身份验证。 
 
-<Note> If an API key is provided, it will be used for authentication over an Azure Identity </Note>
+<Note> 如果提供了 API 密钥，它将用于通过 Azure Identity 进行身份验证 </Note>
 
-Below is a sample configuration for using Mem0 with Azure OpenAI and Azure Identity:
-
-```python
+以下是将 Mem0 与 Azure OpenAI 和 Azure Identity 结合使用的示例配置：```python
 import os
 from mem0 import Memory
 # You can set the values directly in the config dictionary or use environment variables
@@ -112,26 +110,23 @@ config = {
     }
 }
 ```
+请参阅[Azure Identity 故障排除提示](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/TROUBLESHOOTING.md#troubleshoot-environmentcredential-authentication-issues) 设置 Azure Identity 凭据。
 
-Refer to [Azure Identity troubleshooting tips](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/TROUBLESHOOTING.md#troubleshoot-environmentcredential-authentication-issues) for setting up an Azure Identity credential.
-
-### Config
-
-Here are the parameters available for configuring Azure OpenAI embedder:
-<Tabs>
-<Tab title="Python">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `model` | The name of the embedding model to use | `text-embedding-3-small` |
-| `embedding_dims` | Dimensions of the embedding model | `1536` |
-| `azure_kwargs` | The Azure OpenAI configs | `config_keys` |
-</Tab>
-<Tab title="TypeScript">
-| Parameter         | Description                                   | Default Value              |
-| ----------------- | --------------------------------------------- | -------------------------- |
-| `model`           | The name of the embedding model to use        | `text-embedding-3-small`   |
-| `embeddingDims`   | Dimensions of the embedding model             | `1536`                     |
-| `apiKey`          | Azure OpenAI API key                          | `None`                     |
-| `modelProperties` | Object containing endpoint and other settings | `{ endpoint: "",...rest   }`|
-</Tab>
-</Tabs>
+### 配置以下是可用于配置 Azure OpenAI 嵌入器的参数：
+<标签>
+<标签标题=“Python”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `模型` |要使用的嵌入模型的名称 | `文本嵌入-3-小` |
+| `embedding_dims` |嵌入模型的尺寸| `1536` |
+| `azure_kwargs` | Azure OpenAI 配置 | `config_keys` |
+</标签>
+<选项卡标题=“TypeScript”>
+|参数|描述 |默认值 |
+| ----------------- | -------------------------------------------------------- | -------------------------- |
+| `模型` |要使用的嵌入模型的名称 | `文本嵌入-3-小` |
+| `embeddingDims` |嵌入模型的尺寸 | `1536` |
+| `apiKey` | Azure OpenAI API 密钥 | `无` |
+| `模型属性` |包含端点和其他设置的对象 | `{ 端点：“”，...休息}`|
+</标签>
+</标签>

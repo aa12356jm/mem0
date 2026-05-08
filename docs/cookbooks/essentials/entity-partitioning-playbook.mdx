@@ -3,27 +3,26 @@ title: Partition Memories by Entity
 description: Keep memories separate by tagging each write and query with user, agent, app, and session identifiers.
 ---
 
-Nora runs a travel service. When she stored all memories in one bucket, a recruiter's nut allergy accidentally appeared in a traveler's dinner reservation. Let's fix this by properly separating memories for different users, agents, and applications.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
+
+
+
+诺拉经营一家旅行社。当她将所有记忆存储在一个桶中时，一名招聘人员的坚果过敏症意外出现在一名旅行者的晚餐预订中。让我们通过正确分离不同用户、代理和应用程序的内存来解决这个问题。
 
 <Info icon="clock">
-**Time to complete:** ~15 minutes · **Languages:** Python
-</Info>
+**完成时间：** ~15 分钟 · **语言：** Python
+</信息>
 
-## Setup
-
-```python
+## 设置```python
 from mem0 import MemoryClient
 
 client = MemoryClient(api_key="m0-...")
 ```
+从 <a href="https://app.mem0.ai/?utm_source=oss&utm_medium=cookbook-entity-partitioning" rel="nofollow">Mem0 仪表板</a>获取 API 密钥即可开始使用。
 
-Grab an API key from the <a href="https://app.mem0.ai/?utm_source=oss&utm_medium=cookbook-entity-partitioning" rel="nofollow">Mem0 dashboard</a> to get started.
+## 存储和检索范围内存
 
-## Store and Retrieve Scoped Memories
-
-Let's start by storing Cam's travel preferences and retrieving them:
-
-```python
+让我们首先存储并检索 Cam 的旅行偏好：```python
 cam_messages = [
     {"role": "user", "content": "I'm Cam. Keep in mind I avoid shellfish and prefer boutique hotels."},
     {"role": "assistant", "content": "Noted! I'll use those preferences in future itineraries."}
@@ -37,10 +36,7 @@ result = client.add(
     app_id="concierge_app"
 )
 ```
-
-The memory is now stored. Let's retrieve those memories with the same identifiers:
-
-```python
+现在内存已被存储。让我们用相同的标识符检索那些记忆：```python
 user_scope = {
     "AND": [
         {"user_id": "traveler_cam"},
@@ -60,42 +56,32 @@ agent_scope = {
 agent_memories = client.search("Any dietary restrictions?", filters=agent_scope)
 print(agent_memories)
 ```
-
-**Output:**
-```
+**输出：**```
 # User scope returns user's memory
 {'results': [{'memory': 'avoids shellfish and prefers boutique hotels', ...}]}
 # Agent scope returns agent's own memory
 {'results': [{'memory': 'Cam prefers boutique hotels and avoids shellfish', ...}]}
 ```
+<提示图标=“指南针”>
+记忆可以用多个标识符来写入，但每次搜索一次只能解析一个实体边界。对用户和代理范围运行单独的查询（就像上面一样），而不是将两者组合在单个过滤器中。
+</提示>
 
-<Tip icon="compass">
-Memories can be written with several identifiers, but each search resolves one entity boundary at a time. Run separate queries for user and agent scopes—just like above—rather than combining both in a single filter.
-</Tip>
+## 当记忆泄漏时
 
-## When Memories Leak
-
-When Nora adds a chef agent, Cam's travel preferences leak into food recommendations:
-
-```python
+当诺拉（Nora）添加厨师代理时，卡姆（Cam）的旅行偏好会渗透到食物推荐中：```python
 chef_filters = {"AND": [{"user_id": "traveler_cam"}]}
 
 collision = client.search("What should I cook?", filters=chef_filters)
 print(collision)
 ```
-
-**Output:**
-```
+**输出：**```
 ['avoids shellfish and prefers boutique hotels', 'prefers Kyoto kaiseki dining experiences']
 ```
+出现旅行偏好是因为我们仅按“user_id”进行过滤。厨师代理不应该看到酒店的偏好。
 
-The travel preferences appear because we only filtered by `user_id`. The chef agent shouldn't see hotel preferences.
+## 使用适当的过滤器修复泄漏
 
-## Fix the Leak with Proper Filters
-
-First, let's add a memory specifically for the chef agent:
-
-```python
+首先，我们专门为厨师代理添加一个内存：```python
 chef_memory = [
     {"role": "user", "content": "I'd like to try some authentic Kyoto cuisine."},
     {"role": "assistant", "content": "I'll remember that you prefer Kyoto kaiseki dining experiences."}
@@ -109,10 +95,7 @@ client.add(
     app_id="concierge_app"
 )
 ```
-
-Now search within the chef's scope:
-
-```python
+现在在厨师范围内搜索：```python
 safe_filters = {
     "AND": [
         {"agent_id": "chef_recommender"},
@@ -124,19 +107,14 @@ safe_filters = {
 chef_memories = client.search("Any food alerts?", filters=safe_filters)
 print(chef_memories)
 ```
-
-**Output:**
-```
+**输出：**```
 {'results': [{'memory': 'prefers Kyoto kaiseki dining experiences', ...}]}
 ```
+现在厨师代理只能看到自己的食物偏好。酒店偏好由旅行社决定。
 
-Now the chef agent only sees its own food preferences. The hotel preferences stay with the travel agent.
+## 使用 app_id 分隔应用程序
 
-## Separate Apps with app_id
-
-Nora white-labels her travel service for a sports brand. Use `app_id` to keep enterprise data separate:
-
-```python
+诺拉为一个运动品牌贴上了她的旅行服务的白色标签。使用 `app_id` 将企业数据分开：```python
 enterprise_filters = {
     "AND": [
         {"app_id": "sports_brand_portal"}
@@ -150,34 +128,24 @@ enterprise_filters = {
 page = client.get_all(filters=enterprise_filters, page=1, page_size=10)
 print([row["user_id"] for row in page["results"]])
 ```
-
-**Output:**
-```
+**输出：**```
 ['athlete_jane', 'coach_mike', 'team_admin']
 ```
+<信息>
+通配符 (`"*"` ) 仅匹配非空值。确保使用明确的“app_id”值写入内存。
+</信息>
 
-<Info>
-Wildcards (`"*"` ) only match non-null values. Make sure you write memories with explicit `app_id` values.
-</Info>
+<提示图标=“闪闪发光”>
+需要更深入地了解 AND 与 OR、嵌套过滤器或通配符技巧吗？查看<Link href="/platform/features/v2-memory-filters">内存过滤器 v2 指南</Link>以获取可以复制到此流程中的完整示例。
+</提示>
 
-<Tip icon="sparkles">
-Need a deeper tour of AND vs OR, nested filters, or wildcard tricks? Check the <Link href="/platform/features/v2-memory-filters">Memory Filters v2 guide</Link> for full examples you can copy into this flow.
-</Tip>
-
-When the sports brand offboards, delete all their data:
-
-```python
+当运动品牌退出时，删除其所有数据：```python
 client.delete_all(app_id="sports_brand_portal")
 ```
-
-**Output:**
-```
+**输出：**```
 {'message': 'Memories deleted successfully!'}
 ```
-
-## Production Patterns
-
-```python
+## 生产模式```python
 # Nightly audits - check all data for an app
 def audit_app(app_id: str):
     filters = {
@@ -193,12 +161,9 @@ def close_ticket(ticket_id: str, user_id: str):
 # Compliance exports - get all data for one tenant
 export = client.get_memory_export(filters={"AND": [{"app_id": "sports_brand_portal"}]})
 ```
+## 完整示例
 
-## Complete Example
-
-Putting it all together - here's how to properly scope memories:
-
-```python
+总而言之——以下是如何正确界定记忆范围的方法：```python
 # Store memories with all identifiers
 client.add(
     [{"role": "user", "content": "I need a hotel near the conference center."}],
@@ -240,29 +205,25 @@ if not results["results"]:
 
 print(results["results"][0]["memory"])
 ```
-
-**Output:**
-```
+**输出：**```
 I need a hotel near the conference center.
 ```
+## 何时使用每个标识符
 
-## When to Use Each Identifier
-
-| Identifier | When to Use | Example Values |
+|标识符 |何时使用 |示例值 |
 |------------|-------------|----------------|
-| `user_id` | Individual preferences that persist across all interactions | `cam_traveler`, `sarah_exec`, `team_alpha` |
-| `agent_id` | Different AI roles need separate context | `travel_agent`, `concierge`, `customer_support` |
-| `app_id` | White-label deployments or separate products | `travel_app_ios`, `enterprise_portal`, `partner_integration` |
-| `run_id` | Temporary sessions that should be isolated | `support_ticket_9234`, `chat_session_456`, `booking_flow_789` |
+| `用户 ID` |在所有互动中持续存在的个人偏好 | `cam_traveler`、`sarah_exec`、`team_alpha` |
+| `agent_id` |不同的人工智能角色需要不同的背景 | `travel_agent`, `concierge`, `customer_support` |
+| `app_id` |白标部署或单独的产品 | `travel_app_ios`, `enterprise_portal`, `partner_integration` |
+| `run_id` |应该隔离的临时会话 | `support_ticket_9234`、`chat_session_456`、`booking_flow_789` |
 
-## Troubleshooting Common Issues
+## 常见问题故障排除
 
-### My search returns empty results!
+### 我的搜索返回空结果！
 
-**Problem**: Using `AND` with exact matches but some fields might be `null`.
+**问题**：使用“AND”进行精确匹配，但某些字段可能为“null”。
 
-**Solution**:
-```python
+**解决方案**：```python
 # If this returns nothing:
 filters = {"AND": [{"user_id": "u1"}, {"agent_id": "a1"}]}
 
@@ -272,22 +233,18 @@ filters = {"AND": [{"user_id": "u1"}, {"agent_id": "*"}]}
 # Or don't include fields you don't need:
 filters = {"AND": [{"user_id": "u1"}]}
 ```
+### OR 给出结果，但 AND 不给出结果
 
-### OR gives results but AND doesn't
+这确认您存在**字段不匹配**。内存存在，但某些标识符值不完全匹配。
 
-This confirms you have a **field mismatch**. The memory exists but some identifier values don't match exactly.
-
-**Always check what's actually stored:**
-```python
+**始终检查实际存储的内容：**```python
 # Get all memories for the user to see the actual field values
 all_mems = client.get_all(filters={"user_id": "your_user_id"})
 print(json.dumps(all_mems, indent=2))
 ```
+## 最佳实践
 
-## Best Practices
-
-1. **Use consistent identifier formats**
-   ```python
+1. **使用一致的标识符格式**   ```python
    # Good: consistent patterns
    user_id = "cam_traveler"
    agent_id = "travel_agent_v1"
@@ -297,40 +254,35 @@ print(json.dumps(all_mems, indent=2))
    # Avoid: mixed patterns
    # user_id = "123", agent_id = "agent2", app_id = "app"
    ```
-
-2. **Print filters when debugging**
-   ```python
+2. **调试时打印过滤器**   ```python
    filters = {"AND": [{"user_id": "cam", "agent_id": "chef"}]}
    print(f"Searching with filters: {filters}")  # Helps catch typos
    ```
-
-3. **Clean up temporary sessions**
-   ```python
+3. **清理临时会话**   ```python
    # After a support ticket closes
    client.delete_all(user_id="customer_123", run_id="ticket_456")
    ```
+## 总结
 
-## Summary
+您学会了如何：
+- 使用“user_id”、“agent_id”、“app_id”和“run_id”以适当的实体范围存储内存
+- 防止不同代理和应用程序之间的内存泄漏
+- 清理特定租户或会话的数据
+- 使用通配符跨范围内存查询
 
-You learned how to:
-- Store memories with proper entity scoping using `user_id`, `agent_id`, `app_id`, and `run_id`
-- Prevent memory leaks between different agents and applications
-- Clean up data for specific tenants or sessions
-- Use wildcards to query across scoped memories
+## 后续步骤
 
-## Next Steps
-
-<CardGroup cols={2}>
-  <Card
-    title="Deep Dive: Memory Filters v2"
-    description="Layer entity filters with JSON logic to answer complex queries."
-    icon="sliders"
-    href="/platform/features/v2-memory-filters"
+<卡组列={2}>
+  <卡片
+    title="深入探究：内存过滤器 v2"
+    description="使用 JSON 逻辑的层实体过滤器来回答复杂的查询。"
+    图标=“滑块”
+    href="/platform/features/v2-内存过滤器"
   />
-  <Card
-    title="Control Memory Ingestion"
-    description="Pair scoped storage with rules that block low-quality facts."
-    icon="shield-check"
+  <卡片
+    title="控制内存摄取"
+    description="将范围存储与阻止低质量事实的规则配对。"
+    图标=“屏蔽检查”
     href="/cookbooks/essentials/controlling-memory-ingestion"
   />
-</CardGroup>
+</卡组>

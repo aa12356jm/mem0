@@ -3,28 +3,26 @@ title: Smart Travel Assistant
 description: "Plan itineraries that remember traveler preferences across trips."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Create a personalized AI Travel Assistant using Mem0. This guide provides step-by-step instructions and the complete code to get you started.
 
-## Overview
 
-The Personalized AI Travel Assistant uses Mem0 to store and retrieve information across interactions, enabling a tailored travel planning experience. It integrates with OpenAI's GPT-4 model to provide detailed and context-aware responses to user queries.
+使用Mem0打造个性化AI旅行助手。本指南提供了分步说明和完整代码以帮助您入门。
 
-## Setup
+## 概述
 
-Install the required dependencies using pip:
+个性化 AI 旅行助手使用 Mem0 在交互过程中存储和检索信息，从而实现量身定制的旅行规划体验。它与 OpenAI 的 GPT-4 模型集成，为用户查询提供详细的上下文感知响应。
 
-```bash
+## 设置
+
+使用 pip 安装所需的依赖项：```bash
 pip install openai mem0ai
 ```
+## 完整代码示例
 
-## Full Code Example
+以下是使用 Mem0 创建个性化 AI 旅行助手并与之交互的完整代码：
 
-Here's the complete code to create and interact with a Personalized AI Travel Assistant using Mem0:
-
-<CodeGroup>
-
-```python After v1.1
+<代码组>```python After v1.1
 import os
 from openai import OpenAI
 from mem0 import Memory
@@ -182,32 +180,30 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-</CodeGroup>
+</代码组>
 
 
-## Key Components
+## 关键组件
 
-- **Initialization**: The `PersonalTravelAssistant` class is initialized with the OpenAI client and Mem0 memory setup.
-- **Asking Questions**: The `ask_question` method sends a question to the AI, incorporates previous memories, and stores new information.
-- **Memory Management**: The `get_memories` and search_memories methods handle retrieval and searching of stored memories.
+- **初始化**：`PersonalTravelAssistant` 类使用 OpenAI 客户端和 Mem0 内存设置进行初始化。
+- **提问**：`ask_question` 方法向 AI 发送问题，合并以前的记忆，并存储新信息。
+- **内存管理**：`get_memories` 和 search_memories 方法处理存储内存的检索和搜索。
 
-## Usage
+## 用法
 
-1. Set your OpenAI API key in the environment variable.
-2. Instantiate the `PersonalTravelAssistant`.
-3. Use the `main()` function to interact with the assistant in a loop.
+1. 在环境变量中设置您的 OpenAI API 密钥。
+2. 实例化“PersonalTravelAssistant”。
+3. 使用`main()`函数循环与助手交互。
 
-## Conclusion
+## 结论
 
-This Personalized AI Travel Assistant leverages Mem0's memory capabilities to provide context-aware responses. As you interact with it, the assistant learns and improves, offering increasingly personalized travel advice and information.
+这款个性化人工智能旅行助手利用 Mem0 的内存功能来提供上下文感知响应。当您与它互动时，助手会学习和改进，提供越来越个性化的旅行建议和信息。
 
----
-
-<CardGroup cols={2}>
-  <Card title="Tag and Organize Memories" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
-    Use categories to organize travel preferences, destinations, and user context.
-  </Card>
+---<卡组列={2}>
+  <Card title="标记和组织记忆" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
+    使用类别来组织旅行偏好、目的地和用户背景。
+  </卡>
   <Card title="AI Tutor with Mem0" icon="graduation-cap" href="/cookbooks/companions/ai-tutor">
-    Build an educational companion that remembers learning progress and preferences.
-  </Card>
-</CardGroup>
+    打造一个能够记住学习进度和偏好的教育伴侣。
+  </卡>
+</卡组>

@@ -3,15 +3,17 @@ title: LangChain
 description: "Use LangChain as an LLM provider in Mem0 to integrate with various chat models through a unified interface."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0 supports LangChain as a provider to access a wide range of LLM models. LangChain is a framework for developing applications powered by language models, making it easy to integrate various LLM providers through a consistent interface.
 
-For a complete list of available chat models supported by LangChain, refer to the [LangChain Chat Models documentation](https://python.langchain.com/docs/integrations/chat).
 
-## Usage
+Mem0支持LangChain作为提供者访问各种LLM模型。 LangChain是一个用于开发由语言模型支持的应用程序的框架，可以通过一致的接口轻松集成各种LLM提供商。
 
-<CodeGroup>
-```python Python
+有关 LangChain 支持的可用聊天模型的完整列表，请参阅 [LangChain 聊天模型文档](https://python.langchain.com/docs/integrations/chat)。
+
+## 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 from langchain_openai import ChatOpenAI
@@ -76,35 +78,35 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-## Supported LangChain Providers
+## 支持的浪链提供商
 
-LangChain supports a wide range of LLM providers, including:
+LangChain支持广泛的LLM提供商，包括：
 
-- OpenAI (`ChatOpenAI`)
-- Anthropic (`ChatAnthropic`)
-- Google (`ChatGoogleGenerativeAI`, `ChatGooglePalm`)
-- Mistral (`ChatMistralAI`)
-- Ollama (`ChatOllama`)
-- Azure OpenAI (`AzureChatOpenAI`)
+- OpenAI（`ChatOpenAI`）
+- 人择（`ChatAnthropic`）
+- 谷歌（`ChatGoogleGenerativeAI`、`ChatGooglePalm`）
+- 米斯特拉尔（`ChatMistralAI`）
+- Ollama（`ChatOllama`）
+- Azure OpenAI（`AzureChatOpenAI`）
 - HuggingFace (`HuggingFaceChatEndpoint`)
-- And many more
+- 还有更多
 
-You can use any of these model instances directly in your configuration. For a complete and up-to-date list of available providers, refer to the [LangChain Chat Models documentation](https://python.langchain.com/docs/integrations/chat).
+您可以直接在配置中使用这些模型实例中的任何一个。有关可用提供商的完整最新列表，请参阅 [LangChain 聊天模型文档](https://python.langchain.com/docs/integrations/chat)。
 
-## Provider-Specific Configuration
+## 特定于提供商的配置
 
-When using LangChain as a provider, you'll need to:
+当使用LangChain作为提供商时，您需要：
 
-1. Set the appropriate environment variables for your chosen LLM provider
-2. Import and initialize the specific model class you want to use
-3. Pass the initialized model instance to the config
+1. 为您选择的LLM提供商设置适当的环境变量
+2.导入并初始化您要使用的具体模型类
+3.将初始化的模型实例传递给配置
 
-<Note>
-  Make sure to install the necessary LangChain packages and any provider-specific dependencies.
-</Note>
+<注意>
+  确保安装必要的 LangChain 软件包和任何特定于提供商的依赖项。
+</注>
 
-## Config
+## 配置
 
-All available parameters for the `langchain` config are present in [Master List of All Params in Config](../config).
+`langchain` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

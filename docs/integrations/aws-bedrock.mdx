@@ -3,50 +3,46 @@ title: AWS Bedrock
 description: "Use Mem0 with AWS Bedrock and OpenSearch Service for cloud-native persistent semantic memory storage."
 ---
 
-This integration demonstrates how to use **Mem0** with **AWS Bedrock** and **Amazon OpenSearch Service (AOSS)** to enable persistent, semantic memory in intelligent agents.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-In this guide, you'll:
 
-1. Configure AWS credentials to enable Bedrock and OpenSearch access
+此集成演示了如何将 **Mem0** 与 **AWS Bedrock** 和 **Amazon OpenSearch Service (AOSS)** 结合使用，以在智能代理中启用持久语义内存。
+
+## 概述
+
+在本指南中，您将：
+
+1. 配置 AWS 凭证以启用 Bedrock 和 OpenSearch 访问
 2. Set up the Mem0 SDK to use Bedrock for embeddings and LLM
-3. Store and retrieve memories using OpenSearch as a vector store
-4. Build memory-aware applications with scalable cloud infrastructure
+3. 使用 OpenSearch 作为向量存储来存储和检索内存
+4. 使用可扩展的云基础设施构建内存感知应用程序
 
-## Prerequisites
+## 先决条件
 
-- AWS account with access to:
+- AWS 账户有权访问：
   - Bedrock foundation models (e.g., Titan, Claude)
-  - OpenSearch Service with a configured domain
-- Python 3.8+
-- Valid AWS credentials (via environment or IAM role)
+  - 具有已配置域的 OpenSearch 服务
+-Python 3.8+
+- 有效的 AWS 凭证（通过环境或 IAM 角色）
 
-## Setup and Installation
+## 设置和安装
 
-Install required packages:
-
-```bash
+安装所需的包：```bash
 pip install mem0ai boto3 opensearch-py
 ```
+设置环境变量。
 
-Set environment variables.
-
-Configure your AWS credentials using environment variables, IAM roles, or the AWS CLI.
-
-```python
+使用环境变量、IAM 角色或 AWS CLI 配置您的 AWS 凭证。```python
 import os
 
 os.environ['AWS_REGION'] = 'us-west-2'
 os.environ['AWS_ACCESS_KEY_ID'] = 'AKIA...'
 os.environ['AWS_SECRET_ACCESS_KEY'] = 'AS...'
 ```
+## 初始化 Mem0 集成
 
-## Initialize Mem0 Integration
-
-Import necessary modules and configure Mem0:
-
-```python
+导入必要的模块并配置Mem0：```python
 import boto3
 from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
 from mem0 import Memory
@@ -90,12 +86,9 @@ config = {
 # Initialize memory system
 m = Memory.from_config(config)
 ```
+## 内存操作
 
-## Memory Operations
-
-Use Mem0 with your Bedrock-powered LLM and OpenSearch storage backend:
-
-```python
+将 Mem0 与 Bedrock 支持的 LLM 和 OpenSearch 存储后端结合使用：```python
 # Store conversational context
 messages = [
     {"role": "user", "content": "I'm planning to watch a movie tonight. Any recommendations?"},
@@ -112,18 +105,16 @@ relevant = m.search("What kind of movies does Alice like?", filters={"user_id": 
 # Retrieve all user memories
 all_memories = m.get_all(filters={"user_id": "alice"})
 ```
+## 主要特点
 
-## Key Features
+1. **无服务器内存嵌入**：使用 Titan 或其他 Bedrock 模型实现快速的云原生嵌入
+2. **可扩展矢量搜索**：通过 OpenSearch 存储和检索矢量化内存
+3. **无缝AWS身份验证**：使用AWS IAM或环境变量进行安全身份验证
+4. **用户特定的内存空间**：每个用户 ID 的内存都是隔离的
+5. **持久记忆上下文**：跨会话维护和调用历史记录
 
-1. **Serverless Memory Embeddings**: Use Titan or other Bedrock models for fast, cloud-native embeddings
-2. **Scalable Vector Search**: Store and retrieve vectorized memories via OpenSearch
-3. **Seamless AWS Auth**: Uses AWS IAM or environment variables to securely authenticate
-4. **User-specific Memory Spaces**: Memories are isolated per user ID
-5. **Persistent Memory Context**: Maintain and recall history across sessions
-
-<CardGroup cols={2}>
+<卡组列={2}>
   <Card title="AWS Bedrock Cookbook" icon="aws" href="/cookbooks/integrations/aws-bedrock">
-    Complete guide to using Bedrock with Mem0
-  </Card>
-</CardGroup>
-
+    将 Bedrock 与 Mem0 结合使用的完整指南
+  </卡>
+</卡组>

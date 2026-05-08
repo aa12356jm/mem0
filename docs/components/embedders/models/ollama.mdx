@@ -2,12 +2,16 @@
 title: "Ollama"
 description: "Configure Ollama as an embedding provider in Mem0 to generate embeddings locally using open-source models."
 ---
-You can use embedding models from Ollama to run Mem0 locally.
 
-### Usage
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<CodeGroup>
-```python Python
+
+
+您可以使用 Ollama 的嵌入模型在本地运行 Mem0。
+
+### 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -54,25 +58,25 @@ const messages = [
 ]
 await memory.add(messages, { userId: "john" });
 ```
-</CodeGroup>
+</代码组>
 
-### Config
+### 配置
 
-Here are the parameters available for configuring Ollama embedder:
+以下是可用于配置 Ollama 嵌入器的参数：
 
-<Tabs>
-<Tab title="Python">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `model` | The name of the Ollama model to use | `nomic-embed-text` |
-| `embedding_dims` | Dimensions of the embedding model | `512` |
-| `ollama_base_url` | Base URL for ollama connection | `None` |
-</Tab>
-<Tab title="TypeScript">
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `model` | The name of the Ollama model to use | `nomic-embed-text:latest` |
-| `url` | Base URL for Ollama server | `http://localhost:11434` |
-| `embeddingDims` | Dimensions of the embedding model | 768
-</Tab>
-</Tabs>
+<标签>
+<标签标题=“Python”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `模型` |要使用的 Ollama 模型的名称 | `经济嵌入文本` |
+| `embedding_dims` |嵌入模型的尺寸| `512` |
+| `ollama_base_url` | ollama 连接的基本 URL | `无` |
+</标签>
+<选项卡标题=“TypeScript”>
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `模型` |要使用的 Ollama 模型的名称 | `经济嵌入文本：最新` |
+| `网址` | Ollama 服务器的基本 URL | `http://localhost:11434` |
+| `embeddingDims` |嵌入模型的尺寸|第768章
+</标签>
+</标签>

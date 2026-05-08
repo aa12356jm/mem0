@@ -2,13 +2,16 @@
 title: "MongoDB"
 description: "Use MongoDB as a vector database in Mem0 with built-in vector search for high-dimensional similarity queries."
 ---
+
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
+
+
+
 # MongoDB
 
-[MongoDB](https://www.mongodb.com/) is a versatile document database that supports vector search capabilities, allowing for efficient high-dimensional similarity searches over large datasets with robust scalability and performance.
+[MongoDB](https://www.mongodb.com/) 是一个多功能文档数据库，支持矢量搜索功能，允许对大型数据集进行高效的高维相似性搜索，并具有强大的可扩展性和性能。
 
-## Usage
-
-```python
+＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -34,16 +37,15 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+## 配置
 
-## Config
+以下是可用于配置 MongoDB 的参数：
 
-Here are the parameters available for configuring MongoDB:
+|参数|描述 |默认值 |
+| ---| ---| ---|
+|数据库名称 | MongoDB 数据库名称 | `"mem0_db"` |
+|集合名称 | MongoDB 集合的名称 | `"mem0_collection"` |
+|嵌入_模型_尺寸 |嵌入向量的维度 | `1536` |
+| mongo_uri | MongoDB URI 连接字符串 | `mongodb://用户名:密码@localhost:27017` |
 
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| db_name | Name of the MongoDB database | `"mem0_db"` |
-| collection_name | Name of the MongoDB collection | `"mem0_collection"` |
-| embedding_model_dims | Dimensions of the embedding vectors | `1536` |
-| mongo_uri | The MongoDB URI connection string | `mongodb://username:password@localhost:27017` |
-
-> **Note**: If `mongo_uri` is not provided, it will default to `mongodb://username:password@localhost:27017`.
+> **注意**：如果未提供 `mongo_uri`，则默认为 `mongodb://username:password@localhost:27017`。

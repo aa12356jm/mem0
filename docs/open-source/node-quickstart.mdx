@@ -4,32 +4,33 @@ description: "Store and search Mem0 memories from a TypeScript or JavaScript app
 icon: "js"
 ---
 
-Spin up Mem0 with the Node SDK in just a few steps. You’ll install the package, initialize the client, add a memory, and confirm retrieval with a single search.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Prerequisites
 
-- Node.js 18 or higher
-- (Optional) OpenAI API key stored in your environment when you want to customize providers
 
-## Install and run your first memory
+只需几个步骤即可使用 Node SDK 启动 Mem0。您将安装该软件包、初始化客户端、添加内存并通过一次搜索确认检索。
 
-<Steps>
-<Step title="Install the SDK">
-```bash
+## 先决条件
+
+- Node.js 18 或更高版本
+- （可选）当您想要自定义提供程序时，OpenAI API 密钥存储在您的环境中
+
+## 安装并运行你的第一个内存
+
+<步骤>
+<步骤标题=“安装SDK”>```bash
 npm install mem0ai
 ```
-</Step>
+</步骤>
 
-<Step title="Initialize the client">
-```ts
+<Step title="初始化客户端">```ts
 import { Memory } from "mem0ai/oss";
 
 const memory = new Memory();
 ```
-</Step>
+</步骤>
 
-<Step title="Add a memory">
-```ts
+<Step title="添加内存">```ts
 const messages = [
   { role: "user", content: "I'm planning to watch a movie tonight. Any recommendations?" },
   { role: "assistant", content: "How about thriller movies? They can be quite engaging." },
@@ -39,16 +40,13 @@ const messages = [
 
 await memory.add(messages, { userId: "alice", metadata: { category: "movie_recommendations" } });
 ```
-</Step>
+</步骤>
 
-<Step title="Search memories">
-```ts
+<步骤标题=“搜索记忆”>```ts
 const results = await memory.search("What do you know about me?", { filters: { userId: "alice" } });
 console.log(results);
 ```
-
-**Output**
-```json
+**输出**```json
 {
   "results": [
     {
@@ -63,16 +61,14 @@ console.log(results);
   ]
 }
 ```
-</Step>
-</Steps>
+</步骤>
+</步骤>
 
-<Note>
-By default the Node SDK uses local-friendly settings (OpenAI `gpt-5-mini`, `text-embedding-3-small`, in-memory vector store, and SQLite history). Swap components by passing a config as shown below.
-</Note>
+<注意>
+默认情况下，Node SDK 使用本地友好设置（OpenAI `gpt-5-mini`、`text-embedding-3-small`、内存向量存储和 SQLite 历史记录）。通过传递配置来交换组件，如下所示。
+</注>
 
-## Configure for production
-
-```ts
+## 配置生产```ts
 import { Memory } from "mem0ai/oss";
 
 const memory = new Memory({
@@ -100,11 +96,9 @@ const memory = new Memory({
   historyDbPath: "memory.db"
 });
 ```
+## 管理记忆（可选）
 
-## Manage memories (optional)
-
-<CodeGroup>
-```ts Get all memories
+<代码组>```ts Get all memories
 const allMemories = await memory.getAll({ filters: { userId: "alice" } });
 console.log(allMemories);
 ```
@@ -126,9 +120,7 @@ const updateResult = await memory.update(
 );
 console.log(updateResult);
 ```
-</CodeGroup>
-
-```ts
+</代码组>```ts
 // Audit history
 const history = await memory.history("892db2ae-06d9-49e5-8b3e-585ef9b85b8e");
 console.log(history);
@@ -140,13 +132,11 @@ await memory.deleteAll({ userId: "alice" });
 // Reset everything
 await memory.reset();
 ```
+## 使用自定义历史记录存储
 
-## Use a custom history store
+当您需要无服务器友好的历史存储时，Node SDK 支持 Supabase（或其他提供商）。
 
-The Node SDK supports Supabase (or other providers) when you need serverless-friendly history storage.
-
-<CodeGroup>
-```ts Supabase provider
+<代码组>```ts Supabase provider
 import { Memory } from "mem0ai/oss";
 
 const memory = new Memory({
@@ -168,11 +158,9 @@ const memory = new Memory({
   disableHistory: true
 });
 ```
-</CodeGroup>
+</代码组>
 
-Create the Supabase table with:
-
-```sql
+使用以下命令创建 Supabase 表：```sql
 create table memory_history (
   id text primary key,
   memory_id text not null,
@@ -184,53 +172,49 @@ create table memory_history (
   is_deleted integer default 0
 );
 ```
+## 配置参数
 
-## Configuration parameters
-
-Mem0 offers granular configuration across vector stores, LLMs, embedders, and history stores.
-
-<AccordionGroup>
-  <Accordion title="Vector store">
-| Parameter | Description | Default |
-| --- | --- | --- |
-| `provider` | Vector store provider (e.g., `"memory"`) | `"memory"` |
-| `host` | Host address | `"localhost"` |
-| `port` | Port number | `undefined` |
-  </Accordion>
-  <Accordion title="LLM">
-| Parameter | Description | Provider |
-| --- | --- | --- |
-| `provider` | LLM provider (e.g., `"openai"`, `"anthropic"`) | All |
-| `model` | Model to use | All |
-| `temperature` | Temperature value | All |
-| `apiKey` | API key | All |
-| `maxTokens` | Max tokens to generate | All |
-| `topP` | Probability threshold | All |
-| `topK` | Token count to keep | All |
-| `openaiBaseUrl` | Base URL override | OpenAI |
-  </Accordion>
-  <Accordion title="Embedder">
-| Parameter | Description | Default |
-| --- | --- | --- |
-| `provider` | Embedding provider | `"openai"` |
-| `model` | Embedding model | `"text-embedding-3-small"` |
-| `apiKey` | API key | `undefined` |
-  </Accordion>
-  <Accordion title="General">
-| Parameter | Description | Default |
-| --- | --- | --- |
-| `historyDbPath` | Path to history database | `"{mem0_dir}/history.db"` |
-| `customInstructions` | Custom processing prompt | `undefined` |
-  </Accordion>
-  <Accordion title="History store">
-| Parameter | Description | Default |
-| --- | --- | --- |
-| `provider` | History provider | `"sqlite"` |
-| `config` | Provider configuration | `undefined` |
-| `disableHistory` | Disable history store | `false` |
-  </Accordion>
-  <Accordion title="Complete config example">
-```ts
+Mem0 提供跨向量存储、LLM、嵌入器和历史存储的精细配置。<手风琴组>
+  <手风琴标题=“矢量商店”>
+|参数|描述 |默认|
+| ---| ---| ---|
+| `提供者` |矢量存储提供者（例如“内存”）| `“记忆”` |
+| `主机` |主机地址 | `"本地主机"` |
+| `端口` |端口号 | `未定义` |
+  </手风琴>
+  <手风琴标题=“法学硕士”>
+|参数|描述 |供应商|
+| ---| ---| ---|
+| `提供者` | LLM 提供者（例如, `"openai"`, `"anthropic"`) |全部 |
+| `模型` |使用型号|全部 |
+| `温度` |温度值|全部 |
+| `apiKey` | API 密钥 |全部 |
+| `maxTokens` |生成的最大代币 |全部 |
+| `顶P` |概率阈值|全部 |
+| `topK` |保持的令牌数量 |全部 |
+| `openaiBaseUrl` |基本 URL 覆盖 |开放人工智能 |
+  </手风琴>
+  <手风琴标题=“嵌入器”>
+|参数|描述 |默认|
+| ---| ---| ---|
+| `提供者` |嵌入提供商| `"openai"` |
+| `模型` |嵌入模型| `“文本嵌入-3-小”` |
+| `apiKey` | API 密钥 | `未定义` |
+  </手风琴>
+  <手风琴标题=“常规”>
+|参数|描述 |默认|
+| ---| ---| ---|
+| `historyDbPath` |历史数据库路径| `"{mem0_dir}/历史记录。分贝"` |
+| `自定义说明` |定制加工提示| `未定义` |
+  </手风琴>
+  <Accordion title="历史商店">
+|参数|描述 |默认|
+| ---| ---| ---|
+| `提供者` |历史提供者 | `"sqlite"` |
+| `配置` |提供商配置| `未定义` |
+| `禁用历史记录` |禁用历史记录存储 | `假` |
+  </手风琴>
+  <Accordion title="完整配置示例">```ts
 const config = {
   embedder: {
     provider: "openai",
@@ -265,23 +249,23 @@ const config = {
   customInstructions: "I'm a virtual assistant. I'm here to help you with your queries."
 };
 ```
-  </Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
-## What's next?
+## 接下来是什么？
 
-<CardGroup cols={3}>
-  <Card title="Explore Memory Operations" icon="database" href="/core-concepts/memory-operations/add">
-    Review CRUD patterns, filters, and advanced retrieval across the OSS stack.
-  </Card>
-  <Card title="Customize Configuration" icon="sliders" href="/open-source/configuration">
-    Swap in your preferred LLM, vector store, and history provider for production use.
-  </Card>
-  <Card title="Automate Node Workflows" icon="plug" href="/cookbooks/integrations/openai-tool-calls">
-    See a full Node-based workflow that layers Mem0 memories onto tool-calling agents.
-  </Card>
-</CardGroup>
+<卡组列={3}>
+  <Card title="探索内存操作" icon="database" href="/core-concepts/memory-operations/add">
+    查看 OSS 堆栈中的 CRUD 模式、过滤器和高级检索。
+  </卡>
+  <Card title="自定义配置" icon="sliders" href="/open-source/configuration">
+    交换您首选的 LLM、矢量存储和历史记录提供商以供生产使用。
+  </卡>
+  <Card title="自动化节点工作流程" icon="plug" href="/cookbooks/integrations/openai-tool-calls">
+    查看完整的基于节点的工作流程，将 Mem0 内存分层到工具调用代理上。
+  </卡>
+</卡组>
 
-If you have any questions, please feel free to reach out:
+如果您有任何疑问，请随时联系：
 
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

@@ -3,44 +3,33 @@ title: Persistent Eliza Characters
 description: "Bring persistent personality to Eliza OS agents using Mem0."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-You can create a personalized Eliza OS Character using Mem0. This guide will walk you through the necessary steps and provide the complete code to get you started.
 
-## Overview
 
-ElizaOS is a powerful AI agent framework for autonomy and personality. It is a collection of tools that help you create a personalized AI agent.
+您可以使用 Mem0 创建个性化的 Eliza OS 角色。本指南将引导您完成必要的步骤，并提供完整的代码以帮助您入门。
 
-## Setup
+## 概述
 
-You can start by cloning the eliza-os repository:
+ElizaOS 是一个强大的人工智能代理框架，具有自主性和个性。它是帮助您创建个性化 AI 代理的工具集合。
 
-```bash
+## 设置
+
+您可以从克隆 eliza-os 存储库开始：```bash
 git clone https://github.com/elizaOS/eliza.git
 ```
-
-Change the directory to the eliza-os repository:
-
-```bash
+将目录更改为 eliza-os 存储库：```bash
 cd eliza
 ```
-
-Install the dependencies:
-
-```bash
+安装依赖项：```bash
 pnpm install
 ```
-
-Build the project:
-
-```bash
+构建项目：```bash
 pnpm build
 ```
+## 设置 ENV
 
-## Setup ENVs
-
-Create a `.env` file in the root of the project and add the following (you can use the `.env.example` file as a reference):
-
-```bash
+在项目根目录下创建一个 `.env` 文件并添加以下内容（您可以使用 `.env.example` 文件作为参考）：```bash
 # Mem0 Configuration
 MEM0_API_KEY= # Mem0 API Key (get from https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=cookbook-eliza-os)
 MEM0_USER_ID= # Default: eliza-os-user
@@ -50,24 +39,17 @@ SMALL_MEM0_MODEL= # Default: gpt-4.1-nano
 MEDIUM_MEM0_MODEL= # Default: gpt-4o
 LARGE_MEM0_MODEL= # Default: gpt-4o
 ```
+## 使默认字符使用Mem0
 
-## Make the default character use Mem0
-
-By default, there is a character called `eliza` that uses the Ollama model. You can make this character use Mem0 by changing the config in the `agent/src/defaultCharacter.ts` file.
-
-```ts
+默认情况下，有一个名为“eliza”的角色使用 Ollama 模型。您可以通过更改“agent/src/defaultCharacter.ts”文件中的配置来使该角色使用 Mem0。```ts
 modelProvider: ModelProviderName.MEM0,
 ```
+这将使角色使用 Mem0 来生成响应。
 
-This will make the character use Mem0 to generate responses.
-
-## Run the project
-
-```bash
+## 运行项目```bash
 pnpm start
 ```
-
-## Conclusion
+## 结论
 
 You have now created a personalized Eliza OS Character using Mem0. You can now start interacting with the character by running the project and talking to the character.
 
@@ -75,11 +57,11 @@ This is a simple example of how to use Mem0 to create a personalized AI agent. Y
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Partition Memories by Entity" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
+<卡组列={2}>
+  <Card title="按实体划分记忆" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
     Keep character personas isolated by tagging user, agent, and session identifiers.
-  </Card>
+  </卡>
   <Card title="AI Tutor with Mem0" icon="graduation-cap" href="/cookbooks/companions/ai-tutor">
     Build another type of personalized companion with memory capabilities.
-  </Card>
-</CardGroup>
+  </卡>
+</卡组>

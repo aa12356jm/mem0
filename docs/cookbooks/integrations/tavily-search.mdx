@@ -3,47 +3,43 @@ title: Search with Personal Context
 description: "Blend Tavily's realtime results with personal context stored in Mem0."
 ---
 
-
-<Snippet file="security-compliance.mdx" />
-
-Imagine asking a search assistant for "coffee shops nearby" and instead of generic results, it shows remote-work-friendly cafes with great WiFi in your city because it remembers you mentioned working remotely before. Or when you search for "lunchbox ideas for kids" it knows you have a 7-year-old daughter and recommends peanut-free options that align with her allergy.
-
-That's what we are going to build today, a Personalized Search Assistant powered by Mem0 for memory and [Tavily](https://tavily.com) for real-time search.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
 
-## Why Personalized Search
 
-Most assistants treat every query like they've never seen you before. That means repeating yourself about your location, diet, or preferences, and getting results that feel generic.
+<片段文件=“security-compliance.mdx”/>
 
-- With Mem0, your assistant builds a memory of the user's world.
-- With Tavily, it fetches fresh and accurate results in real time.
+想象一下，向搜索助手询问“附近的咖啡馆”，它会显示您所在城市中具有良好 WiFi 且适合远程工作的咖啡馆，而不是通用结果，因为它记得您之前提到过远程工作。或者，当您搜索“儿童午餐盒创意”时，它知道您有一个 7 岁的女儿，并推荐适合她过敏的无花生选项。
 
-Together, they make every interaction smarter, faster, and more personal.
+这就是我们今天要构建的，一个由用于内存的 Mem0 和用于实时搜索的 [Tavily](https://tavily.com) 提供支持的个性化搜索助手。
 
-## Prerequisites
 
-Before you begin, make sure you have:
+## 为什么个性化搜索
 
-1. Installed the dependencies:
-```bash
+大多数助理都会像从未见过您一样对待您的每一个询问。这意味着重复自己的位置、饮食或偏好，并得到感觉一般的结果。
+
+- 通过 Mem0，您的助手可以构建用户世界的记忆。- 借助 Tavily，它可以实时获取新鲜且准确的结果。
+
+它们共同使每次交互变得更智能、更快速、更个性化。
+
+## 先决条件
+
+在开始之前，请确保您拥有：
+
+1.安装依赖项：```bash
 pip install langchain mem0ai langchain-tavily langchain-openai
 ```
-
-2. Set up your API keys in a .env file:
-```bash
+2. 在 .env 文件中设置 API 密钥：```bash
 OPENAI_API_KEY=your-openai-key
 TAVILY_API_KEY=your-tavily-key
 MEM0_API_KEY=your-mem0-key
 ```
+## 代码演练
+让我们分解一下主要组件。
 
-## Code Walkthrough
-Let’s break down the main components.
+### 1：使用自定义指令初始化Mem0
 
-### 1: Initialize Mem0 with Custom Instructions
-
-We configure Mem0 with custom instructions that guide it to infer user memories tailored specifically for our usecase.
-
-```python
+我们使用自定义指令配置 Mem0，引导它推断专门为我们的用例定制的用户记忆。```python
 from mem0 import MemoryClient
 
 mem0_client = MemoryClient()
@@ -57,12 +53,10 @@ and extract facts and memories accordingly.
 '''
 )
 ```
-Now, if a user casually mentions "I need to pick up my daughter" or "What's the weather at Los Angeles", Mem0 remembers they have a daughter or the user is interested in or connected with Los Angeles in terms of location. These details will be referenced for future searches.
+现在，如果用户不经意地提到“我需要去接我的女儿”或“洛杉矶的天气怎么样”，Mem0 会记住他们有一个女儿，或者用户对洛杉矶感兴趣或在位置方面与洛杉矶有联系。这些详细信息将供将来的搜索参考。
 
-### 2. Simulating User History
-To test personalization, we preload some sample conversation history for a user:
-
-```python
+### 2. 模拟用户历史记录
+为了测试个性化，我们为用户预加载一些示例对话历史记录：```python
 def setup_user_history(user_id):
     conversations = [
         [{"role": "user", "content": "What will be the weather today at Los Angeles? I need to pick up my daughter from office."},
@@ -80,12 +74,10 @@ def setup_user_history(user_id):
     for conversation in conversations:
         mem0_client.add(conversation, user_id=user_id)
 ```
-This gives the agent a baseline understanding of the user’s lifestyle and needs.
+这使代理能够对用户的生活方式和需求有一个基本的了解。
 
-### 3. Retrieving User Context from Memory
-When a user makes a new search query, we retrieve relevant memories to enhance the search query:
-
-```python
+### 3. 从内存中检索用户上下文
+当用户进行新的搜索查询时，我们会检索相关记忆以增强搜索查询：```python
 def get_user_context(user_id, query):
     # For Platform API, user_id goes in filters
     filters = {"user_id": user_id}
@@ -97,12 +89,10 @@ def get_user_context(user_id, query):
     else:
         return "No previous user context available."
 ```
-This context is injected into the search agent so results are personalized.
+该上下文被注入到搜索代理中，因此结果是个性化的。
 
-### 4. Creating the Personalized Search Agent
-The agent uses Tavily search, but always augments search queries with user context:
-
-```python
+### 4. 创建个性化搜索代理
+该代理使用 Tavily 搜索，但始终使用用户上下文来增强搜索查询：```python
 def create_personalized_search_agent(user_context):
     tavily_search = TavilySearch(
         max_results=10,
@@ -132,11 +122,8 @@ YOUR ROLE:
     agent = create_openai_tools_agent(llm=llm, tools=tools, prompt=prompt)
     return AgentExecutor(agent=agent, tools=tools, verbose=True, return_intermediate_steps=True)
 ```
-
-### 5. Run a Personalized Search
-The workflow ties everything together:
-
-```python
+### 5. 运行个性化搜索
+工作流程将所有内容联系在一起：```python
 def conduct_personalized_search(user_id, query):
     user_context = get_user_context(user_id, query)
     agent_executor = create_personalized_search_agent(user_context)
@@ -144,11 +131,8 @@ def conduct_personalized_search(user_id, query):
     response = agent_executor.invoke({"messages": [HumanMessage(content=query)]})
     return {"agent_response": response['output']}
 ```
-
-### 6. Store New Interactions
-Every new query/response pair is stored for future personalization:
-
-```python
+### 6. 存储新的交互
+每个新的查询/响应对都会被存储以供将来的个性化设置：```python
 def store_search_interaction(user_id, original_query, agent_response):
     interaction = [
         {"role": "user", "content": f"Searched for: {original_query}"},
@@ -156,10 +140,7 @@ def store_search_interaction(user_id, original_query, agent_response):
     ]
     mem0_client.add(messages=interaction, user_id=user_id)
 ```
-
-### Full Example Run
-
-```python
+### 完整示例运行```python
 if __name__ == "__main__":
     user_id = "john"
     setup_user_history(user_id)
@@ -174,33 +155,30 @@ if __name__ == "__main__":
         print(f"\nQuery: {q}")
         print(f"Personalized Response: {results['agent_response']}")
 ```
+## 它在实践中是如何运作的
 
-## How It Works in Practice
+以下是个性化的实施方式：
 
-Here's how personalization plays out:
+- **背景收集**：用户之前提到住在洛杉矶，是素食主义者，并且有一个对花生过敏的 7 岁女儿。
+- **增强的搜索查询**：
+  - 查询：“附近有适合工作的好咖啡店”
+  - 增强查询：“洛杉矶不错的咖啡店，WiFi 信号强，适合远程工作”
+- **个性化结果**：助手仅返回洛杉矶附近适合 WiFi、适合工作的咖啡馆。
+- **内存更新**：保存交互以便将来更好的推荐。
 
-- **Context Gathering**: User previously mentioned living in Los Angeles, being vegan, and having a 7-year-old daughter allergic to peanuts.
-- **Enhanced Search Query**:
-  - Query: "good coffee shops nearby for working"
-  - Enhanced Query: "good coffee shops in Los Angeles with strong WiFi, remote-work-friendly"
-- **Personalized Results**: The assistant only returns WiFi-friendly, work-friendly cafes near Los Angeles.
-- **Memory Update**: Interaction is saved for better future recommendations.
+## 结论
 
-## Conclusion
+借助 Mem0 和 Tavily，您可以构建一个搜索助手，它不仅可以获取结果，还可以了解查询背后的人员。
 
-With Mem0 and Tavily, you can build a search assistant that doesn't just fetch results but understands the person behind the query.
+无论是购物、旅行还是日常生活，这种方法都能将通用搜索转变为真正的个性化体验。
 
-Whether for shopping, travel, or daily life, this approach turns a generic search into a truly personalized experience.
+完整代码：[个性化搜索GitHub](https://github.com/mem0ai/mem0/blob/main/examples/misc/personalized_search.py)
 
-Full Code: [Personalized Search GitHub](https://github.com/mem0ai/mem0/blob/main/examples/misc/personalized_search.py)
-
----
-
-<CardGroup cols={2}>
+---<卡组列={2}>
   <Card title="Deep Research with Mem0" icon="magnifying-glass" href="/cookbooks/operations/deep-research">
-    Build comprehensive research agents that remember findings across sessions.
-  </Card>
-  <Card title="Tag and Organize Memories" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
-    Categorize search results and user preferences for better personalization.
-  </Card>
-</CardGroup>
+    构建能够记住跨会话发现结果的综合研究代理。
+  </卡>
+  <Card title="标记和组织记忆" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
+    对搜索结果和用户偏好进行分类，以实现更好的个性化。
+  </卡>
+</卡组>

@@ -5,74 +5,65 @@ description: "Agent skills, starter prompts, and setup for building with Mem0 us
 icon: "wand-magic-sparkles"
 ---
 
-These docs are designed to be easily consumable by LLMs. Each page has a button that lets you copy the page as Markdown or paste directly into ChatGPT, Claude, or any AI coding tool.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-We follow the llms.txt standard:
+
+
+这些文档旨在供法学硕士轻松使用。每个页面都有一个按钮，可让您将页面复制为 Markdown 或直接粘贴到 ChatGPT、Claude 或任何 AI 编码工具中。
+
+我们遵循 llms.txt 标准：
 
 - [llms.txt](https://docs.mem0.ai/llms.txt)
 
-<CardGroup cols={2}>
-  <Card title="Get an API Key" icon="key" href="https://app.mem0.ai/login?utm_source=oss&utm_medium=vibecoding">
-    Sign up for Mem0 Platform and start building
-  </Card>
+<卡组列={2}>
+  <Card title="获取 API 密钥" icon="key" href="https://app.mem0.ai/login?utm_source=oss&utm_medium=vibecoding">
+    注册 Mem0 平台并开始构建
+  </卡>
   <Card title="Quickstart" icon="rocket" href="/platform/quickstart">
-    Store your first memory in under 5 minutes
-  </Card>
-</CardGroup>
+    在 5 分钟内存储您的第一个记忆
+  </卡>
+</卡组>
 
-## Agent Skills
+## 代理技能
 
-Mem0 ships two kinds of skills for AI coding assistants. Both work with Claude Code, Codex, Cursor, Windsurf, OpenCode, OpenClaw, and any assistant that supports the skills standard.
+Mem0 为 AI 编码助手提供了两种技能。两者均可与 Claude Code、Codex、Cursor、Windsurf、OpenCode、OpenClaw 以及任何支持技能标准的助手配合使用。### 参考技能——永远在线
 
-### Reference skills — always on
-
-Teach your assistant Mem0's SDK surface so it writes correct code in everyday development:
-
-```bash
+教你的助手 Mem0 的 SDK Surface，以便它在日常开发中编写正确的代码：```bash
 npx skills add https://github.com/mem0ai/mem0 --skill mem0
 npx skills add https://github.com/mem0ai/mem0 --skill mem0-cli
 npx skills add https://github.com/mem0ai/mem0 --skill mem0-vercel-ai-sdk
 ```
+- `mem0` — Python 和 TypeScript SDK（平台 + OSS），以及框架集成（LangChain、CrewAI、OpenAI Agents、LangGraph、LlamaIndex 等）
+- `mem0-cli` — `mem0` CLI 的终端工作流程（Node 和 Python 版本）
+- `mem0-vercel-ai-sdk` — `@mem0/vercel-ai-provider` 和 `createMem0`
 
-- `mem0` — Python and TypeScript SDKs (Platform + OSS), plus framework integrations (LangChain, CrewAI, OpenAI Agents, LangGraph, LlamaIndex, etc.)
-- `mem0-cli` — terminal workflows for the `mem0` CLI (both Node and Python builds)
-- `mem0-vercel-ai-sdk` — `@mem0/vercel-ai-provider` and `createMem0`
+### 管道技能——按需运行
 
-### Pipeline skills — run on demand
-
-Let your assistant execute an end-to-end workflow in an existing repo. Invoked as slash commands:
-
-```bash
+让您的助手在现有存储库中执行端到端工作流程。作为斜杠命令调用：```bash
 npx skills add https://github.com/mem0ai/mem0 --skill mem0-integrate
 npx skills add https://github.com/mem0ai/mem0 --skill mem0-test-integration
 ```
+- `/mem0-integrate` — 使用目标驱动、测试优先的管道将 Mem0 连接到现有存储库。检测堆栈，询问是否使用平台或 OSS，首先编写失败的测试，并保持集成附加和功能标记。
+- `/mem0-test-integration` — 验证 `/mem0-integrate` 生成了什么。针对您的 API 密钥运行存储库的本机测试套件和真正的端到端烟雾流，然后生成记分卡。
 
-- `/mem0-integrate` — wire Mem0 into an existing repository using a goal-driven, test-first pipeline. Detects the stack, asks whether to use Platform or OSS, writes failing tests first, and keeps the integration additive and feature-flagged.
-- `/mem0-test-integration` — verify what `/mem0-integrate` produced. Runs the repo's native test suite and a real end-to-end smoke flow against your API key, then produces a scorecard.
+有关完整目录，请参阅[技能索引](https://github.com/mem0ai/mem0/tree/main/skills)。
 
-See the [skills index](https://github.com/mem0ai/mem0/tree/main/skills) for the full catalog.
+## MCP 服务器设置
 
-## MCP Server Setup
+将 Claude、Claude Code、Cursor、Windsurf、VS Code、OpenCode 或任何 MCP 兼容客户端连接到 Mem0。
 
-Connect Claude, Claude Code, Cursor, Windsurf, VS Code, OpenCode, or any MCP-compatible client to Mem0.
-
-Get your API key from <a href="https://app.mem0.ai?utm_source=oss&utm_medium=vibecoding" rel="nofollow">app.mem0.ai</a>, then add Mem0 MCP with a single command:
-
-```bash
+从 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=vibecoding" rel="nofollow">app.mem0.ai</a> 获取 API 密钥，然后使用单个命令添加 Mem0 MCP：```bash
 npx mcp-add \
   --name mem0-mcp \
   --type http \
   --url "https://mcp.mem0.ai/mcp" \
   --clients "claude,claude code,cursor,windsurf,vscode,opencode"
 ```
+有关每个客户端的设置和高级选项，请参阅 [Mem0 MCP 设置](/platform/mem0-mcp)。
 
-For per-client setup and advanced options, see [Mem0 MCP Setup](/platform/mem0-mcp).
+## 通用启动提示
 
-## Universal Starter Prompt
-
-Copy this into any AI tool to start building with Mem0:
-
-```text
+将其复制到任何 AI 工具中以开始使用 Mem0 进行构建：```text
 I want to start building with Mem0 — a self-improving memory layer for LLM
 applications that gives agents persistent context across sessions.
 
@@ -127,20 +118,19 @@ Sub-50ms retrieval. Dual storage: vector embeddings + graph databases.
 Help me integrate Mem0 into my project. Start by asking what I'm building,
 what language/framework I'm using, and whether I want managed or self-hosted.
 ```
+## 更深入
 
-## Go Deeper
-
-<CardGroup cols={2}>
-  <Card title="Platform Quickstart" icon="cloud" href="/platform/quickstart">
-    Get started with the managed API
-  </Card>
-  <Card title="Open Source" icon="code-branch" href="/open-source/overview">
-    Self-host with full control
-  </Card>
+<卡组列={2}>
+  <Card title="平台快速入门" icon="cloud" href="/platform/quickstart">
+    开始使用托管 API
+  </卡>
+  <Card title="开源" icon="code-branch" href="/open-source/overview">
+    完全控制的自托管
+  </卡>
   <Card title="Cookbooks" icon="book" href="/cookbooks/overview">
-    Production-ready tutorials and examples
-  </Card>
-  <Card title="API Reference" icon="code" href="/api-reference">
-    Explore every REST endpoint
-  </Card>
-</CardGroup>
+    生产就绪的教程和示例
+  </卡>
+  <Card title="API 参考" icon="code" href="/api-reference">
+    探索每个 REST 端点
+  </卡>
+</卡组>

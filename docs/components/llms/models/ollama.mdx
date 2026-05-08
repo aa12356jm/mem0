@@ -3,12 +3,15 @@ title: Ollama
 description: "Configure Ollama as an LLM provider in Mem0 for running local language models with tool-calling support."
 ---
 
-You can use LLMs from Ollama to run Mem0 locally. These [models](https://ollama.com/search?c=tools) support tool calling.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Usage
 
-<CodeGroup>
-```python Python
+
+您可以使用 Ollama 的 LLM 在本地运行 Mem0。这些[模型](https://ollama.com/search?c=tools)支持工具调用。
+
+## 用法
+
+<代码组>```python Python
 import os
 from mem0 import Memory
 
@@ -58,8 +61,8 @@ const messages = [
 ]
 await memory.add(messages, { userId: "alice", metadata: { category: "movies" } });
 ```
-</CodeGroup>
+</代码组>
 
-## Config
+## 配置
 
-All available parameters for the `ollama` config are present in [Master List of All Params in Config](../config).
+`ollama` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

@@ -4,28 +4,28 @@ description: "Narrative recipe structure for end-to-end Mem0 workflows."
 icon: "book-open"
 ---
 
-# Cookbook Template
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Cookbooks are narrative tutorials. They start with a real problem, show the broken path, then layer production-ready fixes. Use this template verbatim so every contributor (human or LLM) ships the same experience.
+# 食谱模板
 
----
-
-## ❌ DO NOT COPY — Guidance & Constraints
-- Tell a story: problem → broken demo → iterative fixes → production patterns.
-- Keep tone conversational; use real names ("Max", "Sarah"), not `user_123`.
-- Opening must stay tight: ≤2 short paragraphs (no bullet lists) before the first section.
-- Inline expected outputs immediately after each code block.
-- When modernizing an existing cookbook, keep the narrative beats, screenshots, and sample outputs—reshape them into this arc instead of rewriting unless the workflow changed.
-- Limit callouts to 3–5 per page. Prefer narrative text over stacked boxes.
-- Always provide Python **and** TypeScript tabs when an SDK exists for both.
-- Every page must end with exactly two navigation cards (left = related/side quest, right = next cookbook in the journey).
+食谱是叙述性教程。他们从一个实际问题开始，显示损坏的路径，然后分层进行生产就绪修复。逐字使用此模板，以便每个贡献者（人类或法学硕士）都能获得相同的体验。
 
 ---
 
-## ✅ COPY THIS — Content Skeleton
-Paste the block below into a new cookbook, then replace all placeholders. Remove any section you don't need **only after** the happy path works.
+## ❌ 请勿复制 — 指南和限制
+- 讲一个故事：问题→损坏的演示→迭代修复→生产模式。
+- 保持对话的语气；使用真实姓名（“Max”、“Sarah”），而不是“user_123”。
+- 开头必须保持紧凑：第一部分之前≤2 个短段落（无项目符号列表）。
+- 在每个代码块之后立即内联预期输出。
+- 在对现有食谱进行现代化改造时，保留叙述节拍、屏幕截图和示例输出——将它们重新塑造成这个弧线，而不是重写，除非工作流程发生了变化。
+- 将标注限制为每页 3-5 个。比起堆叠的盒子，更喜欢叙述性文本。- 当 Python ** 和 ** TypeScript 选项卡都存在 SDK 时，始终提供两者。
+- 每个页面必须以两张导航卡结尾（左=相关/支线任务，右=旅程中的下一本食谱）。
 
-```mdx
+---## ✅ 复制此内容 — 内容骨架
+将下面的块粘贴到新的食谱中，然后替换所有占位符。 **只有在**快乐的路径起作用之后才删除您不需要的任何部分。
+
+```
+mdx
 ---
 title: [Cookbook title — action oriented]
 description: [1 sentence outcome]
@@ -45,11 +45,14 @@ description: [1 sentence outcome]
 
 ## Setup
 
-```python
-default_language = "python"  # replace with real imports
 ```
-```typescript
-// Equivalent TypeScript setup goes here
+python
+default_language = "python" # 替换为真正的导入
+```
+
+```
+typescript
+// 等效的 TypeScript 设置位于此处
 ```
 
 <Note>
@@ -60,11 +63,14 @@ Mention any prerequisites (API keys, environment variables) right here if the re
 
 [Set context with characters + goal.]
 
-```python
-# Happy-path example
 ```
-```typescript
-// Happy-path example (TypeScript)
+python
+# 快乐路径示例
+```
+
+```
+typescript
+// 快乐路径示例 (TypeScript)
 ```
 
 <Info icon="check">
@@ -75,16 +81,21 @@ Expected output (Python): `[describe inline]`  ·  Expected output (TypeScript):
 
 [Explain what breaks without tuning.]
 
-```python
-# Broken behaviour
 ```
-```typescript
-// Broken behaviour
+python
+# 损坏的行为
+```
+
+```
+typescript
+// 损坏的行为
 ```
 
 **Output:**
+
 ```
-[Paste noisy output]
+
+[粘贴噪声输出]
 ```
 
 [One sentence on why the result is unacceptable.]
@@ -93,24 +104,33 @@ Expected output (Python): `[describe inline]`  ·  Expected output (TypeScript):
 
 [Explain the fix and why it helps.]
 
-```python
-# Improved implementation
 ```
-```typescript
-// Improved implementation
+python
+# 改进实施
+```
+
+```
+typescript
+// 改进的实现
 ```
 
 **Retest:**
-```python
-# Same test as before
+
 ```
-```typescript
-// Same test as before
+python
+# 与之前相同的测试
+```
+
+```
+typescript
+// 与之前相同的测试
 ```
 
 **Output:**
+
 ```
-[Cleaner result]
+
+[更干净的结果]
 ```
 
 [Highlight the improvement + remaining gap if any.]
@@ -119,11 +139,14 @@ Expected output (Python): `[describe inline]`  ·  Expected output (TypeScript):
 
 [Add another enhancement, e.g., metadata filters, rerankers, batching.]
 
-```python
-# Additional refinement
 ```
-```typescript
-// Additional refinement
+python
+# 额外的细化
+```
+
+```
+typescript
+// 额外的细化
 ```
 
 <Warning>
@@ -133,19 +156,34 @@ Call out the most common mistake or edge case for this layer.
 ## Production Patterns
 
 - **[Pattern 1]** — `[When to use it]`
-  ```python
-  # Example snippet
-  ```
-  ```typescript
-  // Example snippet
-  ```
+  
+
+```
+python
+# 示例片段  
+```
+
+  
+
+```
+typescript
+// 示例片段  
+```
+
 - **[Pattern 2]** — `[When to use it]`
-  ```python
-  # Example snippet
-  ```
-  ```typescript
-  // Example snippet
-  ```
+  
+
+```
+python
+# 示例片段  
+```
+
+  
+
+```
+typescript
+// 示例片段  
+```
 
 ## What You Built
 
@@ -175,20 +213,21 @@ Call out the most common mistake or edge case for this layer.
     href="#next-link"
   />
 </CardGroup>
+
 ```
 
 ---
 
-## ✅ Publish Checklist (Keep Handy)
-- [ ] Replace every `[placeholder]` and remove unused sections.
-- [ ] Python & TypeScript code compile (or TypeScript omitted with explicit `<Note>` stating language limitation).
-- [ ] Each code block is followed by output + `<Info icon="check">` or inline equivalent.
-- [ ] Callouts ≤ 5 total; no emoji, only Mintlify icons.
-- [ ] Exactly two cards in the final `<CardGroup cols={2}>`.
-- [ ] Added verification narrative (what success looks like) in every major step.
-- [ ] Linked related docs (cookbooks, guides, reference) in Next Steps.
+## ✅ 发布清单（放在手边）
+- [ ] 替换每个“[占位符]”并删除未使用的部分。
+- [ ] Python 和 TypeScript 代码编译（或省略 TypeScript，并明确声明语言限制）。
+- [ ] 每个代码块后面都跟有输出 + `<Info icon="check">` 或内联等效项。
+- [ ] 标注总数 ≤ 5；没有表情符号，只有 Mintlify 图标。
+- [ ] 最终“<CardGroup cols={2}>”中恰好有两张卡。
+- [ ] 在每个主要步骤中添加了验证叙述（成功是什么样子）。
+- [ ] 后续步骤中链接的相关文档（食谱、指南、参考）。
 
-Stick to the skeleton above. If you need to deviate, document the rationale in the PR so we can update the template for everyone else.
+坚持上面的骨架。如果您需要偏离，请在 PR 中记录理由，以便我们可以为其他人更新模板。
 ```
 
 ## Browse Other Templates
@@ -282,3 +321,5 @@ Stick to the skeleton above. If you need to deviate, document the rationale in t
     href="/platform/overview"
   />
 </CardGroup>
+
+```

@@ -3,70 +3,58 @@ title: Claude Code
 description: "Add persistent memory to Claude Code and Claude Cowork with the Mem0 plugin — MCP server, lifecycle hooks, and SDK skill."
 ---
 
-Add persistent memory to [**Claude Code**](https://docs.anthropic.com/en/docs/claude-code) (CLI) and **Claude Cowork** (desktop app) with the Mem0 plugin. Your agent forgets everything between sessions — this plugin fixes that by connecting to Mem0's cloud memory layer via MCP, automatically capturing learnings at key lifecycle points, and retrieving relevant context before every response.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-1. **MCP Server** — Connect to Mem0's remote MCP server for memory tools (add, search, update, delete)
-2. **Lifecycle Hooks** — Automatic memory capture at session start, context compaction, task completion, and session end
-3. **SDK Skill** — Teaches the agent how to integrate the Mem0 SDK into your applications
-4. **Zero local dependencies** — Cloud-hosted MCP server, no local setup required
 
-## Prerequisites
+使用 Mem0 插件将持久内存添加到 [**Claude Code**](https://docs.anthropic.com/en/docs/claude-code) (CLI) 和 **Claude Cowork**（桌面应用程序）。您的代理会忘记会话之间的所有内容 - 该插件通过 MCP 连接到 Mem0 的云存储层、自动捕获关键生命周期点的学习内容并在每次响应之前检索相关上下文来修复该问题。
 
-Before setting up Mem0 with Claude Code, ensure you have:
+## 概述
 
-1. A Mem0 Platform account and API key:
-   - <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-claude-code" rel="nofollow">Sign up at app.mem0.ai</a>
-   - <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-claude-code" rel="nofollow">Get your API key</a> (starts with `m0-`)
+1. **MCP服务器** — 连接Mem0的远程MCP服务器以获取内存工具（添加、搜索、更新、删除）
+2. **生命周期挂钩** - 在会话开始、上下文压缩、任务完成和会话结束时自动捕获内存
+3. **SDK 技能** — 教代理如何将 Mem0 SDK 集成到您的应用程序中
+4. **零本地依赖** — 云托管的 MCP 服务器，无需本地设置
 
-2. Claude Code CLI or Claude Cowork desktop app installed
+## 先决条件
 
-3. Your API key exported in your shell:
+在使用 Claude Code 设置 Mem0 之前，请确保您拥有：1. Mem0 平台帐户和 API 密钥：
+   - <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-claude-code" rel="nofollow">在 app.mem0.ai 注册</a>
+   - <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-claude-code" rel="nofollow">获取您的 API 密钥</a>（以 `m0-` 开头）
 
-```bash
+2. 安装 Claude Code CLI 或 Claude Cowork 桌面应用程序
+
+3. 在 shell 中导出您的 API 密钥：```bash
 export MEM0_API_KEY="m0-your-api-key"
 ```
+## 安装
 
-## Installation
+### 选项 A — 插件市场（推荐）
 
-### Option A — Plugin Marketplace (Recommended)
+安装完整的插件，包括 MCP 服务器、生命周期挂钩和 SDK 技能。
 
-Install the full plugin including MCP server, lifecycle hooks, and SDK skill.
-
-1. Add the Mem0 marketplace:
-
-   ```
+1. 添加Mem0市场：   ```
    /plugin marketplace add mem0ai/mem0
    ```
-
-2. Install the plugin:
-
-   ```
+2.安装插件：   ```
    /plugin install mem0@mem0-plugins
    ```
+**Claude Cowork 桌面应用程序：** 打开 Cowork 选项卡，单击侧边栏中的 **自定义**，单击 **浏览插件**，然后安装 Mem0。
 
-**Claude Cowork desktop app:** Open the Cowork tab, click **Customize** in the sidebar, click **Browse plugins**, and install Mem0.
+### 选项 B — 仅 MCP
 
-### Option B — MCP Only
-
-Add the Mem0 MCP server directly with a single command:
-
-```bash
+使用单个命令直接添加 Mem0 MCP 服务器：```bash
 npx mcp-add \
   --name mem0-mcp \
   --type http \
   --url "https://mcp.mem0.ai/mcp" \
   --clients "claude code"
 ```
+这为您提供了 MCP 工具，但没有生命周期挂钩或 SDK 技能。
 
-This gives you the MCP tools but not the lifecycle hooks or SDK skill.
+### 选项 C — 手动 MCP 配置
 
-### Option C — Manual MCP Configuration
-
-Add to your Claude Code MCP config (`.mcp.json`):
-
-```json
+添加到您的 Claude Code MCP 配置（`.mcp.json`）：```json
 {
   "mcpServers": {
     "mem0": {
@@ -79,57 +67,49 @@ Add to your Claude Code MCP config (`.mcp.json`):
   }
 }
 ```
+<信息图标=“检查”>
+  开始一个新会话并询问：*“列出我的 mem0 实体”* 或 *“搜索我的记忆中的 hello”*。如果“mem0”工具出现并响应，则一切就绪。</信息>
 
-<Info icon="check">
-  Start a new session and ask: *"List my mem0 entities"* or *"Search my memories for hello"*. If the `mem0` tools appear and respond, you're all set.
-</Info>
+## 包含什么
 
-## What's Included
+|组件|插件安装 |仅 MCP |
+|------------|:--------------:|:--------:|
+| MCP 服务器（9 个内存工具）|是的 |是的 |
+|生命周期钩子 |是的 |没有 |
+| Mem0 SDK技巧 |是的 |没有 |
 
-| Component | Plugin Install | MCP Only |
-|-----------|:--------------:|:--------:|
-| MCP Server (9 memory tools) | Yes | Yes |
-| Lifecycle Hooks | Yes | No |
-| Mem0 SDK Skill | Yes | No |
+## 可用的 MCP 工具
 
-## Available MCP Tools
+安装后，每个 Claude Code 会话中都可以使用以下工具：
 
-Once installed, the following tools are available in every Claude Code session:
-
-| Tool | Description |
+|工具|描述 |
 |------|-------------|
-| `add_memory` | Save text or conversation history for a user/agent |
-| `search_memories` | Semantic search across memories with filters |
-| `get_memories` | List memories with filters and pagination |
-| `get_memory` | Retrieve a specific memory by ID |
-| `update_memory` | Overwrite a memory's text by ID |
-| `delete_memory` | Delete a single memory by ID |
-| `delete_all_memories` | Bulk delete all memories in scope |
-| `delete_entities` | Delete a user/agent/app/run entity and its memories |
-| `list_entities` | List users/agents/apps/runs stored in Mem0 |
+| `添加内存` |保存用户/代理的文本或对话历史记录 |
+| `搜索记忆` |使用过滤器跨记忆进行语义搜索 |
+| `获取记忆` |使用过滤器和分页列出记忆 |
+| `获取内存` |通过ID检索特定内存|
+| `更新内存` |按 ID 覆盖内存文本 |
+| `删除内存` |通过ID删除单个内存|
+| `删除所有记忆` |批量删除范围内的所有内存|
+| `删除实体` |删除用户/代理/应用程序/运行实体及其内存 |
+| `列表实体` |列出存储在 Mem0 中的用户/代理/应用程序/运行 |
 
-## Lifecycle Hooks
+## 生命周期挂钩当通过插件市场安装时，Mem0 会挂钩 Claude Code 的生命周期来自动管理内存：
 
-When installed via the plugin marketplace, Mem0 hooks into Claude Code's lifecycle to automatically manage memory:
+### 会话开始
+在每个新会话中，该插件都会提示 Claude 调用“search_memories”以加载先前会话中的相关上下文。在恢复或压缩后会话中，它会相应地调整提示。
 
-### Session Start
-On every new session, the plugin prompts Claude to call `search_memories` to load relevant context from prior sessions. On resumed or post-compaction sessions, it adjusts the prompt accordingly.
+### 用户提示
+在处理每个用户消息之前，插件会在 Mem0 中搜索与当前提示相关的内存，并将它们注入上下文中。跳过短提示（< 20 个字符）以最大限度地减少延迟。
 
-### User Prompt
-Before processing each user message, the plugin searches Mem0 for memories relevant to the current prompt and injects them into context. Short prompts (< 20 characters) are skipped to minimize latency.
+### 预压实
+在上下文压缩之前，该插件会提示 Claude 存储全面的会话摘要 - 包括目标、成就、决策、修改的文件和当前状态 - 因此不会丢失任何内容。### 任务完成
+每次任务完成后，该插件都会提示 Claude 提取并存储关键知识：成功的策略、失败的方法、架构决策和新约定。
 
-### Pre-Compaction
-Before context compaction, the plugin prompts Claude to store a comprehensive session summary — including goals, accomplishments, decisions, modified files, and current state — so nothing is lost.
+### 会议结束
+当 Claude 完成响应时，该插件会提示任何未存储的学习内容，并通过 Mem0 REST API 捕获转录状态作为后台安全网。
 
-### Task Completed
-After each task completion, the plugin prompts Claude to extract and store key learnings: successful strategies, failed approaches, architectural decisions, and new conventions.
-
-### Session End
-When Claude finishes responding, the plugin prompts for any unstored learnings and captures transcript state via the Mem0 REST API as a background safety net.
-
-## Example Workflow
-
-```text
+## 工作流程示例```text
 # Session 1: Working on a feature
 You: Let's refactor the auth module to use JWT tokens instead of sessions.
 
@@ -146,18 +126,15 @@ You: Add refresh token rotation to the auth system.
 # Knows the file structure, decisions made, and user preferences.
 # Continues seamlessly without re-explaining the codebase.
 ```
+## 故障排除
 
-## Troubleshooting
-
-- **"Connection failed"** — Verify `MEM0_API_KEY` is set in your shell: `echo $MEM0_API_KEY`
-- **No tools appearing** — Restart your Claude Code session after installation
-- **Memories not being captured** — Ensure you installed via the plugin marketplace (Option A) for lifecycle hooks. MCP-only installs require manual memory operations.
-
-<CardGroup cols={2}>
-  <Card title="Mem0 MCP Setup" icon="puzzle-piece" href="/platform/mem0-mcp">
-    Detailed MCP configuration for all clients
-  </Card>
+- **“连接失败”** — 验证您的 shell 中是否设置了“MEM0_API_KEY”：“echo $MEM0_API_KEY”
+- **没有出现工具** — 安装后重新启动 Claude Code 会话
+- **未捕获记忆** — 确保您通过生命周期挂钩的插件市场（选项 A）安装。仅 MCP 安装需要手动内存操作。<卡组列={2}>
+  <Card title="Mem0 MCP 设置" icon="puzzle-piece" href="/platform/mem0-mcp">
+    所有客户端的详细 MCP 配置
+  </卡>
   <Card title="Codex Integration" icon={<svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.5565 10.6338C21.0009 9.27575 20.8528 7.76958 20.1367 6.53501C19.0503 4.63378 16.8528 3.67081 14.7046 4.11526C13.7663 3.05353 12.3836 2.46094 10.9515 2.46094C8.75399 2.46094 6.82807 3.86835 6.13671 5.94242C4.7293 6.23872 3.51943 7.10291 2.80338 8.36217C1.71696 10.2634 1.96387 12.6338 3.42066 14.2634C2.97622 15.6461 3.14906 17.1276 3.8651 18.3622C4.95152 20.2634 7.14906 21.2511 9.2972 20.7819C10.2602 21.8437 11.6182 22.4609 13.0503 22.4609C15.2478 22.4609 17.1737 21.0535 17.8651 18.9795C19.2725 18.6832 20.4824 17.819 21.1984 16.5597C22.2849 14.6585 22.0379 12.2634 20.5565 10.6338ZM13.0503 21.1523C12.1614 21.1523 11.3219 20.856 10.6552 20.2881C10.6799 20.2634 10.754 20.2387 10.7787 20.214L14.754 17.9177C14.9515 17.7943 15.075 17.5967 15.075 17.3498V11.7449L16.754 12.7079C16.7787 12.7079 16.7787 12.7325 16.7787 12.7572V17.3992C16.8034 19.4733 15.1244 21.1523 13.0503 21.1523ZM5.00091 17.7202C4.55646 16.9548 4.40831 16.0659 4.55646 15.2017C4.58115 15.2264 4.63054 15.2511 4.67992 15.2758L8.65523 17.572C8.85276 17.6955 9.09967 17.6955 9.2972 17.572L14.1614 14.7572V16.7079C14.1614 16.7325 14.1614 16.7572 14.1367 16.7572L10.112 19.0782C8.33424 20.1153 6.03794 19.498 5.00091 17.7202ZM3.96387 9.02884C4.40831 8.26341 5.09967 7.69551 5.91449 7.37452V12.1153C5.91449 12.3375 6.03794 12.5597 6.23548 12.6832L11.0997 15.498L9.42066 16.4609C9.39597 16.4609 9.37128 16.4856 9.37128 16.4609L5.34659 14.1399C3.51943 13.1029 2.92683 10.8066 3.96387 9.02884ZM17.791 12.2387L12.9268 9.4239L14.6058 8.46094C14.6305 8.46094 14.6552 8.43625 14.6552 8.46094L18.6799 10.7819C20.4824 11.819 21.075 14.1153 20.0379 15.893C19.5935 16.6585 18.9021 17.2264 18.0873 17.5227V12.8066C18.112 12.5844 17.9886 12.3622 17.791 12.2387ZM19.4454 9.7202C19.4207 9.69551 19.3713 9.67081 19.3219 9.64612L15.3466 7.34983C15.1491 7.22637 14.9021 7.22637 14.7046 7.34983L9.84041 10.1646V8.21402C9.84041 8.18933 9.84041 8.16464 9.86511 8.16464L13.8898 5.84365C15.6923 4.80662 17.9639 5.4239 19.0009 7.22637C19.4454 7.96711 19.5935 8.856 19.4454 9.7202ZM8.92683 13.177L7.24782 12.214C7.22313 12.214 7.22313 12.1893 7.22313 12.1646V7.52267C7.22313 5.44859 8.90214 3.76958 10.9762 3.76958C11.8651 3.76958 12.7046 4.06588 13.3713 4.63378C13.3466 4.65847 13.2972 4.68316 13.2478 4.70785L9.27251 7.00415C9.07498 7.1276 8.95152 7.32514 8.95152 7.57205V13.177H8.92683ZM9.84041 11.2017L12.0133 9.94242L14.1861 11.2017V13.6955L12.0133 14.9548L9.84041 13.6955V11.2017Z" fill="currentColor"/></svg>} href="/integrations/codex">
-    Add Mem0 memory to OpenAI Codex workflows
-  </Card>
-</CardGroup>
+    将 Mem0 内存添加到 OpenAI Codex 工作流程
+  </卡>
+</卡组>

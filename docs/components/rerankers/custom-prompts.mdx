@@ -3,13 +3,15 @@ title: Custom Prompts
 description: "Customize the LLM reranker prompt template in Mem0 to control how search results are ranked and scored."
 ---
 
-When using LLM rerankers, you can customize the prompts used for ranking to better suit your specific use case and domain.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Default Prompt
 
-The default LLM reranker prompt scores each memory individually on a 0.0-1.0 scale:
 
-```
+使用 LLM 重新排名器时，您可以自定义用于排名的提示，以更好地适合您的特定用例和领域。
+
+## 默认提示
+
+默认的 LLM reranker 提示按 0.0-1.0 的等级分别对每个内存进行评分：```
 You are a relevance scoring assistant. Given a query and a document, you need to score how relevant the document is to the query.
 
 Score the relevance on a scale from 0.0 to 1.0, where:
@@ -24,12 +26,9 @@ Document: "{document}"
 
 Provide only a single numerical score between 0.0 and 1.0. Do not include any explanation or additional text.
 ```
+## 自定义提示配置
 
-## Custom Prompt Configuration
-
-You can provide a custom prompt template using the `scoring_prompt` parameter:
-
-```python
+您可以使用“scoring_prompt”参数提供自定义提示模板：```python
 from mem0 import Memory
 
 custom_prompt = """
@@ -58,25 +57,22 @@ config = {
 
 memory = Memory.from_config(config)
 ```
+## 提示变量
 
-## Prompt Variables
+您的自定义提示可以使用以下变量：
 
-Your custom prompt can use the following variables:
+|变量|描述 |
+| ------------ | -------------------------------------- |
+| `{查询}` |搜索查询 |
+| `{文档}` |正在评分的内存条目 |
 
-| Variable     | Description                   |
-| ------------ | ----------------------------- |
-| `{query}`    | The search query              |
-| `{document}` | The memory entry being scored |
+<注意>
+  自定义提示中需要“{query}”和“{document}”。 LLM 重新排序器针对查询单独对每个内存进行评分，因此每个候选内存都会调用一次提示。
+</注>
 
-<Note>
-  Both `{query}` and `{document}` are required in your custom prompt. The LLM reranker scores each memory individually against the query, so the prompt is called once per candidate memory.
-</Note>
+## 特定领域的示例
 
-## Domain-Specific Examples
-
-### Customer Support
-
-```python
+### 客户支持```python
 customer_support_prompt = """
 You are ranking customer support conversation memories.
 Prioritize memories that:
@@ -90,10 +86,7 @@ Memory: "{document}"
 Score relevance from 0.0 to 1.0.
 """
 ```
-
-### Educational Content
-
-```python
+### 教育内容```python
 educational_prompt = """
 Score this learning memory for relevance to a student query.
 Consider:
@@ -107,10 +100,7 @@ Memory: "{document}"
 Score educational relevance from 0.0 to 1.0.
 """
 ```
-
-### Personal Assistant
-
-```python
+### 私人助理```python
 personal_assistant_prompt = """
 Score this personal memory for relevance to the user's query.
 Consider:
@@ -124,12 +114,9 @@ Memory: "{document}"
 Provide relevance score from 0.0 to 1.0.
 """
 ```
+## 高级提示技巧
 
-## Advanced Prompt Techniques
-
-### Multi-Criteria Scoring
-
-```python
+### 多标准评分```python
 multi_criteria_prompt = """
 Evaluate this memory using multiple criteria:
 
@@ -145,10 +132,7 @@ Compute a weighted score from 0.0 to 1.0 based on these criteria.
 Provide only the final numerical score.
 """
 ```
-
-### Chain-of-Thought Scoring
-
-```python
+### 思维链评分```python
 reasoning_prompt = """
 Evaluate this memory's relevance step by step:
 
@@ -164,20 +148,17 @@ Memory: "{document}"
 Score:
 """
 ```
+## 最佳实践
 
-## Best Practices
+1. **具体**：明确定义内存与您的用例相关的原因
+2. **使用 0.0-1.0 等级**：分数提取器期望值介于 0.0 和 1.0 之间
+3. **仅请求分数**：仅请求数字分数以提高提取可靠性
+4. **迭代测试**：根据实际排名表现完善提示
+5. **考虑令牌限制**：保持提示简洁而全面
 
-1. **Be Specific**: Clearly define what makes a memory relevant for your use case
-2. **Use 0.0-1.0 Scale**: The score extractor expects values between 0.0 and 1.0
-3. **Request Only the Score**: Ask for just the numerical score to improve extraction reliability
-4. **Test Iteratively**: Refine your prompt based on actual ranking performance
-5. **Consider Token Limits**: Keep prompts concise while being comprehensive
+## 及时测试
 
-## Prompt Testing
-
-You can test different prompts by comparing ranking results:
-
-```python
+您可以通过比较排名结果来测试不同的提示：```python
 # Test multiple prompt variations
 prompts = [
     default_prompt,
@@ -192,10 +173,9 @@ for i, prompt in enumerate(prompts):
     results = memory.search("test query", filters={"user_id": "test_user"})
     print(f"Prompt {i+1} results: {results}")
 ```
+## 常见问题
 
-## Common Issues
-
-- **Too Long**: Keep prompts under token limits for your chosen LLM
-- **Too Vague**: Be specific about scoring criteria
-- **Wrong Scale**: Use 0.0-1.0 scale to match the default score extractor
-- **Extra Output**: Ask for only the numeric score — extra text can confuse score extraction
+- **太长**：将提示保持在您选择的 LLM 的令牌限制范围内
+- **太模糊**：具体说明评分标准
+- **错误的比例**：使用 0.0-1.0 比例来匹配默认分数提取器
+- **额外输出**：仅要求数字分数 - 额外的文本可能会混淆分数提取

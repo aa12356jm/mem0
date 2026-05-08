@@ -4,215 +4,192 @@ description: "Stand up the Mem0 REST server and dashboard in a few minutes — a
 icon: "rocket-launch"
 ---
 
-The self-hosted bundle ships the REST API and a web dashboard together. Configure your LLM provider and secrets in a `.env` file, start the containers, then choose how to create your admin account: through the browser-based setup wizard, or from the command line.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-<Info>
-  **Use this page when…**
-  - You want a self-hosted Mem0 with a dashboard, not just the Python or Node library.
-  - You need per-user API keys and a request audit log for your team.
-  - You're upgrading from a pre-1.x server that relied on `ADMIN_API_KEY` or open endpoints.
-</Info>
 
-<Warning>
-  **Upgrading from 1.x?** Auth is now on by default. Deployments that ran with an empty `ADMIN_API_KEY` will return `401` on every protected endpoint until you either set `ADMIN_API_KEY`, register an admin through the wizard, or set `AUTH_DISABLED=true` for local development. See [Upgrade notes](#upgrade-notes) below.
-</Warning>
 
----
+自托管捆绑包同时提供 REST API 和 Web 仪表板。在“.env”文件中配置您的 LLM 提供程序和机密，启动容器，然后选择如何创建管理员帐户：通过基于浏览器的设置向导或从命令行。
 
-## Prerequisites
+<信息>
+  **当……时使用此页面**
+  - 您想要一个带有仪表板的自托管 Mem0，而不仅仅是 Python 或 Node 库。
+  - 您需要每个用户的 API 密钥和您团队的请求审核日志。
+  - 您正在从依赖“ADMIN_API_KEY”或开放端点的 1.x 之前的服务器进行升级。
+</信息>
 
-- Docker and Docker Compose (the reference path).
-- An `OPENAI_API_KEY` (or equivalent — the server reads the same component config as the library).
-- A free port `8888` for the API and `3000` for the dashboard.
+<警告>
+  **从 1.x 升级？** 现在默认启用身份验证。使用空“ADMIN_API_KEY”运行的部署将在每个受保护端点上返回“401”，直到您设置“ADMIN_API_KEY”、通过向导注册管理员或为本地开发设置“AUTH_DISABLED=true”。请参阅下面的[升级说明](#upgrade-notes)。</警告>
 
 ---
 
-## Configure the environment
+## 先决条件
 
-Copy `server/.env.example` to `server/.env` and fill in the required values. The server refuses to start if `JWT_SECRET` is unset once auth is enabled.
+- Docker 和 Docker Compose（参考路径）。
+- `OPENAI_API_KEY` （或等效项 — 服务器读取与库相同的组件配置）。
+- 用于 API 的免费端口“8888”和用于仪表板的“3000”。
 
-| Variable | Required | Purpose |
+---
+
+## 配置环境将 `server/.env.example` 复制到 `server/.env` 并填写所需的值。如果启用身份验证后未设置“JWT_SECRET”，服务器将拒绝启动。
+
+|变量|必填 |目的|
 |---|---|---|
-| `OPENAI_API_KEY` | Yes | Default LLM and embedder provider. |
-| `JWT_SECRET` | Yes | Signs access and refresh tokens. Use a long random value. A missing secret causes auth endpoints to return `500`. |
-| `ADMIN_API_KEY` | Optional | Legacy shared admin key. Kept for back-compat; prefer per-user keys for new setups. |
-| `AUTH_DISABLED` | Optional | `true` turns off auth for local development only. Never enable in production. |
-| `DASHBOARD_URL` | Optional | Origin the API accepts for CORS. Defaults to `http://localhost:3000`. Set this when you front the dashboard on a custom domain. |
-| `POSTGRES_*` | Optional | Override the bundled Postgres / pgvector connection. |
+| `OPENAI_API_KEY` |是的 |默认法学硕士和嵌入器提供商。 |
+| `JWT_SECRET` |是的 |签署访问和刷新令牌。使用长随机值。丢失机密会导致身份验证端点返回“500”。 |
+| `ADMIN_API_KEY` |可选|旧版共享管理密钥。保留用于向后兼容；对于新设置更喜欢每用户密钥。 |
+| `AUTH_DISABLED` |可选| `true` 仅关闭本地开发的身份验证。切勿在生产中启用。 |
+| `仪表板_URL` |可选| API 接受 CORS 的来源。默认为“http://localhost:3000”。当您将仪表板置于自定义域中时，请设置此项。 |
+| `POSTGRES_*` |可选|覆盖捆绑的 Postgres / pgvector 连接。|
 
-<Tip>
-  Generate a `JWT_SECRET` with `openssl rand -base64 48` or `python -c "import secrets; print(secrets.token_urlsafe(48))"`.
-</Tip>
+<提示>
+  使用 `openssl rand -base64 48` 或 `python -c "import Secrets; print(secrets.token_urlsafe(48))"` 生成 `JWT_SECRET`。
+</提示>
 
 ---
 
-## Start the stack
+## 启动堆栈
 
-Pick the path that fits your workflow.
+选择适合您的工作流程的路径。
 
-### Browser-first (setup wizard)
-
-```bash
+### 浏览器优先（设置向导）```bash
 cd server
 make up
 ```
+这将启动容器并运行数据库迁移。 REST API 监听“http://localhost:8888”，仪表板监听“http://localhost:3000”。
 
-This starts the containers and runs database migrations. The REST API listens on `http://localhost:8888` and the dashboard on `http://localhost:3000`.
+打开“http://localhost:3000”——由于尚不存在管理员帐户，仪表板将重定向到位于“/setup”的一次性设置向导。请参阅下面的[运行安装向导](#run-the-setup-wizard)。
 
-Open `http://localhost:3000` — since no admin account exists yet, the dashboard redirects to the one-time setup wizard at `/setup`. See [Run the setup wizard](#run-the-setup-wizard) below.
+### 代理优先（命令行）
 
-### Agent-first (command line)
-
-First, set `OPENAI_API_KEY` (or `ANTHROPIC_API_KEY` / `GOOGLE_API_KEY`) in `server/.env`. `make bootstrap` does not prompt for it, and the runtime test will fail without a valid provider key.
-
-```bash
+首先，在“server/.env”中设置“OPENAI_API_KEY”（或“ANTHROPIC_API_KEY”/“GOOGLE_API_KEY”）。 `make bootstrap` 不会提示，如果没有有效的提供程序密钥，运行时测试将失败。```bash
 cd server
 make bootstrap
 ```
+`make bootstrap` 启动相同的容器，然后自动创建管理员帐户并通过 CLI 生成第一个 API 密钥。管理员凭据和 API 密钥将打印到您的终端 — 无需浏览器。
 
-`make bootstrap` starts the same containers, then automatically creates the admin account and generates the first API key via the CLI. The admin credentials and API key are printed to your terminal — no browser required.
-
-You can override the generated credentials:
-
-```bash
+您可以覆盖生成的凭据：```bash
 make bootstrap EMAIL=admin@company.com PASSWORD='strong-password' NAME='Admin'
 ```
+因为“make bootstrap”已经创建了管理员，所以会跳过设置向导。打开“http://localhost:3000”将直接进入登录页面。
 
-Because `make bootstrap` already creates the admin, the setup wizard is skipped. Opening `http://localhost:3000` takes you straight to the login page.
-
-<Tip>
-  For machine-readable output (useful in CI), run `OUTPUT=json make seed` after `make up`.
-</Tip>
-
----
-
-## Run the setup wizard
-
-<Info>
-  This section applies to the **browser-first** path (`make up`). If you used `make bootstrap`, the admin and API key were already created — skip ahead to [What the dashboard gives you](#what-the-dashboard-gives-you).
-</Info>
-
-On a fresh install the dashboard redirects to `/setup`. Each step submits on Enter.
-
-**1. Create the admin account.** Name, email, password. This account becomes the first admin. Registration closes after the first admin is created; additional accounts are provisioned by the existing admin.
-
-**2. Review the effective config.** Read-only display of the LLM and embedder the server is running with, sourced from your environment. If anything is wrong here, stop the stack, fix the `.env`, and restart — the dashboard intentionally does not let you change provider secrets at runtime.
-
-**3. Generate your first API key.** The full `m0sk_...` value is shown **once**. Copy it immediately — the server only stores the prefix and a bcrypt hash.
-
-**4. Tell us your use case.** Pick a preset or describe your use case in a few words. Mem0 generates custom instructions that tell the memory system what to prioritize. You can edit the instructions before saving, or skip this step entirely.
-
-**5. Test the key.** A ready-to-paste `curl` exercises `POST /memories` against your new key. Click "Run Test" to fire it from the browser. Success lands you in the dashboard at `/dashboard/requests`, where you'll see the test call in the live audit log.
+<提示>
+  对于机器可读的输出（在 CI 中有用），请在 `make up` 之后运行 `OUTPUT=json make seeds`。
+</提示>
 
 ---
 
-## What the dashboard gives you
+## 运行安装向导
 
-| Page | What it does |
+<信息>
+  本节适用于 **浏览器优先** 路径（`make up`）。如果您使用了“make bootstrap”，则已经创建了管理密钥和 API 密钥 - 向前跳到[仪表板为您提供的内容](#what-the-dashboard-gives-you)。
+</信息>
+
+全新安装时，仪表板会重定向到“/setup”。每个步骤都按 Enter 提交。
+
+**1.创建管理员帐户。** 姓名、电子邮件、密码。该帐户成为第一个管理员。创建第一个管理员后注册将关闭；其他帐户由现有管理员配置。
+
+**2.查看有效的配置。** 只读显示服务器正在运行的 LLM 和嵌入器，源自您的环境。如果这里出现任何问题，请停止堆栈，修复“.env”，然后重新启动 - 仪表板故意不允许您在运行时更改提供者机密。**3.生成您的第一个 API 密钥。** 完整的“m0sk_...”值将显示**一次**。立即复制它——服务器只存储前缀和 bcrypt 哈希值。
+
+**4.告诉我们您的用例。** 选择一个预设或用几句话描述您的用例。 Mem0 生成自定义指令，告诉内存系统优先考虑什么。您可以在保存之前编辑说明，或完全跳过此步骤。
+
+**5.测试密钥。** 准备粘贴的“curl”会针对您的新密钥执行“POST /memories”。单击“运行测试”以从浏览器中触发它。成功后，您将进入位于“/dashboard/requests”的仪表板，您将在实时审核日志中看到测试调用。
+
+---
+
+## 仪表板为您提供什么|页 |它有什么作用 |
 |---|---|
-| **Requests** | Default landing page. Live audit log of every API call, with status, latency, and auth mode. |
-| **Memories** | Browse and search the memories your server has stored. |
-| **Entities** | Distinct `user_id` / `agent_id` / `run_id` values with memory counts and cascade-delete. |
-| **API Keys** | Issue per-user keys, label them, and revoke. |
-| **Configuration** | Runtime override for LLM and embedder. Changes persist to the app database and reapply on restart, layered over the values from your `.env`. |
-| **Settings** | Account and session controls. |
+| **请求** |默认登陆页面。每个 API 调用的实时审核日志，包括状态、延迟和身份验证模式。 |
+| **回忆** |浏览并搜索服务器存储的内存。 |
+| **实体** |具有内存计数和级联删除功能的不同“user_id”/“agent_id”/“run_id”值。 |
+| **API 密钥** |颁发每个用户密钥、标记它们并撤销。 |
+| **配置** | LLM 和嵌入器的运行时覆盖。更改会保留到应用程序数据库中，并在重新启动时重新应用，并覆盖“.env”中的值。 |
+| **设置** |帐户和会话控制。 |
 
-For the underlying endpoints (including `/auth/*`, `/api-keys`, `/requests`, `/entities`), see the [REST API reference](/open-source/features/rest-api).
+对于底层端点（包括“/auth/*”、“/api-keys”、“/requests”、“/entities”），请参阅 [REST API 参考](/open-source/features/rest-api)。---
 
----
+## 支持的提供商
 
-## Supported providers
+运送的容器捆绑了 Python 包，用于：
 
-The shipped container bundles the Python packages for:
+- **法学硕士** — `openai`、`anthropic`、`gemini`
+- **嵌入器** — `openai`、`gemini`
 
-- **LLMs** — `openai`, `anthropic`, `gemini`
-- **Embedders** — `openai`, `gemini`
+配置页面和“POST /configure”仅接受这些列表中的提供程序。其他任何操作都会预先返回 400，而不是在第一次内存写入时失败。
 
-The Configuration page and `POST /configure` only accept providers from these lists. Anything else returns a 400 up front instead of failing at the first memory write.
+**添加另一个提供程序**，例如使用 `sentence-transformers` 在本地运行嵌入：1. 将包添加到`server/requirements.txt`（例如`sentence-transformers>=2.0`）。
+2. 在`server/main.py`中扩展`BUNDLED_LLM_PROVIDERS`或`BUNDLED_EMBEDDER_PROVIDERS`。
+3. 重建镜像（`make up`或`docker compose build`）。
 
-**To add another provider**, for example to run embeddings locally with `sentence-transformers`:
-
-1. Add the package to `server/requirements.txt` (e.g. `sentence-transformers>=2.0`).
-2. Extend `BUNDLED_LLM_PROVIDERS` or `BUNDLED_EMBEDDER_PROVIDERS` in `server/main.py`.
-3. Rebuild the image (`make up` or `docker compose build`).
-
-Heavy providers (`sentence-transformers` pulls in PyTorch, ~2 GB) are intentionally kept out of the default image.
+重型提供程序（PyTorch 中的“句子转换器”，约 2 GB）被有意排除在默认映像之外。
 
 ---
 
-## Upgrade notes
+## 升级注意事项
 
-### Upgrading from a pre-auth build
+### 从预授权版本升级
 
-Previous self-hosted builds allowed open access when `ADMIN_API_KEY` was unset. This build enables auth by default. After pulling the new image, pick **one**:
+以前的自托管版本允许在未设置“ADMIN_API_KEY”时进行开放访问。此版本默认启用身份验证。拉取新镜像后，选择**一个**：
 
-1. **Fastest, zero client changes** — set `ADMIN_API_KEY` to a long random value (16+ characters). Existing clients that send `X-API-Key: <your-key>` keep working unchanged.
-2. **Recommended for teams** — visit `http://<host>:3000`, run the setup wizard, and switch clients to per-user API keys. You get the audit log and revocation for free.
-3. **Local development only** — set `AUTH_DISABLED=true`. The server logs a warning on every boot. Never use this in production.
+1. **最快、零客户端更改** — 将“ADMIN_API_KEY”设置为长随机值（16 个以上字符）。发送“X-API-Key：<your-key>”的现有客户端保持不变。
+2. **建议团队** — 访问“http://<host>:3000”，运行设置向导，并将客户端切换到每用户 API 密钥。您免费获得审核日志和撤销。
+3. **仅限本地开发** — 设置“AUTH_DISABLED=true”。服务器在每次启动时都会记录一条警告。切勿在生产中使用它。
 
-The server prints an unmissable startup banner when it detects the "upgraded but not configured" state so you know exactly which option to pick.
+当服务器检测到“已升级但未配置”状态时，它会打印一个不容错过的启动横幅，以便您确切地知道选择哪个选项。### 此版本中的其他更改
 
-### Other changes in this release
+- Dashboard 作为参考 Compose 堆栈中的第二个容器提供，通过内部 Docker 网络连接到 API。
+- 新表：`users`、`api_keys`、`request_logs`。 Alembic 会在首次启动时自动处理迁移。
 
-- Dashboard ships as a second container in the reference Compose stack, wired to the API over the internal Docker network.
-- New tables: `users`, `api_keys`, `request_logs`. Alembic handles the migration automatically on first boot.
-
-If `alembic upgrade head` fails on first boot, see the [Troubleshooting](#troubleshooting) section below.
+如果“alembic 升级头”在首次启动时失败，请参阅下面的[故障排除](#troubleshooting) 部分。
 
 ---
 
-## Troubleshooting
+## 故障排除
 
-<AccordionGroup>
-  <Accordion title="Port 3000 or 8888 is already in use">
-    Find the owning process on either port:
-    ```bash
+<手风琴组>
+  <Accordion title="端口 3000 或 8888 已在使用">
+    查找任一端口上的所属进程：    ```bash
     lsof -iTCP:3000 -sTCP:LISTEN
     lsof -iTCP:8888 -sTCP:LISTEN
     ```
-    Kill it (`kill <PID>`) or change the host port in `server/docker-compose.yaml`.
-  </Accordion>
+杀死它（`kill <PID>`）或更改`server/docker-compose.yaml`中的主机端口。
+  </手风琴>
 
-  <Accordion title="JWT_SECRET is required">
-    The server refuses to start without one. Generate a secret and add it to `server/.env`:
-    ```bash
+  <Accordion title="需要 JWT_SECRET">
+    如果没有，服务器将拒绝启动。生成一个秘密并将其添加到 `server/.env` 中：    ```bash
     echo "JWT_SECRET=$(openssl rand -base64 48)" >> server/.env
     ```
-    `AUTH_DISABLED=true` is valid for local dev only, never production.
-  </Accordion>
+`AUTH_DISABLED=true` 仅对本地开发有效，对生产无效。
+  </手风琴>
 
-  <Accordion title=".env changes aren't applied after editing">
-    `docker compose restart` does not re-read `env_file`. To pick up changes:
-    ```bash
+  <Accordion title=".env 更改在编辑后不会应用">
+    `docker compose restart` 不会重新读取 `env_file`。要获取更改：    ```bash
     cd server && docker compose up -d --force-recreate mem0
     # or
     cd server && make up
     ```
-  </Accordion>
+</手风琴>
 
-  <Accordion title="Provider returns 401 (bad API key)">
-    Provider credential errors surface as `502 Upstream provider error.`. Check `docker compose logs mem0` for the full trace, then fix the key on the Configuration page and hit **Save**.
-  </Accordion>
+  <Accordion title="提供商返回 401（错误的 API 密钥）">
+    提供商凭证错误显示为“502 上游提供商错误”。检查“docker compose logs mem0”的完整跟踪，然后修复“配置”页面上的密钥并点击“**保存**”。
+  </手风琴>
 
-  <Accordion title="Alembic migrations fail on startup">
-    Inspect the logs:
-    ```bash
+  <Accordion title="Alembic 迁移启动时失败">
+    检查日志：    ```bash
     docker compose logs mem0 | grep -i alembic
     ```
-    If the database is unrecoverable, reset the volume (**this destroys all memories and users**):
-    ```bash
+如果数据库不可恢复，请重置卷（**这会破坏所有内存和用户**）：    ```bash
     docker compose down -v
     ```
-  </Accordion>
-</AccordionGroup>
+</手风琴>
+</手风琴组>
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="REST API reference" icon="code" href="/open-source/features/rest-api">
-    Endpoint tables, auth modes, and example requests.
-  </Card>
-  <Card title="Configure components" icon="sliders" href="/open-source/configuration">
-    Swap LLMs, embedders, vector stores, and rerankers.
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="REST API 参考" icon="code" href="/open-source/features/rest-api">
+    端点表、身份验证模式和示例请求。
+  </卡>
+  <Card title="配置组件" icon="sliders" href="/open-source/configuration">
+    交换 LLM、嵌入器、向量存储和重新排序器。
+  </卡>
+</卡组>

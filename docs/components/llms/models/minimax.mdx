@@ -3,11 +3,13 @@ title: MiniMax
 description: "Configure MiniMax as an LLM provider in Mem0 with API key setup and optional custom endpoint configuration."
 ---
 
-To use MiniMax LLM models, you have to set the `MINIMAX_API_KEY` environment variable. You can also optionally set `MINIMAX_API_BASE` if you need to use a different API endpoint (defaults to "https://api.minimax.io/v1").
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Usage
 
-```python
+
+要使用 MiniMax LLM 模型，您必须设置“MINIMAX_API_KEY”环境变量。如果您需要使用不同的 API 端点（默认为“https://api.minimax.io/v1”），您还可以选择设置“MINIMAX_API_BASE”。
+
+＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -35,10 +37,7 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
-
-You can also configure the API base URL in the config:
-
-```python
+您还可以在配置中配置 API 基本 URL：```python
 config = {
     "llm": {
         "provider": "minimax",
@@ -50,7 +49,6 @@ config = {
     }
 }
 ```
+## 配置
 
-## Config
-
-All available parameters for the `minimax` config are present in [Master List of All Params in Config](../config).
+`minimax` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

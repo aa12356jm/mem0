@@ -2,19 +2,19 @@
 title: "Elasticsearch"
 description: "Use Elasticsearch as a vector database in Mem0 for distributed vector search using dense vectors and k-NN queries."
 ---
-[Elasticsearch](https://www.elastic.co/) is a distributed, RESTful search and analytics engine that can efficiently store and search vector data using dense vectors and k-NN search.
 
-### Installation
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Elasticsearch support requires additional dependencies. Install them with:
 
-```bash
+
+[Elasticsearch](https://www.elastic.co/) 是一种分布式 RESTful 搜索和分析引擎，可以使用密集向量和 k-NN 搜索高效存储和搜索向量数据。
+
+### 安装
+
+Elasticsearch 支持需要额外的依赖项。安装它们：```bash
 pip install elasticsearch>=8.0.0
 ```
-
-### Usage
-
-```python
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -41,41 +41,35 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+### 配置
 
-### Config
-
-Here are the parameters available for configuring Elasticsearch:
-
-| Parameter              | Description                                        | Default Value |
+以下是可用于配置 Elasticsearch 的参数：|参数|描述 |默认值 |
 | ---------------------- | -------------------------------------------------- | ------------- |
-| `collection_name`      | The name of the index to store the vectors         | `mem0`        |
-| `embedding_model_dims` | Dimensions of the embedding model                  | `1536`        |
-| `host`                 | The host where the Elasticsearch server is running | `localhost`   |
-| `port`                 | The port where the Elasticsearch server is running | `9200`        |
-| `cloud_id`             | Cloud ID for Elastic Cloud deployment              | `None`        |
-| `api_key`              | API key for authentication                         | `None`        |
-| `user`                 | Username for basic authentication                  | `None`        |
-| `password`             | Password for basic authentication                  | `None`        |
-| `verify_certs`         | Whether to verify SSL certificates                 | `True`        |
-| `auto_create_index`    | Whether to automatically create the index          | `True`        |
-| `custom_search_query`  | Function returning a custom search query           | `None`        |
-| `headers`              | Custom headers to include in requests              | `None`        |
+| `集合名称` |存储向量的索引名称 | `mem0` |
+| `embedding_model_dims` |嵌入模型的尺寸 | `1536` |
+| `主机` |运行Elasticsearch服务器的主机 | `本地主机` |
+| `端口` | Elasticsearch 服务器运行的端口 | `9200` |
+| `云ID` |用于弹性云部署的云 ID | `无` |
+| `api_key` |用于身份验证的 API 密钥 | `无` |
+| `用户` |基本身份验证的用户名 | `无` |
+| `密码` |基本身份验证的密码 | `无` |
+| `验证证书` |是否验证SSL证书 | '真实' |
+| `自动创建索引` |是否自动创建索引 | '真实' |
+| `自定义搜索查询` |返回自定义搜索查询的函数 | `无` |
+| `标题` |要包含在请求中的自定义标头 | `无` |### 特点
 
-### Features
+- 使用 Elasticsearch 的原生 k-NN 搜索进行高效矢量搜索
+- 支持本地和云部署（弹性云）
+- 多种身份验证方法（基本身份验证、API 密钥）
+- 通过矢量搜索的优化映射自动创建索引
+- 通过有效负载过滤进行内存隔离
+- 自定义搜索查询功能，自定义搜索查询
 
-- Efficient vector search using Elasticsearch's native k-NN search
-- Support for both local and cloud deployments (Elastic Cloud)
-- Multiple authentication methods (Basic Auth, API Key)
-- Automatic index creation with optimized mappings for vector search
-- Memory isolation through payload filtering
-- Custom search query function to customize the search query
+### 自定义搜索查询
 
-### Custom Search Query
-
-The `custom_search_query` parameter allows you to customize the search query when `Memory.search` is called.  
+`custom_search_query` 参数允许您在调用 `Memory.search` 时自定义搜索查询。  
   
-__Example__  
-```python
+__例子__```python
 import os
 from typing import List, Optional, Dict
 from mem0 import Memory
@@ -105,9 +99,9 @@ config = {
     }
 }
 ```
-It should be a function that takes the following parameters:
-- `query`: a query vector used in `Memory.search`
-- `limit`: a number of results used in `Memory.search`
-- `filters`: a dictionary of key-value pairs used in `Memory.search`. You can add custom pairs for the custom search query.  
+它应该是一个带有以下参数的函数：
+- `query`：`Memory.search` 中使用的查询向量
+- `limit`：`Memory.search` 中使用的结果数量
+- `filters`：`Memory.search` 中使用的键值对字典。您可以为自定义搜索查询添加自定义对。  
   
-The function should return a query body for the Elasticsearch search API.
+该函数应返回 Elasticsearch 搜索 API 的查询正文。

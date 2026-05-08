@@ -3,28 +3,27 @@ title: CrewAI
 description: "Combine CrewAI agent-based architecture with Mem0 for persistent memory across agent interactions."
 ---
 
-Build an AI system that combines CrewAI's agent-based architecture with Mem0's memory capabilities. This integration enables persistent memory across agent interactions and personalized task execution based on user history.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-In this guide, we'll create a CrewAI agent that:
-1. Uses CrewAI to manage AI agents and tasks
-2. Leverages Mem0 to store and retrieve conversation history
-3. Creates personalized experiences based on stored user preferences
 
-## Setup and Configuration
+构建一个将 CrewAI 基于代理的架构与 Mem0 的内存功能相结合的 AI 系统。这种集成支持跨代理交互和基于用户历史记录的个性化任务执行的持久记忆。
 
-Install necessary libraries:
+## 概述
 
-```bash
+在本指南中，我们将创建一个 CrewAI 代理：
+1.使用CrewAI管理AI代理和任务
+2. 利用 Mem0 存储和检索对话历史记录
+3. 根据存储的用户偏好创建个性化体验
+
+## 设置和配置
+
+安装必要的库：```bash
 pip install crewai crewai-tools mem0ai
 ```
+导入所需模块并设置配置：
 
-Import required modules and set up configurations:
-
-<Note>Remember to get your API keys from <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-crewai" rel="nofollow">Mem0 Platform</a>, [OpenAI](https://platform.openai.com) and [Serper Dev](https://serper.dev) for search capabilities.</Note>
-
-```python
+<Note>请记住从 <a href="https://app.mem0.ai?utm_source=oss&utm_medium=integration-crewai" rel="nofollow">Mem0 Platform</a>、[OpenAI](https://platform.openai.com) 和 [Serper Dev](https://serper.dev) 获取 API 密钥以获取搜索功能。</Note>```python
 import os
 from mem0 import MemoryClient
 from crewai import Agent, Task, Crew, Process
@@ -38,12 +37,9 @@ os.environ["SERPER_API_KEY"] = "your-serper-api-key"
 # Initialize Mem0 client
 client = MemoryClient()
 ```
+## 存储用户首选项
 
-## Store User Preferences
-
-Set up initial conversation and preferences storage:
-
-```python
+设置初始对话和首选项存储：```python
 def store_user_preferences(user_id: str, conversation: list):
     """Store user preferences from conversation history"""
     client.add(conversation, user_id=user_id)
@@ -68,12 +64,9 @@ messages = [
 
 store_user_preferences("crew_user_1", messages)
 ```
+## 创建 CrewAI 代理
 
-## Create CrewAI Agent
-
-Define an agent with memory capabilities:
-
-```python
+定义一个具有记忆能力的代理：```python
 def create_travel_agent():
     """Create a travel planning agent with search capabilities"""
     search_tool = SerperDevTool()
@@ -87,12 +80,9 @@ def create_travel_agent():
         tools=[search_tool],
     )
 ```
+## 定义任务
 
-## Define Tasks
-
-Create tasks for your agent:
-
-```python
+为您的代理创建任务：```python
 def create_planning_task(agent, destination: str):
     """Create a travel planning task"""
     return Task(
@@ -101,12 +91,9 @@ def create_planning_task(agent, destination: str):
         agent=agent,
     )
 ```
+## 设置人员
 
-## Set Up Crew
-
-Configure the crew with memory integration:
-
-```python
+使用内存集成配置船员：```python
 def setup_crew(agents: list, tasks: list):
     """Set up a crew with Mem0 memory integration"""
     return Crew(
@@ -120,12 +107,9 @@ def setup_crew(agents: list, tasks: list):
         }
     )
 ```
+## 主要执行函数
 
-## Main Execution Function
-
-Implement the main function to run the travel planning system:
-
-```python
+实现运行出行计划系统的主要功能：```python
 def plan_trip(destination: str, user_id: str):
     # Create agent
     travel_agent = create_travel_agent()
@@ -144,29 +128,25 @@ if __name__ == "__main__":
     result = plan_trip("San Francisco", "crew_user_1")
     print(result)
 ```
+## 主要特点
 
-## Key Features
+1. **持久内存**：使用Mem0来维护用户偏好和对话历史记录
+2. **基于代理的架构**：利用CrewAI的代理系统来执行任务
+3. **搜索集成**：包括用于现实世界信息检索的 SerperDev 工具
+4. **个性化**：利用存储的首选项进行定制推荐
 
-1. **Persistent Memory**: Uses Mem0 to maintain user preferences and conversation history
-2. **Agent-Based Architecture**: Leverages CrewAI's agent system for task execution
-3. **Search Integration**: Includes SerperDev tool for real-world information retrieval
-4. **Personalization**: Utilizes stored preferences for tailored recommendations
+## 好处
 
-## Benefits
+1. **持久上下文和内存**：维护跨会话的用户偏好和交互历史记录
+2. **灵活且可扩展的设计**：可通过新代理、任务和功能轻松扩展
 
-1. **Persistent Context & Memory**: Maintains user preferences and interaction history across sessions
-2. **Flexible & Scalable Design**: Easily extendable with new agents, tasks, and capabilities
+## 结论
 
-## Conclusion
-
-By combining CrewAI with Mem0, you can create sophisticated AI systems that maintain context and provide personalized experiences while leveraging the power of autonomous agents.
-
-<CardGroup cols={2}>
+通过将 CrewAI 与 Mem0 相结合，您可以创建复杂的 AI 系统，在利用自主代理的力量的同时维护上下文并提供个性化体验。<卡组列={2}>
   <Card title="AutoGen Integration" icon="users" href="/integrations/autogen">
-    Build multi-agent systems with AutoGen and Mem0
-  </Card>
+    使用 AutoGen 和 Mem0 构建多代理系统
+  </卡>
   <Card title="LangGraph Integration" icon="diagram-project" href="/integrations/langgraph">
-    Create stateful agent workflows with memory
-  </Card>
-</CardGroup>
-
+    使用内存创建有状态代理工作流程
+  </卡>
+</卡组>

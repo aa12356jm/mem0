@@ -4,61 +4,54 @@ description: "Install the Mem0 Python SDK, configure your environment, and store
 icon: "snake"
 ---
 
-Get started with Mem0's Python SDK in under 5 minutes. This guide shows you how to install Mem0 and store your first memory.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Prerequisites
 
-- Python 3.10 or higher
-- OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
 
-Set your OpenAI API key:
+5 分钟内即可开始使用 Mem0 的 Python SDK。本指南向您展示如何安装 Mem0 并存储您的第一个内存。
 
-```bash
+## 先决条件
+
+- Python 3.10 或更高版本
+- OpenAI API 密钥（[在此处获取一个](https://platform.openai.com/api-keys)）
+
+设置您的 OpenAI API 密钥：```bash
 export OPENAI_API_KEY="your-openai-api-key"
 ```
+<注意>
+默认使用 OpenAI。想要使用 Ollama、Anthropic 或本地模型？请参阅[配置](/open-source/configuration)。
+</注>
 
-<Note>
-Uses OpenAI by default. Want to use Ollama, Anthropic, or local models? See [Configuration](/open-source/configuration).
-</Note>
+## 安装
 
-## Installation
-
-<Steps>
-<Step title="Install via pip">
-```bash
+<步骤>
+<Step title="通过 pip 安装">```bash
 pip install mem0ai
 ```
-</Step>
+</步骤>
 
-<Step title="Initialize Memory">
-```python
+<步骤标题=“初始化内存”>```python
 from mem0 import Memory
 
 m = Memory()
 
 ````
-</Step>
+</步骤>
 
-<Step title="Add a memory">
-```python
+<Step title="添加内存">```python
 messages = [
     {"role": "user", "content": "Hi, I'm Alex. I love basketball and gaming."},
     {"role": "assistant", "content": "Hey Alex! I'll remember your interests."}
 ]
 m.add(messages, user_id="alex")
 ````
+</步骤>
 
-</Step>
-
-<Step title="Search memories">
-```python
+<步骤标题=“搜索记忆”>```python
 results = m.search("What do you know about me?", filters={"user_id": "alex"})
 print(results)
 ```
-
-**Output:**
-
-```json
+**输出：**```json
 {
   "results": [
     {
@@ -72,38 +65,33 @@ print(results)
   ]
 }
 ```
+</步骤>
+</步骤>
 
-</Step>
-</Steps>
 
+<注意>
+默认情况下 `Memory()` 连接起来：
+- OpenAI `gpt-5-mini` 用于事实提取和更新
+- OpenAI `text-embedding-3-small` 嵌入（1536 维）
+- Qdrant向量存储在`/tmp/qdrant`上的磁盘数据
+- SQLite 历史记录位于 `~/.mem0/history.db`
+- 没有重新排名器（需要时在配置中添加一个）
+</注>
 
-<Note>
-By default `Memory()` wires up:
-- OpenAI `gpt-5-mini` for fact extraction and updates
-- OpenAI `text-embedding-3-small` embeddings (1536 dimensions)
-- Qdrant vector store with on-disk data at `/tmp/qdrant`
-- SQLite history at `~/.mem0/history.db`
-- No reranker (add one in the config when you need it)
-</Note>
+## 下一步是什么？<卡组列={3}>
+<Card title="内存操作" icon="database" href="/core-concepts/memory-operations/add">
+了解如何通过完整的 CRUD 操作来搜索、更新和管理内存
+</卡>
 
-## What's Next?
+<Card title="配置" icon="sliders" href="/open-source/configuration">
+  使用不同的 LLM、向量存储和嵌入器自定义 Mem0 以供生产使用
+</卡>
 
-<CardGroup cols={3}>
-<Card title="Memory Operations" icon="database" href="/core-concepts/memory-operations/add">
-Learn how to search, update, and manage memories with full CRUD operations
-</Card>
+<Card title="高级功能" icon="sparkles" href="/open-source/features/async-memory">
+探索异步支持和多代理内存组织
+</卡>
+</卡组>
 
-<Card title="Configuration" icon="sliders" href="/open-source/configuration">
-  Customize Mem0 with different LLMs, vector stores, and embedders for production use
-</Card>
-
-<Card title="Advanced Features" icon="sparkles" href="/open-source/features/async-memory">
-Explore async support and multi-agent memory organization
-</Card>
-</CardGroup>
-
-## Additional Resources
-
-- **[OpenAI Compatibility](/open-source/features/openai_compatibility)** - Use Mem0 with OpenAI-compatible chat completions
-- **[Contributing Guide](/contributing/development)** - Learn how to contribute to Mem0
-- **[Examples](/cookbooks/companions/local-companion-ollama)** - See Mem0 in action with Ollama and other integrations
+## 其他资源- **[OpenAI 兼容性](/open-source/features/openai_compatibility)** - 使用 Mem0 与 OpenAI 兼容的聊天完成功能
+- **[贡献指南](/contributing/development)** - 了解如何为 Mem0 做出贡献
+- **[示例](/cookbooks/companions/local-companion-ollama)** - 查看 Mem0 与 Ollama 和其他集成的实际应用

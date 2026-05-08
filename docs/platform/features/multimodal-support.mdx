@@ -3,14 +3,17 @@ title: Multimodal Support
 description: Integrate images and documents into your interactions with Mem0
 ---
 
-Mem0 extends its capabilities beyond text by supporting multimodal data, including images and documents. With this feature, users can seamlessly integrate visual and document content into their interactions, allowing Mem0 to extract relevant information from various media types and enrich the memory system.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## How It Works
 
-When a user submits an image or document, Mem0 processes it to extract textual information and other pertinent details. These details are then added to the user's memory, enhancing the system's ability to understand and recall multimodal inputs.
 
-<CodeGroup>
-```python Python
+Mem0 通过支持多模式数据（包括图像和文档），将其功能扩展到文本之外。借助此功能，用户可以将视觉和文档内容无缝集成到他们的交互中，从而使Mem0能够从各种媒体类型中提取相关信息并丰富记忆系统。
+
+## 它是如何工作的
+
+当用户提交图像或文档时，Mem0 对其进行处理以提取文本信息和其他相关详细信息。然后，这些细节将被添加到用户的记忆中，从而增强系统理解和回忆多模式输入的能力。
+
+<代码组>```python Python
 import os
 from mem0 import MemoryClient
 
@@ -86,24 +89,22 @@ await client.add(messages, { userId: "alice" })
   ]
 }
 ```
-</CodeGroup>
+</代码组>
 
-## Supported Media Types
+## 支持的媒体类型
 
-Mem0 currently supports the following media types:
+Mem0 目前支持以下媒体类型：
 
-1. **Images** - JPG, PNG, and other common image formats
-2. **Documents** - MDX, TXT, and PDF files
+1. **图片** - JPG、PNG等常见图片格式
+2. **文档** - MDX、TXT 和 PDF 文件
 
-## Integration Methods
+## 整合方法
 
-### 1. Images
+### 1. 图片
 
-#### Using an Image URL
+#### 使用图像 URL
 
-You can include an image by providing its direct URL. This method is simple and efficient for online images.
-
-```python {2, 5-13}
+您可以通过提供图像的直接 URL 来包含图像。该方法对于在线图像简单高效。```python {2, 5-13}
 # Define the image URL
 image_url = "https://www.superhealthykids.com/wp-content/uploads/2021/10/best-veggie-pizza-featured-image-square-2.jpg"
 
@@ -119,13 +120,11 @@ image_message = {
 }
 client.add([image_message], user_id="alice")
 ```
+#### 对本地文件使用 Base64 图像编码
 
-#### Using Base64 Image Encoding for Local Files
+对于本地图像或直接嵌入图像更合适时，您可以使用 Base64 编码的字符串。
 
-For local images or when embedding the image directly is preferable, you can use a Base64-encoded string.
-
-<CodeGroup>
-```python Python
+<代码组>```python Python
 import base64
 
 # Path to the image file
@@ -168,15 +167,13 @@ const imageMessage = {
 
 await client.add([imageMessage], { userId: "alice" })
 ```
-</CodeGroup>
+</代码组>
 
-### 2. Text Documents (MDX/TXT)
+### 2. 文本文档 (MDX/TXT)
 
-Mem0 supports both online and local text documents in MDX or TXT format.
+Mem0 支持 MDX 或 TXT 格式的在线和本地文本文档。
 
-#### Using a Document URL
-
-```python
+#### 使用文档 URL```python
 # Define the document URL
 document_url = "https://www.w3.org/TR/2003/REC-PNG-20031110/iso_8859-1.txt"
 
@@ -192,10 +189,7 @@ document_message = {
 }
 client.add([document_message], user_id="alice")
 ```
-
-#### Using Base64 Encoding for Local Documents
-
-```python
+#### 对本地文档使用 Base64 编码```python
 import base64
 
 # Path to the document file
@@ -221,12 +215,9 @@ document_message = {
 }
 client.add([document_message], user_id="alice")
 ```
-
 ### 3. PDF Documents
 
-Mem0 supports PDF documents via URL.
-
-```python
+Mem0 通过 URL 支持 PDF 文档。```python
 # Define the PDF URL
 pdf_url = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
 
@@ -242,12 +233,9 @@ pdf_message = {
 }
 client.add([pdf_message], user_id="alice")
 ```
+## 具有多种文件类型的完整示例
 
-## Complete Example with Multiple File Types
-
-Here's a comprehensive example showing how to work with different file types:
-
-```python
+下面是一个全面的示例，展示了如何处理不同的文件类型：```python
 import base64
 from mem0 import MemoryClient
 
@@ -295,9 +283,8 @@ client.add([image_message], user_id="alice")
 client.add([text_message], user_id="alice")
 client.add([pdf_message], user_id="alice")
 ```
+使用这些方法，您可以将各种媒体类型无缝地融入您的交互中，进一步增强 Mem0 的多模式功能。
 
-Using these methods, you can seamlessly incorporate various media types into your interactions, further enhancing Mem0's multimodal capabilities.
+如果您有任何疑问，请随时通过以下方式之一与我们联系：
 
-If you have any questions, please feel free to reach out to us using one of the following methods:
-
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

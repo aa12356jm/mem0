@@ -3,14 +3,16 @@ title: AWS Bedrock
 description: "Configure AWS Bedrock as an LLM provider in Mem0 with IAM authentication and Claude model support."
 ---
 
-### Setup
-- Before using the AWS Bedrock LLM, make sure you have the appropriate model access from [Bedrock Console](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess).
-- You will also need to authenticate the `boto3` client by using a method in the [AWS documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html#configuring-credentials)
-- You will have to export `AWS_REGION`, `AWS_ACCESS_KEY`, and `AWS_SECRET_ACCESS_KEY` to set environment variables.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Usage
 
-```python
+
+### 设置
+- 在使用 AWS Bedrock LLM 之前，请确保您拥有 [Bedrock 控制台](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess) 的适当模型访问权限。
+- 您还需要使用 [AWS 文档](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html#configuring-credentials) 中的方法对“boto3”客户端进行身份验证
+- 您必须导出“AWS_REGION”、“AWS_ACCESS_KEY”和“AWS_SECRET_ACCESS_KEY”才能设置环境变量。
+
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -38,7 +40,6 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+### 配置
 
-### Config
-
-All available parameters for the `aws_bedrock` config are present in [Master List of All Params in Config](../config).
+`aws_bedrock` 配置的所有可用参数都存在于 [配置中所有参数的主列表](../config) 中。

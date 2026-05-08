@@ -3,11 +3,13 @@ title: Together
 description: "Configure Together AI as an LLM provider in Mem0 with API key setup and Mixtral model configuration."
 ---
 
-To use Together LLM models, you have to set the `TOGETHER_API_KEY` environment variable. You can obtain the Together API key from their [Account settings page](https://api.together.xyz/settings/api-keys).
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Usage
 
-```python
+
+要使用Together LLM模型，您必须设置“TOGETHER_API_KEY”环境变量。您可以从他们的[帐户设置页面](https://api.together.xyz/settings/api-keys)获取Together API密钥。
+
+＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -34,7 +36,6 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+## 配置
 
-## Config
-
-All available parameters for the `together` config are present in [Master List of All Params in Config](../config).
+“together”配置的所有可用参数都存在于[配置中所有参数的主列表](../config)中。

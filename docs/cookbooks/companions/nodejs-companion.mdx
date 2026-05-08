@@ -3,26 +3,24 @@ title: Build a Node.js Companion
 description: "Build a JavaScript fitness coach that remembers user goals run after run."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-You can create a personalized AI Companion using Mem0. This guide will walk you through the necessary steps and provide the complete code to get you started.
 
-## Overview
 
-The Personalized AI Companion leverages Mem0 to retain information across interactions, enabling a tailored learning experience. It creates memories for each user interaction and integrates with OpenAI's GPT models to provide detailed and context-aware responses to user queries.
+您可以使用 Mem0 创建个性化的 AI Companion。本指南将引导您完成必要的步骤，并提供完整的代码以帮助您入门。
 
-## Setup
+## 概述
 
-Before you begin, ensure you have Node.js installed and create a new project. Install the required dependencies using npm:
+个性化 AI Companion 利用 Mem0 在交互过程中保留信息，从而实现量身定制的学习体验。它为每个用户交互创建记忆，并与 OpenAI 的 GPT 模型集成，为用户查询提供详细的上下文感知响应。
 
-```bash
+## 设置
+
+在开始之前，请确保已安装 Node.js 并创建一个新项目。使用 npm 安装所需的依赖项：```bash
 npm install openai mem0ai
 ```
+## 完整代码示例
 
-## Full Code Example
-
-Below is the complete code to create and interact with an AI Companion using Mem0:
-
-```javascript
+以下是使用 Mem0 创建 AI Companion 并与之交互的完整代码：```javascript
 import { OpenAI } from 'openai';
 import { Memory } from 'mem0ai/oss';
 import * as readline from 'readline';
@@ -96,44 +94,40 @@ async function main() {
 
 main().catch(console.error);
 ```
+### 关键组件
 
-### Key Components
+1. **初始化**
+   - 该代码初始化 OpenAI 和 Mem0 内存客户端
+   - 使用 Node.js 的内置 readline 模块进行命令行交互
 
-1. **Initialization**
-   - The code initializes both OpenAI and Mem0 Memory clients
-   - Uses Node.js's built-in readline module for command-line interaction
+2. **内存管理（chatWithMemories功能）**
+   - 使用 Mem0 的搜索功能检索相关记忆
+   - 构建一个包含过去记忆的系统提示
+   - 对 OpenAI 进行 API 调用以生成响应
+   - 在内存中存储新的交互
 
-2. **Memory Management (chatWithMemories function)**
-   - Retrieves relevant memories using Mem0's search functionality
-   - Constructs a system prompt that includes past memories
-   - Makes API calls to OpenAI for generating responses
-   - Stores new interactions in memory
+3. **互动聊天界面（主要功能）**
+   - 创建用于用户交互的命令行界面
+   - 处理用户输入并显示人工智能响应
+   - 包括优雅的退出功能
 
-3. **Interactive Chat Interface (main function)**
-   - Creates a command-line interface for user interaction
-   - Handles user input and displays AI responses
-   - Includes graceful exit functionality
+### 环境设置
 
-### Environment Setup
-
-Make sure to set up your environment variables:
-```bash
+确保设置环境变量：```bash
 export OPENAI_API_KEY=your_api_key
 ```
+### 结论
 
-### Conclusion
+此实现演示了如何创建一个 AI Companion，使用 Mem0 的内存功能来维护跨对话的上下文。系统自动存储和检索相关信息，创造更加个性化和情境感知的交互体验。
 
-This implementation demonstrates how to create an AI Companion that maintains context across conversations using Mem0's memory capabilities. The system automatically stores and retrieves relevant information, creating a more personalized and context-aware interaction experience.
-
-As users interact with the system, Mem0's memory system continuously learns and adapts, making future responses more relevant and personalized. This setup is ideal for creating long-term learning AI assistants that can maintain context and provide increasingly personalized responses over time.
+当用户与系统交互时，Mem0 的记忆系统不断学习和适应，使未来的响应更加相关和个性化。这种设置非常适合创建长期学习的人工智能助手，可以维护上下文并随着时间的推移提供越来越个性化的响应。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Partition Memories by Entity" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
-    Separate user, agent, and session context to keep your companion consistent.
-  </Card>
-  <Card title="Quickstart Demo with Mem0" icon="rocket" href="/cookbooks/companions/quickstart-demo">
-    Run the full showcase app to see memory-powered companions in action.
-  </Card>
-</CardGroup>
+<卡组列={2}>
+  <Card title="按实体划分记忆" icon="layers" href="/cookbooks/essentials/entity-partitioning-playbook">
+    独立的用户、代理和会话上下文可让您的同伴保持一致。</卡>
+  <Card title="Mem0 快速入门演示" icon="rocket" href="/cookbooks/companions/quickstart-demo">
+    运行完整的展示应用程序，查看内存驱动的同伴的运行情况。
+  </卡>
+</卡组>

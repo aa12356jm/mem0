@@ -2,11 +2,14 @@
 title: "Turbopuffer"
 description: "Use Turbopuffer as a serverless vector database in Mem0 for low-latency search at scale with native metadata filtering."
 ---
-[Turbopuffer](https://turbopuffer.com) is a serverless vector database optimized for low-latency search at scale. It offers cost-effective vector storage with native metadata filtering.
 
-### Usage
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-```python
+
+
+[Turbopuffer](https://turbopuffer.com) 是一个无服务器矢量数据库，针对大规模低延迟搜索进行了优化。它提供具有本机元数据过滤功能的经济高效的矢量存储。
+
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -38,31 +41,28 @@ m.add(messages, user_id="alice", metadata={"category": "movies"})
 # Search memories
 results = m.search(query="sci-fi recommendations", filters={"user_id": "alice"})
 ```
+### 配置
 
-### Config
+以下是可用于配置 Turbopuffer 的参数：
 
-Here are the parameters available for configuring Turbopuffer:
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |命名空间/集合的名称 | `mem0` |
+| `embedding_model_dims` |嵌入模型的尺寸（必须与您选择的嵌入模型相匹配）| `1536` |
+| `api_key` | Turbopuffer API 密钥 |环境变量：`TURBOPUFFER_API_KEY` |
+| `地区` |涡轮喷气机区域 | `gcp-us-central1` |
+| `距离度量` |向量相似度的距离度量（“cosine_distance”或“euclidean_squared”）| `余弦距离` |
+| `batch_size` |批量操作的批量大小 | `100` |
+| `extra_params` | Turbopuffer 客户端的附加参数 | `无` |
 
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collection_name` | Name of the namespace/collection | `mem0` |
-| `embedding_model_dims` | Dimensions of the embedding model (must match your chosen embedding model) | `1536` |
-| `api_key` | Turbopuffer API key | Environment variable: `TURBOPUFFER_API_KEY` |
-| `region` | Turbopuffer region | `gcp-us-central1` |
-| `distance_metric` | Distance metric for vector similarity (`cosine_distance` or `euclidean_squared`) | `cosine_distance` |
-| `batch_size` | Batch size for bulk operations | `100` |
-| `extra_params` | Additional parameters for the Turbopuffer client | `None` |
+### 地区
 
-### Regions
+|地区 |地点 |
+| ---| ---|
+| `gcp-us-central1` |美国爱荷华州（默认）|
+| `aws-us-west-2` |美国俄勒冈州 |
 
-| Region | Location |
-| --- | --- |
-| `gcp-us-central1` | Iowa, USA (Default) |
-| `aws-us-west-2` | Oregon, USA |
-
-### Config Example
-
-```python
+### 配置示例```python
 config = {
     "vector_store": {
         "provider": "turbopuffer",

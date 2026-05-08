@@ -4,86 +4,83 @@ description: "Managed memory layer for AI agents - production-ready in minutes"
 icon: "cloud"
 ---
 
-# Mem0 Platform Overview
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0 is the memory engine that keeps conversations contextual so users never repeat themselves and your agents respond with continuity. Mem0 Platform delivers that experience as a fully managed service—scaling, securing, and enriching memories without any infrastructure work on your side.
 
-## Why it matters
 
-- **Personalized replies**: Memories persist across users and agents, cutting prompt bloat and repeat questions.
-- **Hosted stack**: Mem0 runs the vector store, graph services, and rerankers—no provisioning, tuning, or maintenance.
-- **Enterprise controls**: SOC 2, audit logs, and workspace governance ship by default for production readiness.
+# Mem0 平台概述
 
-<AccordionGroup>
-  <Accordion title="What you get with Mem0 Platform" icon="sparkles">
+Mem0 是保持对话上下文的内存引擎，因此用户永远不会重复自己的内容，并且您的代理可以连续响应。 Mem0 平台作为完全托管的服务提供这种体验 - 扩展、保护和丰富内存，而无需您进行任何基础设施工作。
 
-    | Feature | Why it helps |
-    | --- | --- |
-    | Fast setup | Add a few lines of code and you’re production-ready—no vector database or LLM configuration required. |
-    | Production scale | Automatic scaling, high availability, and managed infrastructure so you focus on product work. |
-    | Advanced features | Graph memory, webhooks, multimodal support, and custom categories are ready to enable. |
-    | Enterprise ready | SOC 2 Type II, GDPR compliance, and dedicated support keep security and governance covered. |
-  </Accordion>
-</AccordionGroup>
+## 为什么这很重要
 
-<Info>
-  Start with the <Link href="/platform/quickstart">Platform quickstart</Link> to provision your workspace, then pick the journey below that matches your next milestone.
-</Info>
+- **个性化回复**：记忆在用户和座席之间持久存在，从而减少快速膨胀和重复问题。
+- **托管堆栈**：Mem0 运行矢量存储、图形服务和重新排序器 - 无需配置、调整或维护。
+- **企业控制**：默认情况下提供 SOC 2、审核日志和工作区治理，以做好生产准备。
 
-## Choose your path
+<手风琴组>
+  <Accordion title="Mem0 平台能带来什么" icon="sparkles">|特色 |为什么它有帮助 |
+    | ---| ---|
+    |快速设置 |添加几行代码即可投入生产，无需矢量数据库或 LLM 配置。 |
+    |生产规模|自动扩展、高可用性和托管基础架构让您可以专注于产品工作。 |
+    |高级功能 |图形内存、网络钩子、多模式支持和自定义类别已准备好启用。 |
+    |企业准备就绪 | SOC 2 Type II、GDPR 合规性和专门支持可确保安全和治理。 |
+  </手风琴>
+</手风琴组>
 
-<CardGroup cols={3}>
-  <Card title="Launch Your Workspace" icon="rocket" href="/platform/quickstart">
-    Create project and ship first memory.
-  </Card>
-  <Card title="Connect Any AI Client" icon="puzzle-piece" href="/platform/mem0-mcp">
-    Use MCP for universal AI integration.
-  </Card>
-  <Card title="Understand Memory Types" icon="brain" href="/core-concepts/memory-types">
-    User, agent, and session memory behavior.
-  </Card>
-</CardGroup>
+<信息>
+  从<Link href="/platform/quickstart">平台快速入门</Link>开始配置您的工作区，然后选择下面与您的下一个里程碑相匹配的旅程。
+</信息>
 
-<CardGroup cols={3}>
-  <Card title="Master Core Operations" icon="circle-check" href="/core-concepts/memory-operations/add">
-    Add, search, update, and delete workflows.
-  </Card>
-  <Card title="Explore Platform Features" icon="sparkles" href="/platform/features/platform-overview">
-    Graph memory, async clients, and rerankers.
-  </Card>
-  <Card title="Configure Advanced Operations" icon="bolt" href="/platform/advanced-memory-operations">
-    Metadata filters and per-request toggles.
-  </Card>
-</CardGroup>
+## 选择你的路径<卡组列={3}>
+  <Card title="启动您的工作区" icon="rocket" href="/platform/quickstart">
+    创建项目并交付第一个内存。
+  </卡>
+  <Card title="连接任何 AI 客户端" icon="puzzle-piece" href="/platform/mem0-mcp">
+    使用 MCP 进行通用 AI 集成。
+  </卡>
+  <Card title="了解内存类型" icon="brain" href="/core-concepts/memory-types">
+    用户、代理和会话内存行为。
+  </卡>
+</卡组>
 
-<CardGroup cols={2}>
+<卡组列={3}>
+  <Card title="掌握核心操作" icon="circle-check" href="/core-concepts/memory-operations/add">
+    添加、搜索、更新和删除工作流程。
+  </卡>
+  <Card title="探索平台功能" icon="sparkles" href="/platform/features/platform-overview">
+    图形内存、异步客户端和重新排序器。</卡>
+  <Card title="配置高级操作" icon="bolt" href="/platform/advanced-memory-operations">
+    元数据过滤器和每个请求切换。
+  </卡>
+</卡组><卡组列={2}>
   <Card title="Connect Integrations" icon="plug" href="/integrations">
-    LangChain, CrewAI, Vercel AI SDK.
-  </Card>
-  <Card title="Monitor in the Dashboard" icon="presentation" href="https://app.mem0.ai/login?utm_source=oss&utm_medium=platform-overview">
-    Track activity and manage workspaces.
-  </Card>
-</CardGroup>
+    LangChain、CrewAI、Vercel AI SDK。
+  </卡>
+  <Card title="仪表板中的监视器" icon="presentation" href="https://app.mem0.ai/login?utm_source=oss&utm_medium=platform-overview">
+    跟踪活动并管理工作区。
+  </卡>
+</卡组>
 
-<Tip>
-  Evaluating self-hosting instead? Jump to the <Link href="/platform/platform-vs-oss">Platform vs OSS comparison</Link> to see trade-offs before you commit.
-</Tip>
+<提示>
+  而是评估自托管？在提交之前，请跳至<Link href="/platform/platform-vs-oss">平台与 OSS 比较</Link>，了解权衡。
+</提示>
 
-## Keep going
+## 继续
 
-{/* DEBUG: verify CTA targets */}
+{/* DEBUG：验证 CTA 目标 */}
 
-<CardGroup cols={2}>
-  <Card
-    title="Compare with Open Source"
-    description="Review feature parity, migration paths, and when to stay managed."
-    icon="arrows-left-right"
+<卡组列={2}>
+  <卡片
+    title="与开源比较"
+    description="查看功能奇偶性、迁移路径以及何时保持管理。”
+    图标=“箭头左右”
     href="/platform/platform-vs-oss"
   />
-  <Card
-    title="Run the Quickstart"
-    description="Provision your workspace, install the SDK, and persist your first memory."
-    icon="rocket"
-    href="/platform/quickstart"
+  <卡片
+    title="运行快速入门"
+    description="配置您的工作区，安装 SDK，并保留您的第一个记忆。"
+    图标=“火箭”
+    href="/平台/快速启动"
   />
-</CardGroup>
+</卡组>

@@ -5,18 +5,21 @@ icon: "image"
 iconType: "solid"
 ---
 
-Mem0 extends its capabilities beyond text by supporting multimodal data, including images. You can seamlessly integrate images into your interactions, allowing Mem0 to extract pertinent information from visual content and enrich the memory system.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## How It Works
 
-When you provide an image, Mem0 processes it to extract textual information and relevant details, which are then added to your memory. This feature enhances the system's ability to understand and remember details based on visual inputs.
 
-<Note>
-To enable multimodal support, you must set `enable_vision = True` in your configuration. The `vision_details` parameter can be set to "auto" (default), "low", or "high" to control the level of detail in image processing.
-</Note>
+Mem0 通过支持包括图像在内的多模态数据，将其功能扩展到文本之外。 You can seamlessly integrate images into your interactions, allowing Mem0 to extract pertinent information from visual content and enrich the memory system.
 
-<CodeGroup>
-```python Code
+## 它是如何工作的
+
+当您提供图像时，Mem0 会对其进行处理以提取文本信息和相关详细信息，然后将其添加到您的内存中。此功能增强了系统根据视觉输入理解和记住细节的能力。
+
+<注意>
+要启用多模式支持，您必须在配置中设置“enable_vision = True”。 `vision_details` 参数可以设置为“auto”（默认）、“low”或“high”以控制图像处理的细节级别。
+</注>
+
+<代码组>```python Code
 from mem0 import Memory
 
 config = {
@@ -99,18 +102,17 @@ await client.add(messages, { userId: "alice" })
   ]
 }
 ```
-</CodeGroup>
+</代码组>
 
-## Image Integration Methods
+## 图像整合方法
 
-Mem0 allows you to add images to user interactions through two primary methods: by providing an image URL or by using a Base64-encoded image. Below are examples demonstrating each approach.
+Mem0 允许您通过两种主要方法向用户交互添加图像：提供图像 URL 或使用 Base64 编码的图像。以下是演示每种方法的示例。
 
-### Using an Image URL (Recommended)
+### 使用图像 URL（推荐）
 
-You can include an image by passing its direct URL. This method is simple and efficient for online images.
+您可以通过传递图像的直接 URL 来包含图像。该方法对于在线图像简单高效。
 
-<CodeGroup>
-```python
+<代码组>```python
 # Define the image URL
 image_url = "https://www.superhealthykids.com/wp-content/uploads/2021/10/best-veggie-pizza-featured-image-square-2.jpg"
 
@@ -145,14 +147,13 @@ const imageMessage: Message = {
 
 await client.add([imageMessage], { userId: "alice" })
 ```
-</CodeGroup>
+</代码组>
 
-### Using Base64 Image Encoding for Local Files
+### 对本地文件使用 Base64 图像编码
 
-For local images or scenarios where embedding the image directly is preferable, you can use a Base64-encoded string.
+对于本地图像或更适合直接嵌入图像的场景，您可以使用 Base64 编码的字符串。
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 import base64
 
 # Path to the image file
@@ -195,14 +196,13 @@ const imageMessage: Message = {
 
 await client.add([imageMessage], { userId: "alice" })
 ```
-</CodeGroup>
+</代码组>
 
-### OpenAI-Compatible Message Format
+### OpenAI 兼容消息格式
 
-You can also use the OpenAI-compatible format to combine text and images in a single message:
+您还可以使用 OpenAI 兼容格式将文本和图像组合在一条消息中：
 
-<CodeGroup>
-```python Python
+<代码组>```python Python
 import base64
 
 # Path to the image file
@@ -258,12 +258,12 @@ const message: Message = {
 
 await client.add([message], { userId: "alice" })
 ```
-</CodeGroup>
+</代码组>
 
-This format allows you to combine text and images in a single message, making it easier to provide context along with visual content.
+这种格式允许您将文本和图像组合在一条消息中，从而更轻松地提供上下文和视觉内容。
 
-By utilizing these methods, you can effectively incorporate images into user interactions, enhancing the multimodal capabilities of your Mem0 instance.
+通过利用这些方法，您可以有效地将图像合并到用户交互中，从而增强 Mem0 实例的多模式功能。
 
-If you have any questions, please feel free to reach out to us using one of the following methods:
+如果您有任何疑问，请随时通过以下方式之一与我们联系：
 
-<Snippet file="get-help.mdx" />
+<片段文件=“get-help.mdx”/>

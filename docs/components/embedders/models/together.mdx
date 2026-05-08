@@ -3,13 +3,15 @@ title: Together
 description: "Configure Together AI as an embedding provider in Mem0 with support for 768-dimensional embedding models."
 ---
 
-To use Together embedding models, set the `TOGETHER_API_KEY` environment variable. You can obtain the Together API key from the [Together Platform](https://api.together.xyz/settings/api-keys).
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-### Usage
 
-<Note> The `embedding_model_dims` parameter for `vector_store` should be set to `768` for Together embedder. </Note>
 
-```python
+要使用 Together 嵌入模型，请设置“TOGETHER_API_KEY”环境变量。您可以从[Together Platform](https://api.together.xyz/settings/api-keys)获取Together API密钥。
+
+### 用法
+
+<注意> 对于 Together 嵌入器，“vector_store”的“embedding_model_dims”参数应设置为“768”。 </注>```python
 import os
 from mem0 import Memory
 
@@ -34,13 +36,12 @@ messages = [
 ]
 m.add(messages, user_id="john")
 ```
+### 配置
 
-### Config
+以下是可用于配置 Together 嵌入器的参数：
 
-Here are the parameters available for configuring Together embedder:
-
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `model` | The name of the embedding model to use | `togethercomputer/m2-bert-80M-8k-retrieval` |
-| `embedding_dims` | Dimensions of the embedding model | `768` |
-| `api_key` | The Together API key | `None` |
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `模型` |要使用的嵌入模型的名称 | `togethercomputer/m2-bert-80M-8k-retrieval` |
+| `embedding_dims` |嵌入模型的尺寸| `768` |
+| `api_key` | Together API 密钥 | `无` |

@@ -3,66 +3,65 @@ title: Research Assistant for YouTube
 description: "Layer personalized context over any video using the Mem0 YouTube assistant."
 ---
 
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Enhance your YouTube experience with Mem0's YouTube Assistant, a Chrome extension that brings AI-powered chat directly to your YouTube videos. Get instant, personalized answers about video content while leveraging your own knowledge and memories, all without leaving the page.
 
-## Features
 
-- **Contextual AI Chat**: Ask questions about videos you're watching
-- **Seamless Integration**: Chat interface sits alongside YouTube's native UI
-- **Memory Integration**: Personalized responses based on your knowledge through Mem0
-- **Real-Time Memory**: Memories are updated in real-time based on your interactions
+使用 Mem0 的 YouTube 助手增强您的 YouTube 体验，这是一款 Chrome 扩展程序，可将人工智能支持的聊天直接带入您的 YouTube 视频。无需离开页面，即可利用您自己的知识和记忆获得有关视频内容的即时、个性化答案。
 
-## Demo Video
+## 特点
 
-<video
-  autoPlay
-  muted
-  loop
-  playsInline
-  width="700"
-  height="400"
-  src="https://github.com/user-attachments/assets/c0334ccd-311b-4dd7-8034-ef88204fc751"
-></video>
+- **情境人工智能聊天**：询问有关您正在观看的视频的问题
+- **无缝集成**：聊天界面位于 YouTube 的本机 UI 旁边
+- **内存集成**：通过 Mem0 根据您的知识进行个性化响应
+- **实时记忆**：记忆根据您的互动实时更新
 
-## Installation
+## 演示视频
 
-This extension is not available on the Chrome Web Store yet. You can install it manually using below method:
+<视频
+  自动播放
+  静音
+  循环
+  内联播放
+  宽度=“700”
+  高度=“400”
+  src =“https://github.com/user-attachments/assets/c0334ccd-311b-4dd7-8034-ef88204fc751”
+></视频>
 
-### Manual Installation (Developer Mode)
+## 安装
 
-1. **Download the Extension**: Clone or download the extension files from the [Mem0 GitHub repository](https://github.com/mem0ai/mem0/tree/main/examples)
-2. **Build**: Run `npm install` followed by `npm run build` to install the dependencies and build the extension
-3. **Access Chrome Extensions**: Open Google Chrome and navigate to `chrome://extensions`
-4. **Enable Developer Mode**: Toggle the "Developer mode" switch in the top right corner
-5. **Load Unpacked Extension**: Click "Load unpacked" and select the directory containing the extension files
-6. **Confirm Installation**: The Mem0 YouTube Assistant Extension should now appear in your Chrome toolbar
+Chrome 网上应用店尚未提供此扩展程序。您可以使用以下方法手动安装它：
 
-## Setup
+### 手动安装（开发者模式）1. **下载扩展**：从 [Mem0 GitHub 存储库](https://github.com/mem0ai/mem0/tree/main/examples) 克隆或下载扩展文件
+2. **构建**：运行“npm install”，然后运行“npm run build”来安装依赖项并构建扩展
+3. **访问 Chrome 扩展**：打开 Google Chrome 并导航至“chrome://extensions”
+4. **启用开发者模式**：切换右上角的“开发者模式”开关
+5. **加载解压的扩展**：点击“加载解压”，选择包含扩展文件的目录
+6. **确认安装**：Mem0 YouTube Assistant 扩展现在应该出现在您的 Chrome 工具栏中
 
-1. **Configure API Settings**: Click the extension icon and enter your OpenAI API key (required to use the extension)
-2. **Customize Settings**: Configure additional settings such as model, temperature, and memory settings
-3. **Navigate to YouTube**: Start using the assistant on any YouTube video
-4. **Memories**: Enter your Mem0 API key to enable personalized responses, and feed initial memories from settings
+## 设置
 
-## Example Prompts
+1. **配置 API 设置**：单击扩展程序图标并输入您的 OpenAI API 密钥（使用扩展程序所需）
+2. **自定义设置**：配置其他设置，例如型号、温度和内存设置
+3.**导航到 YouTube**：开始在任何 YouTube 视频上使用助手
+4. **记忆**：输入您的 Mem0 API 密钥以启用个性化响应，并从设置中提供初始记忆
 
-- "Can you summarize the main points of this video?"
-- "Explain the concept they just mentioned"
-- "How does this relate to what I already know?"
-- "What are some practical applications of this topic related to my work?"
+## 提示示例- “你能概括一下这个视频的要点吗？”
+- “解释一下他们刚才提到的概念”
+- “这与我已经知道的有什么关系？”
+- “这个主题与我的工作相关的实际应用有哪些？”
 
-## Privacy and Data Security
+## 隐私和数据安全
 
-Your API keys are stored locally in your browser. Your messages are sent to the Mem0 API for extracting and retrieving memories. Mem0 is committed to ensuring your data's privacy and security.
+您的 API 密钥存储在您本地的浏览器中。您的消息将发送到 Mem0 API 以提取和检索内存。 Mem0 致力于确保您数据的隐私和安全。
 
 ---
 
-<CardGroup cols={2}>
-  <Card title="Tag and Organize Memories" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
-    Categorize video insights to build a searchable research knowledge base.
-  </Card>
+<卡组列={2}>
+  <Card title="标记和组织记忆" icon="tag" href="/cookbooks/essentials/tagging-and-organizing-memories">
+    对视频见解进行分类，构建可搜索的研究知识库。
+  </卡>
   <Card title="Deep Research with Mem0" icon="magnifying-glass" href="/cookbooks/operations/deep-research">
-    Combine memory with search tools to conduct comprehensive research projects.
-  </Card>
-</CardGroup>
+    将记忆与搜索工具结合起来进行全面的研究项目。
+  </卡>
+</卡组>

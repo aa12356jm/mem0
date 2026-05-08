@@ -3,33 +3,33 @@ title: Google ADK
 description: "Integrate Mem0 with Google Agent Development Kit for persistent memory across multi-agent workflows."
 ---
 
-Integrate [**Mem0**](https://github.com/mem0ai/mem0) with [Google ADK (Agent Development Kit)](https://github.com/google/adk-python), an open-source framework for building multi-agent workflows. This integration enables agents to access persistent memory across conversations, enhancing context retention and personalization.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-## Overview
 
-1. Store and retrieve memories from Mem0 within Google ADK agents
-2. Multi-agent workflows with shared memory across hierarchies
-3. Retrieve relevant memories from past conversations
-4. Personalized responses based on user history
 
-## Prerequisites
+将 [**Mem0**](https://github.com/mem0ai/mem0) 与 [Google ADK（代理开发套件）](https://github.com/google/adk-python) 集成，这是一个用于构建多代理工作流程的开源框架。这种集成使代理能够跨对话访问持久内存，从而增强上下文保留和个性化。
 
-Before setting up Mem0 with Google ADK, ensure you have:
+## 概述
 
-1. Installed the required packages:
-```bash
+1. 在 Google ADK 代理中存储和检索 Mem0 的内存
+2. 跨层次结构共享内存的多代理工作流程
+3.从过去的对话中检索相关记忆
+4. 基于用户历史记录的个性化响应
+
+## 先决条件
+
+在使用 Google ADK 设置 Mem0 之前，请确保您拥有：
+
+1.安装所需的包：```bash
 pip install google-adk mem0ai python-dotenv
 ```
+2. 有效的 API 密钥：
+   - <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-google-ai-adk" rel="nofollow">Mem0 API 密钥</a>
+   - 谷歌AI Studio API密钥
 
-2. Valid API keys:
-   - <a href="https://app.mem0.ai/dashboard/api-keys?utm_source=oss&utm_medium=integration-google-ai-adk" rel="nofollow">Mem0 API Key</a>
-   - Google AI Studio API Key
+## 基本集成示例
 
-## Basic Integration Example
-
-The following example demonstrates how to create a Google ADK agent with Mem0 memory integration:
-
-```python
+以下示例演示了如何创建具有 Mem0 内存集成的 Google ADK 代理：```python
 import os
 import asyncio
 from google.adk.agents import Agent
@@ -121,12 +121,9 @@ if __name__ == "__main__":
     ))
     print(response)
 ```
+## 具有共享内存的多代理层次结构
 
-## Multi-Agent Hierarchy with Shared Memory
-
-Create specialized agents in a hierarchy that share memory:
-
-```python
+在共享内存的层次结构中创建专门的代理：```python
 from google.adk.tools.agent_tool import AgentTool
 
 # Travel specialist agent
@@ -207,14 +204,9 @@ def chat_with_specialists(user_input: str, user_id: str) -> str:
 response = chat_with_specialists("Plan a healthy meal for my Italy trip", user_id="alice")
 print(response)
 ```
+## 快速启动聊天界面
 
-
-
-## Quick Start Chat Interface
-
-Simple interactive chat with memory and Google ADK:
-
-```python
+使用内存和 Google ADK 进行简单的交互式聊天：```python
 def interactive_chat():
     """Interactive chat interface with memory and ADK"""
     user_id = input("Enter your user ID: ") or "demo_user"
@@ -235,29 +227,26 @@ def interactive_chat():
 if __name__ == "__main__":
     interactive_chat()
 ```
+## 主要特点
 
-## Key Features
+### 1. 记忆增强功能工具
+- **函数工具**：标准Python函数，可以搜索和保存内存
+- **工具上下文**：通过函数参数访问会话状态和内存
+- **结构化回报**：基于字典的回报，带有状态指示器，以便更好地理解法学硕士
 
-### 1. Memory-Enhanced Function Tools
-- **Function Tools**: Standard Python functions that can search and save memories
-- **Tool Context**: Access to session state and memory through function parameters
-- **Structured Returns**: Dictionary-based returns with status indicators for better LLM understanding
+### 2. 多代理内存共享
+- **代理即工具**：专家可以被称为工具，同时维护共享内存
+- **分层委派**：协调员代理根据上下文路由至专家
+- **内存类别**：存储与元数据的交互以更好地组织
 
-### 2. Multi-Agent Memory Sharing
-- **Agent-as-a-Tool**: Specialists can be called as tools while maintaining shared memory
-- **Hierarchical Delegation**: Coordinator agents route to specialists based on context
-- **Memory Categories**: Store interactions with metadata for better organization
+### 3.灵活的内存操作
+- **搜索功能**：通过对话历史检索相关记忆
+- **用户细分**：按用户 ID 组织记忆
+- **内存管理**：用于保存和检索信息的内置工具
 
-### 3. Flexible Memory Operations
-- **Search Capabilities**: Retrieve relevant memories through conversation history
-- **User Segmentation**: Organize memories by user ID
-- **Memory Management**: Built-in tools for saving and retrieving information
+## 配置选项
 
-## Configuration Options
-
-Customize memory behavior and agent setup:
-
-```python
+自定义内存行为和代理设置：```python
 # Configure memory search with filters
 # For Platform API, all filters including user_id go in filters object
 memories = mem0.search(
@@ -285,13 +274,11 @@ os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "True"
 os.environ["GOOGLE_CLOUD_PROJECT"] = "your-project-id"
 os.environ["GOOGLE_CLOUD_LOCATION"] = "us-central1"
 ```
-
-<CardGroup cols={2}>
+<卡组列={2}>
   <Card title="Healthcare Agent Cookbook" icon="heart-pulse" href="/cookbooks/integrations/healthcare-google-adk">
-    Build HIPAA-compliant healthcare agents with Google ADK
-  </Card>
+    使用 Google ADK 构建符合 HIPAA 的医疗保健代理
+  </卡>
   <Card title="OpenAI Agents SDK" icon="cube" href="/integrations/openai-agents-sdk">
-    Compare with OpenAI's agent framework
-  </Card>
-</CardGroup>
-
+    与OpenAI的代理框架比较
+  </卡>
+</卡组>

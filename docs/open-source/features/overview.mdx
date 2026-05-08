@@ -4,60 +4,59 @@ description: "Self-hosting features that extend Mem0 beyond basic memory storage
 icon: "list"
 ---
 
-# Self-Hosting Features Overview
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-Mem0 Open Source ships with capabilities that adapt memory behavior for production workloads—async operations, graph relationships, multimodal inputs, and fine-tuned retrieval. Configure these features with code or YAML to match your application's needs.
 
-<Info>
-  Start with the <Link href="/open-source/python-quickstart">Python quickstart</Link> to validate basic memory operations, then enable the features below when you need them.
-</Info>
 
-## Choose your path
+# 自托管功能概述
 
-<CardGroup cols={3}>
-  <Card title="Advanced Metadata Filtering" icon="filter" href="/open-source/features/metadata-filtering">
-    Query with logical operators and nested conditions.
-  </Card>
-  <Card title="Search with Reranking" icon="ranking-star" href="/open-source/features/reranker-search">
-    Boost search relevance with specialized models.
-  </Card>
-  <Card title="Async Memory Operations" icon="bolt" href="/open-source/features/async-memory">
-    Non-blocking operations for high-throughput apps.
-  </Card>
-  <Card title="Multimodal Support" icon="image" href="/open-source/features/multimodal-support">
-    Process images, audio, and video memories.
-  </Card>
-  <Card title="Custom Instructions" icon="wand-magic-sparkles" href="/open-source/features/custom-instructions">
-    Tailor how facts are extracted from text.
-  </Card>
-</CardGroup>
+Mem0 开源附带了针对生产工作负载调整内存行为的功能——异步操作、图形关系、多模式输入和微调检索。使用代码或 YAML 配置这些功能以满足您的应用程序的需求。
 
-<CardGroup cols={2}>
-  <Card title="REST API" icon="code" href="/open-source/features/rest-api">
-    HTTP endpoints for language-agnostic integrations.
-  </Card>
-  <Card title="OpenAI Compatibility" icon="message-bot" href="/open-source/features/openai_compatibility">
-    Drop-in replacement for OpenAI chat endpoints.
-  </Card>
-</CardGroup>
+<信息>
+  从<Link href="/open-source/python-quickstart">Python 快速入门</Link>开始验证基本内存操作，然后在需要时启用以下功能。
+</信息>
 
-<Tip>
-  Looking for managed features instead? Compare self-hosting vs managed in the <Link href="/platform/platform-vs-oss">Platform vs OSS guide</Link>.
-</Tip>
+## 选择你的路径<卡组列={3}>
+  <Card title="高级元数据过滤" icon="filter" href="/open-source/features/metadata-filtering">
+    使用逻辑运算符和嵌套条件进行查询。
+  </卡>
+  <Card title="带重新排名的搜索" icon="ranking-star" href="/open-source/features/reranker-search">
+    通过专门的模型提高搜索相关性。
+  </卡>
+  <Card title="异步内存操作" icon="bolt" href="/open-source/features/async-memory">
+    高吞吐量应用程序的非阻塞操作。
+  </卡>
+  <Card title="多模式支持" icon="image" href="/open-source/features/multimodal-support">
+    处理图像、音频和视频存储器。
+  </卡>
+  <Card title="自定义说明" icon="wand-magic-sparkles" href="/open-source/features/custom-instructions">
+    定制如何从文本中提取事实。</卡>
+</卡组>
 
-## Keep going
+<卡组列={2}>
+  <卡标题=“REST API”图标=“代码”href=“/open-source/features/rest-api”>
+    用于与语言无关的集成的 HTTP 端点。
+  </卡>
+  <Card title="OpenAI 兼容性" icon="message-bot" href="/open-source/features/openai_compatibility">
+    OpenAI 聊天端点的直接替代品。
+  </卡>
+</卡组><提示>
+  正在寻找托管功能？在<Link href="/platform/platform-vs-oss">平台与 OSS 指南</Link>中比较自托管与托管。
+</提示>
 
-<CardGroup cols={2}>
-  <Card
-    title="Configure Components"
-    description="Choose your LLM, embedder, vector store, and reranker with YAML or code."
-    icon="sliders"
-    href="/open-source/configuration"
+## 继续
+
+<卡组列={2}>
+  <卡片
+    title="配置组件"
+    description="使用 YAML 或代码选择您的 LLM、嵌入器、矢量存储和重新排序器。"
+    图标=“滑块”
+    href="/开源/配置"
   />
-  <Card
-    title="Explore Cookbooks"
-    description="Follow production-ready examples that combine multiple features."
-    icon="book"
-    href="/cookbooks/overview"
+  <卡片
+    title="探索食谱"
+    描述=“遵循结合了多个功能的生产就绪示例。”
+    图标=“书”
+    href="/cookbooks/概述"
   />
-</CardGroup>
+</卡组>

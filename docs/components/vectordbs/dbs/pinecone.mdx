@@ -2,15 +2,18 @@
 title: "Pinecone"
 description: "Use Pinecone as a fully managed vector database in Mem0 with serverless deployment and namespace-based multi-tenancy."
 ---
-[Pinecone](https://www.pinecone.io/) is a fully managed vector database designed for machine learning applications, offering high performance vector search with low latency at scale. It's particularly well-suited for semantic search, recommendation systems, and other AI-powered applications.
 
-> **New**: Pinecone integration now supports custom namespaces! Use the `namespace` parameter to logically separate data within the same index. This is especially useful for multi-tenant or multi-user applications.
+> 中文注释：本文件非代码内容已翻译为中文，代码块与配置示例保持原样。
 
-> **Note**: Before configuring Pinecone, you need to select an embedding model (e.g., OpenAI, Cohere, or custom models) and ensure the `embedding_model_dims` in your config matches your chosen model's dimensions. For example, OpenAI's text-embedding-3-small uses 1536 dimensions.
 
-### Usage
 
-```python
+[Pinecone](https://www.pinecone.io/) 是一个完全托管的矢量数据库，专为机器学习应用程序而设计，提供大规模低延迟的高性能矢量搜索。它特别适合语义搜索、推荐系统和其他人工智能驱动的应用程序。
+
+> **新**：Pinecone 集成现在支持自定义命名空间！使用“namespace”参数在逻辑上分隔同一索引中的数据。这对于多租户或多用户应用程序特别有用。
+
+> **注意**：在配置 Pinecone 之前，您需要选择一个嵌入模型（例如 OpenAI、Cohere 或自定义模型），并确保配置中的“embedding_model_dims”与您选择的模型的尺寸相匹配。例如，OpenAI 的 text-embedding-3-small 使用 1536 维。
+
+＃＃＃ 用法```python
 import os
 from mem0 import Memory
 
@@ -43,29 +46,27 @@ messages = [
 ]
 m.add(messages, user_id="alice", metadata={"category": "movies"})
 ```
+### 配置
 
-### Config
+以下是可用于配置 Pinecone 的参数：
 
-Here are the parameters available for configuring Pinecone:
+|参数|描述 |默认值 |
+| ---| ---| ---|
+| `集合名称` |索引/集合的名称 |必填 |
+| `embedding_model_dims` |嵌入模型的尺寸（必须与您选择的嵌入模型相匹配）|必填 |
+| `客户` |现有的 Pinecone 客户端实例 | `无` |
+| `api_key` | Pinecone 的 API 密钥 |环境变量：`PINECONE_API_KEY` |
+| `环境` |松果环境| `无` |
+| `无服务器配置` |无服务器部署的配置（AWS 或 GCP 或 Azure）| `无` |
+| `pod_config` |基于 Pod 的部署配置 | `无` |
+| `混合搜索` |是否启用混合搜索 | ‘假’|
+| `公制` |向量相似度的距离度量 | `“余弦”` |
+| `batch_size` |操作批量大小 | `100` |
+| `命名空间` |集合的命名空间，对于多租户很有用。 | `无` |
 
-| Parameter | Description | Default Value |
-| --- | --- | --- |
-| `collection_name` | Name of the index/collection | Required |
-| `embedding_model_dims` | Dimensions of the embedding model (must match your chosen embedding model) | Required |
-| `client` | Existing Pinecone client instance | `None` |
-| `api_key` | API key for Pinecone | Environment variable: `PINECONE_API_KEY` |
-| `environment` | Pinecone environment | `None` |
-| `serverless_config` | Configuration for serverless deployment (AWS or GCP or Azure) | `None` |
-| `pod_config` | Configuration for pod-based deployment | `None` |
-| `hybrid_search` | Whether to enable hybrid search | `False` |
-| `metric` | Distance metric for vector similarity | `"cosine"` |
-| `batch_size` | Batch size for operations | `100` |
-| `namespace` | Namespace for the collection, useful for multi-tenancy. | `None` |
+> **重要**：您必须为部署选择 `serverless_config` 或 `pod_config`，但不能同时选择两者。
 
-> **Important**: You must choose either `serverless_config` or `pod_config` for your deployment, but not both.
-
-#### Serverless Config Example
-```python
+#### 无服务器配置示例```python
 config = {
     "vector_store": {
         "provider": "pinecone",
@@ -81,9 +82,7 @@ config = {
     }
 }
 ```
-
-#### Pod Config Example
-```python
+#### Pod 配置示例```python
 config = {
     "vector_store": {
         "provider": "pinecone",
