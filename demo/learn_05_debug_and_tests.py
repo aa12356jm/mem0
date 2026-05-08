@@ -13,7 +13,6 @@ learn_05_debug_and_tests.py
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
 
@@ -85,4 +84,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

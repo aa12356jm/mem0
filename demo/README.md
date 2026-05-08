@@ -6,6 +6,20 @@
 > 仓库路径：`/Volumes/ZhiTaiTiPlus7100-2T/codes/mem0`  
 > 推荐主线：先学 Python SDK，再了解 TypeScript SDK、CLI、Server、OpenMemory。
 
+## 0. 新人快速入口（先跑这个）
+
+你可以先运行以下脚本，按编号执行即可：
+
+```bash
+python demo/learn_00_index.py
+```
+
+如果你偏好直接看文档，也可以先读：
+
+- `demo/README.md`（全景版）
+- `demo/learn_01_environment_and_layout.py`（环境与目录）
+- `demo/learn_02_first_memory_flow.py`（第一条可运行链路）
+
 ## 1. 这个仓库解决什么问题
 
 Mem0 是一个给 AI 应用使用的“记忆层”。普通聊天模型只看当前上下文，Mem0 会把对话中的长期偏好、事实、历史状态抽取成结构化记忆，再在后续对话中检索出来，帮助模型做个性化回答。
@@ -127,57 +141,7 @@ export OPENAI_API_KEY="你的 OpenAI API Key"
 
 ## 5. 第一个最小 Python 示例
 
-在仓库根目录新建临时文件 `demo/quickstart_deepseek.py`，写入下面代码。这个文件用于你自己练习，不是必须提交的源码。
-
-```python
-import os
-
-from mem0 import Memory
-
-
-config = {
-    "llm": {
-        "provider": "deepseek",
-        "config": {
-            "model": "deepseek-v4-flash",
-            "temperature": 0.2,
-            "max_tokens": 2000,
-            "top_p": 1.0,
-        },
-    },
-}
-
-
-def main() -> None:
-    if not os.getenv("DEEPSEEK_API_KEY"):
-        raise RuntimeError("请先设置 DEEPSEEK_API_KEY")
-    if not os.getenv("OPENAI_API_KEY"):
-        raise RuntimeError("请先设置 OPENAI_API_KEY，默认 embedding 会用到它")
-
-    memory = Memory.from_config(config)
-    user_id = "demo-user"
-
-    messages = [
-        {"role": "user", "content": "我喜欢科幻电影，不喜欢恐怖片。"},
-        {"role": "assistant", "content": "明白，以后推荐电影时优先考虑科幻，避开恐怖片。"},
-    ]
-
-    add_result = memory.add(messages, user_id=user_id, metadata={"source": "demo"})
-    print("ADD RESULT:")
-    print(add_result)
-
-    search_result = memory.search(
-        "我今晚想看电影，应该推荐什么类型？",
-        filters={"user_id": user_id},
-        top_k=3,
-    )
-    print("\nSEARCH RESULT:")
-    print(search_result)
-
-
-if __name__ == "__main__":
-    main()
-```
+`demo/quickstart_deepseek.py` 已经准备好，你可以直接运行，不需要手动创建文件。
 
 运行：
 
@@ -261,7 +225,7 @@ rg -n "def search\\(|def _search_vector_store|keyword_search|rerank" mem0/memory
 2. Embedder 把 query 转成向量。
 3. Vector Store 做语义搜索。
 4. 如果后端支持，叠加关键词搜索。
-5. 结果按分数、阈值、limit 过滤。
+5. 结果按分数、阈值、`top_k` 过滤。
 6. 返回可注入到模型上下文的记忆。
 
 你可以做一个小实验：连续写入三条不同偏好，然后搜索不同问题，观察 `SEARCH RESULT` 里的排序变化。

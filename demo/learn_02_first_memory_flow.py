@@ -93,9 +93,16 @@ def run_first_flow() -> None:
 
 def main() -> None:
     print("Mem0 学习引导 - 第 2 课：最小可运行记忆流")
-    run_first_flow()
+    try:
+        run_first_flow()
+    except Exception as exc:
+        print("\n运行失败，请按下面顺序排查：")
+        print("1) 环境变量: DEEPSEEK_API_KEY / OPENAI_API_KEY")
+        print("2) 网络可达性: DeepSeek/OpenAI API")
+        print("3) 当前环境: hatch shell dev_py_3_11")
+        print("4) 模型名: deepseek-v4-flash 或 deepseek-v4-pro")
+        print(f"\n原始错误: {exc}")
 
 
 if __name__ == "__main__":
     main()
-

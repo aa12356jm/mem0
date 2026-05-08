@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import os
 import platform
+import shutil
 from pathlib import Path
 
 
@@ -45,6 +46,8 @@ def check_environment() -> None:
     print(f"Python 版本: {platform.python_version()}")
     print(f"系统: {platform.system()} {platform.release()}")
     print(f"仓库根目录: {REPO_ROOT}")
+    print(f"hatch 可用: {bool(shutil.which('hatch'))}")
+    print(f"pnpm 可用: {bool(shutil.which('pnpm'))}")
 
     deepseek_key = os.getenv("DEEPSEEK_API_KEY")
     openai_key = os.getenv("OPENAI_API_KEY")
@@ -54,6 +57,7 @@ def check_environment() -> None:
     print("\n如果没设置 key，先执行：")
     print('  export DEEPSEEK_API_KEY="你的-key"')
     print('  export OPENAI_API_KEY="你的-key"')
+    print("\n如果 hatch/pnpm 不可用，先安装再继续后续课程。")
 
 
 def explain_layout() -> None:
@@ -100,4 +104,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
