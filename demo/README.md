@@ -20,6 +20,13 @@ python demo/learn_00_index.py
 - `demo/learn_01_environment_and_layout.py`（环境与目录）
 - `demo/learn_02_first_memory_flow.py`（第一条可运行链路）
 
+### 两种学习模式（建议先选一种）
+
+1. 无 API key 模式（先理解架构与源码）：
+`learn_01` -> `learn_03` -> `learn_05` -> `learn_07`
+2. 有 API key 模式（边学边跑）：
+`learn_01` -> `quickstart_deepseek.py` -> `learn_02` -> `learn_03` -> `learn_04` -> `learn_06`
+
 ## 1. 这个仓库解决什么问题
 
 Mem0 是一个给 AI 应用使用的“记忆层”。普通聊天模型只看当前上下文，Mem0 会把对话中的长期偏好、事实、历史状态抽取成结构化记忆，再在后续对话中检索出来，帮助模型做个性化回答。
@@ -73,6 +80,14 @@ TypeScript 相关包使用 `pnpm`：
 npm install -g pnpm@10
 cd mem0-ts
 pnpm install
+```
+
+如果你暂时没有 API key，也可以先不跑联网示例，只执行源码学习脚本：
+
+```bash
+python demo/learn_03_source_walkthrough.py
+python demo/learn_05_debug_and_tests.py
+python demo/learn_07_typescript_track.py
 ```
 
 本仓库规则：
@@ -293,6 +308,12 @@ rg -n "DeepSeek|deepseek|DEEPSEEK" src tests -S
 
 ```ts
 model: "deepseek-v4-flash"
+```
+
+你也可以直接运行本目录的 TS 学习引导脚本：
+
+```bash
+python demo/learn_07_typescript_track.py
 ```
 
 ## 11. 第一个源码改动练习

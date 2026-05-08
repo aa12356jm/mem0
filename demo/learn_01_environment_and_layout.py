@@ -46,8 +46,10 @@ def check_environment() -> None:
     print(f"Python 版本: {platform.python_version()}")
     print(f"系统: {platform.system()} {platform.release()}")
     print(f"仓库根目录: {REPO_ROOT}")
+    print(f"当前工作目录: {Path.cwd()}")
     print(f"hatch 可用: {bool(shutil.which('hatch'))}")
     print(f"pnpm 可用: {bool(shutil.which('pnpm'))}")
+    print(f"git 可用: {bool(shutil.which('git'))}")
 
     deepseek_key = os.getenv("DEEPSEEK_API_KEY")
     openai_key = os.getenv("OPENAI_API_KEY")
@@ -58,6 +60,7 @@ def check_environment() -> None:
     print('  export DEEPSEEK_API_KEY="你的-key"')
     print('  export OPENAI_API_KEY="你的-key"')
     print("\n如果 hatch/pnpm 不可用，先安装再继续后续课程。")
+    print("如果暂时没有 API key，先走源码学习链路（learn_03/05/07）。")
 
 
 def explain_layout() -> None:
